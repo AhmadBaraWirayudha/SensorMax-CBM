@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Main application theme (Industrial Dark Mode) -->
+    <style name="Theme.SensorMax" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+        <!-- FIXED: Standardized system font alias to prevent Typeface crashes -->
+        <item name="android:fontFamily">sans-serif</item>
+
+        <!-- FIXED: Synchronized with the pitch-black OLED layout -->
+        <item name="android:windowBackground">#000000</item>
+
+        <!-- Dark slate for the notification bar and gesture navigation pill -->
+        <item name="android:statusBarColor">#0A0F1D</item>
+        <item name="android:navigationBarColor">#0A0F1D</item>
+
+        <!-- FIXED: Set to false so system battery/time icons turn white -->
+        <item name="android:windowLightStatusBar">false</item>
+
+    </style>
+
+    <!-- Android startup / splash theme -->
+    <style name="Theme.SensorMax.Starting" parent="Theme.SplashScreen">
+
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+
+        <!-- Inflates the tri-axial vector icon on boot -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_sensormax</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.SensorMax</item>
+
+    </style>
+
+</resources>

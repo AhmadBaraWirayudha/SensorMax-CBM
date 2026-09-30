@@ -1,0 +1,994 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- =================================================================== -->
+    <!-- PERSISTENT THUMB ACTION DOCK (FIXED AT BOTTOM FOR 1-HAND FIELD USE) -->
+    <!-- =================================================================== -->
+    <LinearLayout
+        android:id="@+id/llThumbActionDock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#0A0F1D"
+        android:elevation="16dp"
+        android:orientation="vertical"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="12dp">
+
+        <!-- 1-Hand Trigger: Immediate Diagnostic Snapshot -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSnapshot"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginBottom="6dp"
+            android:backgroundTint="#7C3AED"
+            android:text="CAPTURE SNAPSHOT AT THIS POINT"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <!-- 1-Hand Triggers: Dual Operational Modes -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnStreamAndLog"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#059669"
+                android:text="1. STREAM &amp; LOG"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnOfflineLog"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#DC2626"
+                android:text="2. OFFLINE LOG ONLY"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- =================================================================== -->
+    <!-- SCROLLABLE DIAGNOSTIC TELEMETRY & CALIBRATION BODY                  -->
+    <!-- =================================================================== -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/llThumbActionDock"
+        android:background="#000000"
+        android:fadingEdge="vertical"
+        android:padding="12dp"
+        android:requiresFadingEdge="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
+
+            <!-- APP IDENTITY & INSTRUMENT SPECIFICATION -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:letterSpacing="0.08"
+                android:text="SENSORMAX"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="by Ahmad Bara Wirayudha"
+                android:textColor="#94A3B8"
+                android:textSize="11sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:text="Multi-Modal Condition Monitoring // Industrial Spec"
+                android:textColor="#38BDF8"
+                android:textSize="10sp"
+                android:typeface="monospace" />
+
+            <!-- HARDWARE INITIALIZATION STATE -->
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:background="#111827"
+                android:padding="10dp"
+                android:text="Status: Initializing Multi-Sensor Array..."
+                android:textColor="#38BDF8"
+                android:textSize="12sp"
+                android:typeface="monospace" />
+
+            <!-- INSTANT TRIAGE SEVERITY BANNER (HIGH-CONTRAST FIELD VISIBILITY) -->
+            <TextView
+                android:id="@+id/tvSeverityBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="#1E293B"
+                android:padding="14dp"
+                android:text="STATUS: Awaiting first spectrum window..."
+                android:textColor="#FACC15"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <!-- PRIMARY TELEMETRY CONDUIT -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="#0A0F1D"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/tvOverallRms"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="Overall RMS: -- m/s² (-- g)  |  -- mm/s velocity (derived)  |  -- µm displacement (derived)"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/tvSampleRate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="Measured: -- Hz (requested ~-- Hz) | FFT: 0–-- Hz | Resolution: -- Hz/bin | Window: -- | Jitter: -- ms"
+                    android:textColor="#94A3B8"
+                    android:textSize="11sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/tvQualityScore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Measurement quality: -- / 100"
+                    android:textColor="#10B981"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:typeface="monospace" />
+            </LinearLayout>
+
+            <!-- 1. LIVE TIME-DOMAIN ACCELERATION -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="1. Kinetic Triaxial Waveform (Live Animation):"
+                android:textColor="#38BDF8"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/vibrationChart"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:layout_marginBottom="14dp"
+                android:background="#030712" />
+
+            <!-- 2. FFT FREQUENCY SPECTRUM ANALYZER -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="2. Vibration Spectrum Analyzer (FFT):"
+                android:textColor="#38BDF8"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/spectrumChart"
+                android:layout_width="match_parent"
+                android:layout_height="240dp"
+                android:layout_marginBottom="6dp"
+                android:background="#030712" />
+
+            <!-- HIGH-CONTRAST AXIS SELECTOR BAR -->
+            <RadioGroup
+                android:id="@+id/rgAxisSelect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="#0A0F1D"
+                android:orientation="horizontal"
+                android:padding="6dp">
+
+                <RadioButton
+                    android:id="@+id/rbAxisAuto"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="AUTO"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <RadioButton
+                    android:id="@+id/rbAxisX"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="X"
+                    android:textColor="#EF4444"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/rbAxisY"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="Y"
+                    android:textColor="#10B981"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/rbAxisZ"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="Z"
+                    android:textColor="#3B82F6"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/rbAxisRss"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="RSS"
+                    android:textColor="#14B8A6"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </RadioGroup>
+
+            <!-- HARMONIC ORDER TUNING -->
+            <EditText
+                android:id="@+id/etRpm"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="#0A0F1D"
+                android:hint="Running speed RPM (unlocks 1X/2X/3X orders)"
+                android:inputType="numberDecimal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#64748B"
+                android:textSize="12sp"
+                android:typeface="monospace" />
+
+            <TextView
+                android:id="@+id/tvDominantFreq"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dominant peak: -- Hz @ -- m/s² (axis --)  |  Crest --  |  Kurtosis --"
+                android:textColor="#F1F5F9"
+                android:textSize="11sp"
+                android:typeface="monospace" />
+
+            <TextView
+                android:id="@+id/tvFaultHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Heuristic hint (not a diagnosis): --"
+                android:textColor="#C084FC"
+                android:textSize="11sp"
+                android:textStyle="italic"
+                android:typeface="monospace" />
+
+            <!-- TREND LOGGING & ENVELOPE SPECTRUM -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Overall RMS trend (this session):"
+                android:textColor="#94A3B8"
+                android:textSize="11sp" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/trendChart"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_marginBottom="14dp"
+                android:background="#030712" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Envelope Spectrum (bearing-fault detection):"
+                android:textColor="#94A3B8"
+                android:textSize="11sp" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/envelopeChart"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:layout_marginBottom="6dp"
+                android:background="#030712" />
+
+            <!-- BEARING KINEMATIC GEOMETRY INPUTS (optional: collapsed by
+                 default so it doesn't compete with the primary health state;
+                 see setupCollapsibleSections()) -->
+            <TextView
+                android:id="@+id/tvBearingGeometryHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="▸ Bearing geometry (optional -- tap to enter)"
+                android:textColor="#94A3B8"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp" />
+
+            <LinearLayout
+                android:id="@+id/llBearingGeometryInputs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/etBearingElements"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight="1"
+                    android:background="#0A0F1D"
+                    android:hint="Balls"
+                    android:inputType="number"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#64748B"
+                    android:textSize="11sp" />
+
+                <EditText
+                    android:id="@+id/etBearingBallDiameter"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight="1"
+                    android:background="#0A0F1D"
+                    android:hint="Ball Dia"
+                    android:inputType="numberDecimal"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#64748B"
+                    android:textSize="11sp" />
+
+                <EditText
+                    android:id="@+id/etBearingPitchDiameter"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight="1"
+                    android:background="#0A0F1D"
+                    android:hint="Pitch Dia"
+                    android:inputType="numberDecimal"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#64748B"
+                    android:textSize="11sp" />
+
+                <EditText
+                    android:id="@+id/etBearingContactAngle"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="#0A0F1D"
+                    android:hint="Angle°"
+                    android:inputType="numberDecimal"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#64748B"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvBearingHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="#0A0F1D"
+                android:padding="8dp"
+                android:text="Bearing hint (not a diagnosis): waiting for analysis..."
+                android:textColor="#38BDF8"
+                android:textSize="11sp"
+                android:typeface="monospace" />
+
+            <!-- WATERFALL CASCADE SPECTROGRAM -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Cascade / waterfall history (most recent window at top):"
+                android:textColor="#94A3B8"
+                android:textSize="11sp" />
+
+            <com.research.sensormax.WaterfallView
+                android:id="@+id/waterfallView"
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:layout_marginBottom="14dp"
+                android:background="#030712" />
+
+            <!-- SECONDARY SENSOR TELEMETRY (collapsed by default: low-priority
+                 readouts, not asset data; see setupCollapsibleSections()) -->
+            <TextView
+                android:id="@+id/tvSecondaryTelemetryHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="▸ 3. Secondary Sensor Telemetry (tap to expand)"
+                android:textColor="#38BDF8"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp" />
+
+            <TableLayout
+                android:id="@+id/gridSecondaryTelemetry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:background="#0A0F1D"
+                android:padding="10dp"
+                android:stretchColumns="1"
+                android:visibility="gone">
+
+                <TableRow android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_marginEnd="8dp"
+                        android:text="Magnetic Flux:"
+                        android:textColor="#94A3B8"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvMagData"
+                        android:text="0.0 µT"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:typeface="monospace" />
+                </TableRow>
+
+                <TableRow android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_marginEnd="8dp"
+                        android:text="Ambient Light:"
+                        android:textColor="#94A3B8"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvLightData"
+                        android:text="0.0 lx"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:typeface="monospace" />
+                </TableRow>
+
+                <TableRow android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_marginEnd="8dp"
+                        android:text="Gravity (Z-axis):"
+                        android:textColor="#94A3B8"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvGravityData"
+                        android:text="0.0 m/s²"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:typeface="monospace" />
+                </TableRow>
+
+                <TableRow>
+                    <TextView
+                        android:layout_marginEnd="8dp"
+                        android:text="Shock/Impact:"
+                        android:textColor="#94A3B8"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvActivityData"
+                        android:text="No shock events yet"
+                        android:textColor="#EF4444"
+                        android:textSize="12sp"
+                        android:typeface="monospace" />
+                </TableRow>
+            </TableLayout>
+
+            <!-- 4. ASSET TAGGING & ALARM THRESHOLDS -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="4. Asset Tagging &amp; Alarm Thresholds:"
+                android:textColor="#38BDF8"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/etMachineId"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:background="#0A0F1D"
+                    android:hint="Machine ID (e.g. PUMP-04)"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#64748B"
+                    android:textSize="12sp" />
+
+                <EditText
+                    android:id="@+id/etPointTag"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="#0A0F1D"
+                    android:hint="Point (e.g. MotorDE-H)"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#64748B"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/etCustomTagLabel"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="#0A0F1D"
+                android:hint="Measurement Label (e.g. Drive-End Bearing)"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:singleLine="true"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#64748B"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnAddTag"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#2563EB"
+                    android:text="ADD LABEL"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnDeleteTag"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#DC2626"
+                    android:text="DELETE LABEL"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- SPINNERS: HIGH CONTRAST SELECTION -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Saved Labels:"
+                android:textColor="#94A3B8"
+                android:textSize="11sp" />
+
+            <Spinner
+                android:id="@+id/spinnerSavedTags"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="#1E293B" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ISO 20816 Machine Class (severity reference):"
+                android:textColor="#94A3B8"
+                android:textSize="11sp" />
+
+            <Spinner
+                android:id="@+id/spinnerIsoClass"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="#1E293B" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Warn/Alert below only apply while ISO class = &quot;Not classified&quot; -- any real class uses its own zone limits instead."
+                android:textColor="#64748B"
+                android:textSize="9sp"
+                android:layout_marginBottom="4dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/etWarnThreshold"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:background="#0A0F1D"
+                    android:hint="Warn (m/s²)"
+                    android:inputType="numberDecimal"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#64748B"
+                    android:textSize="12sp" />
+
+                <EditText
+                    android:id="@+id/etAlertThreshold"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="#0A0F1D"
+                    android:hint="Alert (m/s²)"
+                    android:inputType="numberDecimal"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#64748B"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- TRANSDUCER MOUNTING CHECK -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mounting &amp; Triaxial Mapping:"
+                android:textColor="#94A3B8"
+                android:textSize="11sp" />
+
+            <Spinner
+                android:id="@+id/spinnerMountingMethod"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="#1E293B" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="2dp"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="X"
+                        android:textColor="#EF4444"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                    <Spinner
+                        android:id="@+id/spinnerAxisRoleX"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="#1E293B" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="2dp"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Y"
+                        android:textColor="#10B981"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                    <Spinner
+                        android:id="@+id/spinnerAxisRoleY"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="#1E293B" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Z"
+                        android:textColor="#3B82F6"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                    <Spinner
+                        android:id="@+id/spinnerAxisRoleZ"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="#1E293B" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnCheckMounting"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="4dp"
+                android:backgroundTint="#0D9488"
+                android:text="CHECK MOUNTING (2s, hold still)"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvMountingCheck"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:background="#0A0F1D"
+                android:padding="8dp"
+                android:text="Mounting: not checked this session"
+                android:textColor="#94A3B8"
+                android:textSize="11sp"
+                android:typeface="monospace" />
+
+            <!-- CALIBRATION (design-debt Section 33) -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Calibration:"
+                android:textColor="#94A3B8"
+                android:textSize="11sp"
+                android:layout_marginBottom="2dp" />
+
+            <EditText
+                android:id="@+id/etCalibrationOperator"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:background="#0A0F1D"
+                android:hint="Operator name (optional)"
+                android:singleLine="true"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#64748B"
+                android:textSize="12sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnRunCalibration"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="4dp"
+                android:backgroundTint="#0369A1"
+                android:text="RUN CALIBRATION (3s, keep sensor still &amp; undisturbed)"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvCalibrationResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:background="#0A0F1D"
+                android:padding="8dp"
+                android:text="Calibration: not run this session"
+                android:textColor="#94A3B8"
+                android:textSize="11sp"
+                android:typeface="monospace" />
+
+            <!-- 5. TELEMETRY ROUTING -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="5. Telemetry Routing &amp; Storage:"
+                android:textColor="#38BDF8"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/etTargetIp"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="2"
+                    android:background="#0A0F1D"
+                    android:hint="WebSocket URL"
+                    android:inputType="textUri"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:text="ws://192.168.1.100"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#64748B"
+                    android:textSize="12sp"
+                    android:typeface="monospace" />
+
+                <EditText
+                    android:id="@+id/etTargetPort"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="#0A0F1D"
+                    android:hint="Port"
+                    android:inputType="number"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:text="8765"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#64748B"
+                    android:textSize="12sp"
+                    android:typeface="monospace" />
+            </LinearLayout>
+
+            <!-- 6. HARDWARE SAMPLING & THROTTLING -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="6. Hardware Sampling &amp; Throttling:"
+                android:textColor="#38BDF8"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvCaptureRate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Capture Interval: 20 ms (~50 Hz requested)"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:typeface="monospace" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5 ms"
+                    android:textColor="#64748B"
+                    android:textSize="9sp"
+                    android:layout_marginEnd="4dp" />
+                <SeekBar
+                    android:id="@+id/seekCaptureRate"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:max="495"
+                    android:progress="15" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="500 ms"
+                    android:textColor="#64748B"
+                    android:textSize="9sp"
+                    android:layout_marginStart="4dp" />
+            </LinearLayout>
+
+            <!-- 7. DEVICE HARDWARE MATRIX & LOG -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="7. Device Hardware &amp; Sensor Matrix:"
+                android:textColor="#38BDF8"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/llSensorList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="#0A0F1D"
+                android:orientation="vertical"
+                android:padding="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Live Diagnostic Monitor:"
+                android:textColor="#38BDF8"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvLog"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginTop="4dp"
+                android:background="#050B14"
+                android:padding="10dp"
+                android:scrollbars="vertical"
+                android:text="SYSTEM BOOT INITIALIZED..."
+                android:textColor="#10B981"
+                android:textSize="11sp"
+                android:typeface="monospace" />
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

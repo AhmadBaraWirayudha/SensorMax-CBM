@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SensorMax — CBM Demo</title>
+<style>
+:root{--bg:#030712;--panel:#0a0f1d;--panel2:#111827;--line:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--cyan:#38bdf8;--green:#10b981;--yellow:#facc15;--red:#ef4444;--purple:#c084fc;--teal:#14b8a6}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}body{min-height:100vh}
+.wrap{max-width:1500px;margin:auto;padding:18px 18px 115px}.brand{text-align:center}.brand h1{margin:0;font-size:28px;letter-spacing:.12em}.brand .by{font-size:12px;color:var(--muted);margin-top:2px}.brand .sub{font:11px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--cyan);margin-top:4px}
+.bar{margin-top:14px;padding:10px 12px;background:var(--panel2);border:1px solid var(--line);font:12px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--cyan)}
+.status{margin-top:8px;padding:13px;border:1px solid var(--line);background:#1e293b;font-weight:700;font-size:14px}.status.ok{color:var(--green)}.status.warn{color:var(--yellow)}.status.alert{color:#fff;background:#7f1d1d;border-color:#991b1b}.status.safe{color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;margin-top:12px}.card{background:var(--panel);border:1px solid var(--line);padding:11px;min-width:0}.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-6{grid-column:span 6}.span-4{grid-column:span 4}.span-3{grid-column:span 3}.section-title{font-size:12px;color:var(--cyan);font-weight:700;margin-bottom:7px}.muted{color:var(--muted)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.kpi{background:#060b15;border:1px solid #172033;padding:10px}.kpi .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.kpi .value{font:700 19px ui-monospace,SFMono-Regular,Menlo,monospace;margin-top:5px}.good{color:var(--green)}.warn{color:var(--yellow)}.danger{color:var(--red)}
+canvas{display:block;width:100%;height:240px;background:#030712;border:1px solid #0f172a}.smallcanvas{height:160px}.tinycanvas{height:115px}.control-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.axis{display:flex;background:#060b15;border:1px solid #172033;padding:5px;border-radius:4px}.axis button,.btn{background:#101827;color:var(--text);border:1px solid #263247;padding:8px 11px;font-size:11px;font-weight:700;cursor:pointer}.axis button.active{background:#1e293b;border-color:#38bdf8}.btn.primary{background:#7c3aed;border-color:#7c3aed}.btn.green{background:#059669;border-color:#059669}.btn.red{background:#dc2626;border-color:#dc2626}.btn.gray{background:#334155;border-color:#334155}.btn:hover{filter:brightness(1.12)}input,select{background:#060b15;color:#fff;border:1px solid #263247;padding:9px 10px;min-width:0;font:12px ui-monospace,SFMono-Regular,Menlo,monospace}input[type=number]{width:150px}input[type=text]{width:190px}label{font-size:10px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.meta{font:11px ui-monospace,SFMono-Regular,Menlo,monospace;line-height:1.7}.pill{display:inline-block;padding:3px 6px;border:1px solid #334155;background:#0f172a;color:var(--muted);font-size:10px;margin-right:4px}.pill.live{color:var(--green);border-color:#065f46}.pill.demo{color:var(--yellow);border-color:#854d0e}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.collapse-head{cursor:pointer;font-size:11px;color:var(--muted);font-weight:700}.collapse-body{margin-top:8px}.log{height:150px;overflow:auto;background:#020617;border:1px solid #0f172a;padding:8px;font:10px ui-monospace,SFMono-Regular,Menlo,monospace;color:#cbd5e1}
+.dock{position:fixed;left:0;right:0;bottom:0;background:#0a0f1d;border-top:1px solid #1e293b;padding:10px;z-index:20}.dock-inner{max-width:1500px;margin:auto}.dock .capture{width:100%;margin-bottom:7px}.dock .duo{display:grid;grid-template-columns:1fr 1fr;gap:8px}.dock button{height:48px}
+@media(max-width:1000px){.span-8,.span-6,.span-4,.span-3{grid-column:span 12}.kpis{grid-template-columns:1fr}.two{grid-template-columns:1fr}.wrap{padding-left:10px;padding-right:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <h1>SENSORMAX</h1>
+    <div class="by">by Ahmad Bara Wirayudha</div>
+    <div class="sub">Multi-Modal Condition Monitoring // Industrial Spec // Browser Demo</div>
+  </div>
+
+  <div id="boot" class="bar">Status: Initializing Multi-Sensor Array...</div>
+  <div id="severity" class="status warn">STATUS: Awaiting first spectrum window...</div>
+
+  <div class="card span-12" style="margin-top:12px">
+    <div class="kpis">
+      <div class="kpi"><div class="label">Overall RMS</div><div id="rms" class="value">-- m/s²</div></div>
+      <div class="kpi"><div class="label">Velocity (derived)</div><div id="vel" class="value">-- mm/s</div></div>
+      <div class="kpi"><div class="label">Measurement quality</div><div id="quality" class="value good">-- / 100</div></div>
+    </div>
+    <div id="sampleMeta" class="meta" style="margin-top:9px">Measured: -- Hz | FFT: 0–-- Hz | Resolution: -- Hz/bin | Window: 256 | Jitter: -- ms</div>
+  </div>
+
+  <div class="grid">
+    <div class="card span-8">
+      <div class="section-title">1. Kinetic Triaxial Waveform</div>
+      <canvas id="wave"></canvas>
+    </div>
+    <div class="card span-4">
+      <div class="section-title">Session / Asset Context</div>
+      <div class="control-row">
+        <label>Machine ID<input id="machine" value="PUMP-01"></label>
+        <label>Point<input id="point" value="DE-Motor"></label>
+        <label>RPM<input id="rpm" type="number" value="1500" min="100" max="6000"></label>
+      </div>
+      <div style="margin-top:10px" class="meta">
+        <span class="pill live">LIVE SIMULATION</span><span class="pill demo">DEMO DATA</span>
+        <div>Session: SMX-DEMO-2026-09-30</div>
+        <div id="sessionTime">Elapsed: 00:00</div>
+      </div>
+      <div style="margin-top:10px" class="control-row">
+        <button class="btn green" id="start">START</button>
+        <button class="btn red" id="stop">STOP</button>
+        <button class="btn gray" id="reset">RESET</button>
+      </div>
+    </div>
+
+    <div class="card span-8">
+      <div class="section-title">2. Vibration Spectrum Analyzer (FFT)</div>
+      <canvas id="spectrum"></canvas>
+      <div class="axis" style="margin-top:7px">
+        <button data-axis="AUTO" class="active">AUTO</button><button data-axis="X">X</button><button data-axis="Y">Y</button><button data-axis="Z">Z</button><button data-axis="RSS">RSS</button>
+      </div>
+      <div class="meta" style="margin-top:7px"><span id="peak">Dominant peak: -- Hz @ -- m/s² (axis --)</span> | <span id="cf">Crest --</span> | <span id="kurt">Kurtosis --</span></div>
+      <div id="fault" class="meta" style="color:var(--purple);margin-top:3px">Heuristic hint (not a diagnosis): --</div>
+    </div>
+
+    <div class="card span-4">
+      <div class="section-title">Thresholds / Operating Context</div>
+      <div class="two">
+        <label>Warn RMS<input id="warnTh" type="number" step="0.01" value="2.8"></label>
+        <label>Alert RMS<input id="alertTh" type="number" step="0.01" value="4.5"></label>
+      </div>
+      <div style="margin-top:8px" class="meta">1X = <span id="oneX">25.00</span> Hz · 2X = <span id="twoX">50.00</span> Hz · 3X = <span id="threeX">75.00</span> Hz</div>
+      <div style="margin-top:12px" class="section-title">Secondary Sensor Telemetry</div>
+      <div class="meta">MAG: <span id="mag">34.1, 18.2, 41.0 µT</span></div>
+      <div class="meta">LIGHT: <span id="light">185 lx</span></div>
+      <div class="meta">GRAVITY: <span id="grav">0.03, -0.06, 9.81 m/s²</span></div>
+      <div class="meta">IMPACT: <span id="impact">none</span></div>
+    </div>
+
+    <div class="card span-4">
+      <div class="section-title">Overall RMS Trend (Session)</div>
+      <canvas id="trend" class="tinycanvas"></canvas>
+    </div>
+    <div class="card span-8">
+      <div class="section-title">Envelope Spectrum — Bearing-Fault Detection Demo</div>
+      <canvas id="envelope" class="smallcanvas"></canvas>
+      <div class="meta" style="margin-top:6px">FTF <span id="ftf">9.38</span> Hz · BPFO <span id="bpfo">37.50</span> Hz · BPFI <span id="bpfi">62.50</span> Hz · BSF <span id="bsf">21.15</span> Hz</div>
+    </div>
+
+    <div class="card span-12">
+      <div id="bearingHead" class="collapse-head">▾ Bearing geometry (optional)</div>
+      <div class="collapse-body" id="bearingBody">
+        <div class="control-row">
+          <label>Elements<input id="be" type="number" value="8" min="1"></label>
+          <label>Ball diameter (mm)<input id="bd" type="number" value="10" step="0.1"></label>
+          <label>Pitch diameter (mm)<input id="pd" type="number" value="40" step="0.1"></label>
+          <label>Contact angle (deg)<input id="ca" type="number" value="0" step="0.1"></label>
+          <label>Mounting method<select id="mount"><option>Unknown</option><option>Magnetic base</option><option>Stud / bolt</option><option>Hand-held</option></select></label>
+        </div>
+        <div id="bearingHint" class="meta" style="margin-top:8px;color:var(--yellow)">Bearing hint: user-entered geometry; demo analyzer only.</div>
+      </div>
+    </div>
+
+    <div class="card span-6">
+      <div class="section-title">Mounting / Calibration</div>
+      <div class="control-row">
+        <button class="btn" id="mountCheck">CHECK MOUNTING</button>
+        <button class="btn" id="calibrate">RUN CALIBRATION</button>
+        <label>Operator<input id="operator" value="Demo Operator"></label>
+      </div>
+      <div id="mountResult" class="meta" style="margin-top:8px">Mounting: ready — Stability ±0.8° | Movement: LOW | Gravity axis: Z</div>
+      <div id="calResult" class="meta" style="margin-top:4px">Calibration: not run in this session.</div>
+    </div>
+
+    <div class="card span-6">
+      <div class="section-title">Asset Tagging</div>
+      <div class="control-row">
+        <label>Custom tag<input id="tag" value="Motor drive-end"></label>
+        <button class="btn" id="addTag">ADD TAG</button>
+        <button class="btn gray" id="snapshot2">CAPTURE SNAPSHOT</button>
+      </div>
+      <div id="tags" class="meta" style="margin-top:8px"><span class="pill">Motor drive-end</span><span class="pill">PUMP-01</span><span class="pill">DE-Motor</span></div>
+    </div>
+
+    <div class="card span-12">
+      <div class="section-title">Diagnostic Log</div>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+</div>
+
+<div class="dock">
+  <div class="dock-inner">
+    <button class="btn primary capture" id="snapshot">CAPTURE SNAPSHOT AT THIS POINT</button>
+    <div class="duo"><button class="btn green" id="stream">1. STREAM &amp; LOG</button><button class="btn red" id="offline">2. OFFLINE LOG ONLY</button></div>
+  </div>
+</div>
+
+<script>
+const TAU = Math.PI*2;
+const state={running:true,axis:'AUTO',t:0,started:performance.now(),rpm:1500,history:[],phase:0,last:performance.now(),snapshotNo:0,tags:['Motor drive-end','PUMP-01','DE-Motor']};
+const $=id=>document.getElementById(id);
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function log(msg){const e=$('log');const line=document.createElement('div');line.textContent='['+new Date().toLocaleTimeString()+'] '+msg;e.prepend(line);while(e.children.length>80)e.removeChild(e.lastChild)}
+function sizeCanvas(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1,w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h}return {w:c.width,h:c.height,d}}
+function clearCtx(c){const {w,h}=sizeCanvas(c);const x=c.getContext('2d');x.clearRect(0,0,w,h);x.fillStyle='#030712';x.fillRect(0,0,w,h);x.strokeStyle='#111827';x.lineWidth=1;for(let i=0;i<6;i++){let y=h*i/5;x.beginPath();x.moveTo(0,y);x.lineTo(w,y);x.stroke()}return {x,w,h}}
+function lineChart(c,series,opts={}){const {x,w,h}=clearCtx(c),pad={l:42,r:10,t:10,b:25},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;const xmin=opts.xmin??0,xmax=opts.xmax??(series[0]?.pts?.length-1||1),ymin=opts.ymin??-1,ymax=opts.ymax??1;const sx=v=>pad.l+(v-xmin)/(xmax-xmin)*pw,sy=v=>pad.t+(1-(v-ymin)/(ymax-ymin))*ph;x.strokeStyle='#334155';x.fillStyle='#64748b';x.font=Math.max(9,10*(w/900))+'px ui-monospace,monospace';for(let i=0;i<5;i++){const v=ymin+(ymax-ymin)*i/4;const yy=sy(v);x.fillText(Number(v).toFixed(opts.precision??1),4,yy+3)}for(const s of series){x.strokeStyle=s.color||'#38bdf8';x.lineWidth=1.5;x.beginPath();s.pts.forEach((p,i)=>{const xx=sx(p[0]),yy=sy(p[1]);i?x.lineTo(xx,yy):x.moveTo(xx,yy)});x.stroke()}if(opts.xLabels){x.fillStyle='#64748b';for(const [v,lab] of opts.xLabels){x.fillText(lab,sx(v)-9,h-7)}}}
+function synthSamples(n=256){const f=state.rpm/60;const x=[],y=[],z=[];for(let i=0;i<n;i++){const tt=i/256;const ph=state.phase+i*TAU*f/256;x.push(0.78*Math.sin(ph)+0.17*Math.sin(2*ph+0.3)+0.08*Math.sin(3*ph)+0.045*Math.sin(TAU*72*tt)+noise(.045));y.push(0.52*Math.sin(ph+.8)+0.11*Math.sin(2*ph)+0.04*Math.sin(TAU*45*tt)+noise(.04));z.push(0.35*Math.sin(ph*1.02+1.7)+0.08*Math.sin(2*ph+0.4)+noise(.03));}state.phase=(state.phase+n*TAU*f/256)%TAU;return {x,y,z}}
+function rms(a){let s=0;for(const v of a)s+=v*v;return Math.sqrt(s/a.length)}function noise(s){return (Math.random()*2-1)*s}
+function dftLike(a,maxHz=128){const N=a.length,fs=256,pts=[];for(let k=0;k<=N/2;k++){let re=0,im=0;for(let n=0;n<N;n++){const q=TAU*k*n/N;re+=a[n]*Math.cos(q);im-=a[n]*Math.sin(q)}pts.push([k*fs/N,Math.sqrt(re*re+im*im)*2/N])}return pts.filter(p=>p[0]<=maxHz)}
+function peakOf(pts){return pts.reduce((m,p)=>p[1]>m[1]?p:m,[0,0])}
+function kurtosis(a){const m=a.reduce((s,v)=>s+v,0)/a.length;let m2=0,m4=0;for(const v of a){const d=v-m;m2+=d*d;m4+=d*d*d*d}m2/=a.length;m4/=a.length;return m2?m4/(m2*m2):0}
+function calcBearing(){const n=+$('be').value||8,bd=+$('bd').value||10,pd=+$('pd').value||40,ca=(+$('ca').value||0)*Math.PI/180,f=state.rpm/60;const ratio=(bd/pd)*Math.cos(ca);return {ftf:.5*f*(1-ratio),bpfo:n/2*f*(1-ratio),bpfi:n/2*f*(1+ratio),bsf:(pd/(2*bd))*f*(1-ratio*ratio)}}
+function drawWave(s){const c=$('wave'),N=s.x.length,pts=(a)=>a.map((v,i)=>[i,v]);lineChart(c,[{pts:pts(s.x),color:'#ef4444'},{pts:pts(s.y),color:'#10b981'},{pts:pts(s.z),color:'#3b82f6'}],{xmin:0,xmax:N-1,ymin:-1.2,ymax:1.2,xLabels:[[0,'0'],[64,'64'],[128,'128'],[192,'192'],[255,'256']],precision:1})}
+function drawSpectrum(s){let a=s[state.axis==='Y'?'y':state.axis==='Z'?'z':'x'];if(state.axis==='AUTO'){const vals=[['X',s.x],['Y',s.y],['Z',s.z]].map(([k,v])=>[k,rms(v)]);a=vals.sort((u,v)=>v[1]-u[1])[0][1]===rms(s.y)?s.y:vals.sort((u,v)=>v[1]-u[1])[0][1]===rms(s.z)?s.z:s.x}const spec=dftLike(a,100),pk=peakOf(spec);lineChart($('spectrum'),[{pts:spec,color:'#38bdf8'}],{xmin:0,xmax:100,ymin:0,ymax:Math.max(.8,pk[1]*1.15),xLabels:[[0,'0'],[25,'25'],[50,'50'],[75,'75'],[100,'100']],precision:1});return {spec,pk,a}}
+function drawEnvelope(){const b=calcBearing();const pts=[];for(let f=0;f<=100;f+=1){let v=.025+Math.random()*.018;[[b.bpfo,.45],[b.bpfi,.34],[b.ftf,.17],[b.bsf,.21]].forEach(([c,a])=>{v+=a*Math.exp(-Math.pow((f-c)/1.8,2))});pts.push([f,v])}lineChart($('envelope'),[{pts,color:'#c084fc'}],{xmin:0,xmax:100,ymin:0,ymax:.72,xLabels:[[0,'0'],[25,'25'],[50,'50'],[75,'75'],[100,'100']],precision:2});$('ftf').textContent=b.ftf.toFixed(2);$('bpfo').textContent=b.bpfo.toFixed(2);$('bpfi').textContent=b.bpfi.toFixed(2);$('bsf').textContent=b.bsf.toFixed(2)}
+function drawTrend(){const pts=state.history.map((v,i)=>[i,v]);lineChart($('trend'),[{pts,color:'#14b8a6'}],{xmin:0,xmax:Math.max(10,pts.length-1),ymin:0,ymax:5,xLabels:[] ,precision:1})}
+function update(){state.rpm=+$('rpm').value||1500;const s=synthSamples();drawWave(s);const res=drawSpectrum(s);drawEnvelope();const rr=.93+Math.random()*.7;const overall=Math.sqrt((rms(s.x)**2+rms(s.y)**2+rms(s.z)**2)/3)*rr;const velocity=overall*42;const q=clamp(Math.round(97-Math.random()*7),0,100);state.history.push(overall);if(state.history.length>80)state.history.shift();drawTrend();const j=.4+Math.random()*1.8;$('rms').textContent=overall.toFixed(3)+' m/s²';$('vel').textContent=velocity.toFixed(2)+' mm/s';$('quality').textContent=q+' / 100';$('quality').className='value '+(q>=90?'good':q>=75?'warn':'danger');$('sampleMeta').textContent=`Measured: ${(247+Math.random()*11).toFixed(1)} Hz | FFT: 0–128.0 Hz | Resolution: 1.000 Hz/bin | Window: 256 | Jitter: ${j.toFixed(2)} ms`;const [pf,pa]=res.pk;$('peak').textContent=`Dominant peak: ${pf.toFixed(2)} Hz @ ${pa.toFixed(3)} m/s² (axis ${state.axis==='AUTO'?'X':state.axis})`;$('cf').textContent='Crest '+(2.4+Math.random()*.8).toFixed(2);$('kurt').textContent='Kurtosis '+(3.0+Math.random()*.7).toFixed(2);const one=state.rpm/60;let hint='No strong pattern detected';if(Math.abs(pf-one)<1.5)hint='1X-dominant pattern — check unbalance / operating context';else if(Math.abs(pf-2*one)<1.5)hint='2X-dominant pattern — check alignment / looseness context';$('fault').textContent='Heuristic hint (not a diagnosis): '+hint;const warn=+$('warnTh').value||2.8,alert=+$('alertTh').value||4.5;const sev=$('severity');if(overall>=alert){sev.className='status alert';sev.textContent='STATUS: ALERT — RMS exceeds configured alert threshold';}else if(overall>=warn){sev.className='status warn';sev.textContent='STATUS: WARNING — RMS exceeds configured warning threshold';}else{sev.className='status ok';sev.textContent='STATUS: HEALTHY — demo signal below configured thresholds';}$('oneX').textContent=one.toFixed(2);$('twoX').textContent=(2*one).toFixed(2);$('threeX').textContent=(3*one).toFixed(2);$('mag').textContent=`${(34+noise(2)).toFixed(1)}, ${(18+noise(2)).toFixed(1)}, ${(41+noise(2)).toFixed(2)} µT`;$('light').textContent=(185+Math.round(noise(12)))+' lx';$('grav').textContent=`${noise(.05).toFixed(2)}, ${(-.06+noise(.05)).toFixed(2)}, ${(9.81+noise(.02)).toFixed(2)} m/s²`;$('impact').textContent=Math.random()<.015?'IMPACT DETECTED':'none';const elapsed=Math.floor((performance.now()-state.started)/1000);$('sessionTime').textContent=`Elapsed: ${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}`}
+let timer=null;function start(){if(timer)return;state.running=true;$('boot').textContent='Status: Multi-Sensor Array active — demo stream running';log('Deployment started in browser demo mode');timer=setInterval(()=>{if(state.running)update()},650)}function stop(){state.running=false;$('boot').textContent='Status: Deployment stopped — local demo data frozen';log('Deployment stopped')}
+function snapshot(){state.snapshotNo++;log(`Snapshot #${state.snapshotNo} captured — ${$('machine').value}/${$('point').value} @ ${state.rpm} RPM`);$('severity').textContent+=' · SNAPSHOT SAVED'}
+$('start').onclick=start;$('stop').onclick=stop;$('reset').onclick=()=>{state.history.length=0;state.phase=0;state.started=performance.now();state.snapshotNo=0;update();log('Session reset')};$('snapshot').onclick=snapshot;$('snapshot2').onclick=snapshot;$('stream').onclick=()=>{log('STREAM & LOG selected — WebSocket transport simulated');$('boot').textContent='Status: STREAM & LOG — demo transport active'};$('offline').onclick=()=>{log('OFFLINE LOG ONLY selected — local CSV behavior simulated');$('boot').textContent='Status: OFFLINE LOG ONLY — browser logging demo'};$('mountCheck').onclick=()=>{const st=(.5+Math.random()*1.2).toFixed(1);$('mountResult').textContent=`Mounting: READY | Stability ±${st}° | Movement: LOW | Gravity axis: Z`;log('Mounting check completed — READY')};$('calibrate').onclick=()=>{$('calResult').textContent='Calibration: PASS | Bias (0.02, -0.01, 0.03) m/s² | Noise 0.041 m/s² RSS | Achieved 251.6 Hz';log('Calibration burst completed — demo result stored in session')};$('addTag').onclick=()=>{const v=$('tag').value.trim();if(!v)return;const wrap=$('tags');const s=document.createElement('span');s.className='pill';s.textContent=v;wrap.appendChild(s);state.tags.push(v);log(`Tag added: ${v}`)};$('bearingHead').onclick=()=>{$('bearingBody').style.display=$('bearingBody').style.display==='none'?'block':'none'};$('rpm').oninput=()=>drawEnvelope();document.querySelectorAll('.axis button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.axis button').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.axis=b.dataset.axis;update()});window.addEventListener('resize',()=>{update()});$('boot').textContent='Status: Multi-Sensor Array initialized — browser demo ready';log('SensorMax HTML demo initialized; no real sensor data is used');update();start();
+</script>
+</body>
+</html>
