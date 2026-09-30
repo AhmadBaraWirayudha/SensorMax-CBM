@@ -1,26 +1,360 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SensorMax Research Suite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+```
+<title>SensorMax Research Suite</title>
+
+<style>
+    :root {
+        --bg: #f6f8fb;
+        --card: #ffffff;
+        --text: #172033;
+        --muted: #667085;
+        --border: #dfe4ec;
+        --primary: #1d4ed8;
+        --primary-hover: #1e40af;
+        --secondary: #0f766e;
+        --secondary-hover: #115e59;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            Roboto,
+            Helvetica,
+            Arial,
+            sans-serif;
+
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+    }
+
+    .container {
+        width: min(100% - 32px, 1000px);
+        margin: 0 auto;
+    }
+
+    header {
+        padding: 72px 0 48px;
+        text-align: center;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: #fff;
+        color: var(--muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    h1 {
+        margin: 18px 0 12px;
+        font-size: clamp(2rem, 6vw, 3.5rem);
+        line-height: 1.1;
+    }
+
+    .subtitle {
+        max-width: 700px;
+        margin: 0 auto;
+        color: var(--muted);
+        font-size: 1.08rem;
+    }
+
+    .actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+        margin: 24px 0 48px;
+    }
+
+    .card {
+        display: flex;
+        flex-direction: column;
+        padding: 28px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+    }
+
+    .card h2 {
+        margin: 0 0 10px;
+        font-size: 1.35rem;
+    }
+
+    .card p {
+        margin: 0 0 24px;
+        color: var(--muted);
+        flex: 1;
+    }
+
+    .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 0 20px;
+        border-radius: 10px;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        transition:
+            background 0.15s ease,
+            transform 0.15s ease;
+    }
+
+    .button:hover {
+        transform: translateY(-1px);
+    }
+
+    .dashboard {
+        background: var(--primary);
+    }
+
+    .dashboard:hover {
+        background: var(--primary-hover);
+    }
+
+    .app {
+        background: var(--secondary);
+    }
+
+    .app:hover {
+        background: var(--secondary-hover);
+    }
+
+    .section {
+        margin: 0 0 48px;
+    }
+
+    .section h2 {
+        margin-bottom: 10px;
+        font-size: 1.4rem;
+    }
+
+    .section p {
+        color: var(--muted);
+    }
+
+    .workflow {
+        display: grid;
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+    }
+
+    .step {
+        padding: 20px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+    }
+
+    .step-number {
+        font-size: 0.82rem;
+        font-weight: 800;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .step strong {
+        display: block;
+        margin-top: 4px;
+        font-size: 1rem;
+    }
+
+    footer {
+        padding: 32px 0 48px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 700px) {
+        .actions {
+            grid-template-columns: 1fr;
+        }
+
+        .workflow {
+            grid-template-columns: 1fr;
+        }
+
+        header {
+            padding-top: 48px;
+        }
+    }
+</style>
+```
+
 </head>
+
 <body>
-    <h1>SensorMax Research Suite</h1>
 
-    <p>
-        Android sensor acquisition and desktop vibration research suite.
-    </p>
+```
+<header>
+    <div class="container">
 
-    <p>
-        <a href="web_dashboard.html">
-            Open Live Dashboard
-        </a>
-    </p>
+        <span class="badge">
+            Engineering Research Project
+        </span>
 
-    <p>
-        <a href="report.html">
-            Open Engineering Report
-        </a>
-    </p>
+        <h1>
+            SensorMax Research Suite
+        </h1>
+
+        <p class="subtitle">
+            An Android sensor acquisition and desktop vibration
+            research platform for measurement, visualization,
+            and engineering analysis.
+        </p>
+
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="actions">
+
+        <article class="card">
+            <h2>Live Dashboard</h2>
+
+            <p>
+                Explore the SensorMax monitoring interface for
+                sensor waveforms, vibration signals, FFT,
+                frequency content, and measurement context.
+            </p>
+
+            <a
+                class="button dashboard"
+                href="web_dashboard.html"
+            >
+                Open Live Dashboard →
+            </a>
+        </article>
+
+
+        <article class="card">
+            <h2>Android App Demo</h2>
+
+            <p>
+                See the Android-side SensorMax application and
+                how the mobile device is used as the acquisition
+                interface for the research workflow.
+            </p>
+
+            <a
+                class="button app"
+                href="sensormax_demo.html"
+            >
+                View Android App Demo →
+            </a>
+        </article>
+
+    </section>
+
+
+    <section class="section">
+
+        <h2>How SensorMax Works</h2>
+
+        <p>
+            SensorMax separates mobile data acquisition from
+            desktop visualization and analysis.
+        </p>
+
+        <div class="workflow">
+
+            <div class="step">
+                <span class="step-number">
+                    Step 1
+                </span>
+
+                <strong>
+                    Acquire
+                </strong>
+
+                <p>
+                    Android sensors collect measurement data
+                    with machine and measurement-point context.
+                </p>
+            </div>
+
+
+            <div class="step">
+                <span class="step-number">
+                    Step 2
+                </span>
+
+                <strong>
+                    Visualize
+                </strong>
+
+                <p>
+                    Sensor data can be viewed through the
+                    desktop/web monitoring interface.
+                </p>
+            </div>
+
+
+            <div class="step">
+                <span class="step-number">
+                    Step 3
+                </span>
+
+                <strong>
+                    Analyze
+                </strong>
+
+                <p>
+                    Recorded data can be processed for
+                    vibration, frequency, quality, and
+                    engineering research.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="section">
+
+        <h2>What to Open First</h2>
+
+        <p>
+            Start with the <strong>Live Dashboard</strong> to see
+            the engineering interface. Open the
+            <strong>Android App Demo</strong> to understand the
+            acquisition side of the system.
+        </p>
+
+    </section>
+
+</main>
+
+
+<footer>
+    SensorMax Research Suite
+</footer>
+```
+
 </body>
 </html>
