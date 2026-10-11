@@ -1,0 +1,14 @@
+# SensorResearchSuite LaptopSuite — direct dependency pins for CPython 3.13.
+# These exact pins stabilize top-level requirements; they do NOT lock transitive
+# dependencies. Streamlit 1.65.0 metadata: https://pypi.org/project/streamlit/1.65.0/
+# Generate and review a hash-locked full dependency file with
+# pip-tools in a network-enabled clean environment before claiming reproducible builds.
+numpy==2.3.5
+pandas==2.2.3
+matplotlib==3.10.8
+plotly==6.5.2
+pyserial==3.5
+websockets==16.0
+aiohttp==3.13.3
+openpyxl==3.1.5
+streamlit==1.65.0

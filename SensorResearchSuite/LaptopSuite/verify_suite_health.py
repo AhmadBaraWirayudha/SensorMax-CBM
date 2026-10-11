@@ -20,6 +20,7 @@ AndroidApp is intentionally excluded from this script.
 
 from __future__ import annotations
 
+import argparse
 import importlib
 import os
 import socket
@@ -54,7 +55,6 @@ ANDROID_DIR = (
 
 REQUIRED_FILES = [
     "web_server.py",
-    "web_dashboard.html",
     "export_converter.py",
     "export_json.py",
     "batch_dataset_processor.py",
@@ -69,6 +69,7 @@ PYTHON_FILES = [
     "export_json.py",
     "batch_dataset_processor.py",
     "test_all_pipelines.py",
+    "cbm_live_dashboard.py",
 ]
 
 
@@ -313,7 +314,7 @@ def check_web_dashboard() -> None:
     )
 
     dashboard = (
-        SUITE_DIR /
+        PROJECT_DIR /
         "web_dashboard.html"
     )
 
@@ -495,7 +496,7 @@ def scan_legacy_references() -> None:
         SUITE_DIR /
         "web_server.py",
 
-        SUITE_DIR /
+        PROJECT_DIR /
         "web_dashboard.html",
 
         SUITE_DIR /
@@ -681,7 +682,17 @@ def print_summary() -> int:
 # Main
 # ============================================================
 
-def main() -> int:
+def main(argv=None) -> int:
+
+    parser = argparse.ArgumentParser(
+        description="Run SensorMax desktop health checks."
+    )
+    parser.add_argument(
+        "--skip-integration",
+        action="store_true",
+        help="Skip the longer test_all_pipelines.py integration run.",
+    )
+    args = parser.parse_args(argv)
 
     print(
         "============================================================"
@@ -725,7 +736,12 @@ def main() -> int:
 
     # Integration test is intentionally last because it executes
     # several components and produces temporary artifacts.
-    run_integration_test()
+    if args.skip_integration:
+        warn_check(
+            "Desktop integration test skipped by --skip-integration"
+        )
+    else:
+        run_integration_test()
 
     return print_summary()
 

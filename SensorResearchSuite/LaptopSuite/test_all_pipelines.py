@@ -34,13 +34,19 @@ This replaces the old walking/activity-recognition integration test.
 
 The test intentionally uses the CURRENT Android CSV schema:
 
-RAW
----
+RAW v2
+------
+Schema_Version
+Sensor_Timestamp_ns
 Timestamp_ms
 Machine_ID
 Point
+Source_Kind
+Source_ID
+Channel_ID
 Sensor_Type
 Sensor_Name
+Unit
 Val_0
 Val_1
 Val_2
@@ -85,6 +91,11 @@ import sys
 import time
 from pathlib import Path
 
+try:  # Support both `python LaptopSuite/test_all_pipelines.py` and package import.
+    from . import web_server as gateway_module
+except ImportError:
+    import web_server as gateway_module
+
 
 # ============================================================
 # Paths
@@ -106,6 +117,7 @@ TEST_DIR = (
 # ============================================================
 
 MACHINE_ID = "TEST-MOTOR-01"
+INTEGRATION_SENSOR_TIMESTAMP_NS = "9223372036854775000"  # signed 64-bit boundary fixture
 
 POINT = "DE-BRG-X"
 
@@ -273,26 +285,10 @@ def generate_raw_csv() -> Path:
         "synthetic_sensormax_raw.csv"
     )
 
-    header = [
-        "Timestamp_ms",
-        "Machine_ID",
-        "Point",
-        "Sensor_Type",
-        "Sensor_Name",
-        "Val_0",
-        "Val_1",
-        "Val_2",
-        "Val_3",
-        "Val_4",
-        "Val_5",
-    ]
+    header = list(gateway_module.RAW_CSV_COLUMNS)
 
-    start_ms = (
-        int(
-            time.time() *
-            1000
-        )
-    )
+    start_ms = int(time.time() * 1000)
+    start_sensor_ns = time.monotonic_ns()
 
     with path.open(
         "w",
@@ -396,21 +392,26 @@ def generate_raw_csv() -> Path:
                 )
             )
 
-            writer.writerow(
-                [
-                    ts,
-                    MACHINE_ID,
-                    POINT,
-                    1,
-                    "Synthetic Accelerometer",
-                    f"{x:.8f}",
-                    f"{y:.8f}",
-                    f"{z:.8f}",
-                    "0",
-                    "0",
-                    "0",
-                ]
-            )
+            row = {
+                "Schema_Version": 2,
+                "Sensor_Timestamp_ns": start_sensor_ns + int(t * 1_000_000_000),
+                "Timestamp_ms": ts,
+                "Machine_ID": MACHINE_ID,
+                "Point": POINT,
+                "Source_Kind": "ANDROID_SENSOR",
+                "Source_ID": "integration-accelerometer-01",
+                "Channel_ID": "accelerometer",
+                "Sensor_Type": 1,
+                "Sensor_Name": "Synthetic Accelerometer",
+                "Unit": "m/s²",
+                "Val_0": f"{x:.8f}",
+                "Val_1": f"{y:.8f}",
+                "Val_2": f"{z:.8f}",
+                "Val_3": "0",
+                "Val_4": "0",
+                "Val_5": "0",
+            }
+            writer.writerow([row.get(column, "") for column in header])
 
     passed(
         f"Generated RAW fixture: "
@@ -739,8 +740,26 @@ def validate_json(
 
             return False
 
+        if data.get("provenance", {}).get("source_schema") != "android_raw_v2":
+            failed(
+                "JSON source schema was not recognized as android_raw_v2"
+            )
+            return False
+
+        telemetry = data.get("sensor_telemetry")
+        if not isinstance(telemetry, list) or len(telemetry) != RAW_SAMPLE_COUNT:
+            failed(
+                f"JSON telemetry row count mismatch: expected {RAW_SAMPLE_COUNT}, "
+                f"got {len(telemetry) if isinstance(telemetry, list) else 'non-list'}"
+            )
+            return False
+
+        if telemetry and str(telemetry[0].get("Schema_Version")) != "2":
+            failed("JSON did not preserve the v2 schema version")
+            return False
+
         passed(
-            "JSON structure validated"
+            "JSON structure, v2 schema and row count validated"
         )
 
         return True
@@ -1099,190 +1118,238 @@ def find_free_port(
         return sock.getsockname()[1]
 
 
-async def websocket_client_test(
-    port: int,
-) -> bool:
-
+async def websocket_client_test(port: int) -> bool:
+    """Check Android-sender -> gateway -> dashboard forwarding on a v2 packet."""
     try:
-
         import websockets
-
     except ImportError:
-
-        failed(
-            "websockets package is not installed"
-        )
-
+        failed("websockets package is not installed")
         return False
 
-    uri = (
-        f"ws://127.0.0.1:{port}"
-    )
+    uri = f"ws://127.0.0.1:{port}"
+    timestamp_ms = int(time.time() * 1000)
+    sensor_timestamp_ns = INTEGRATION_SENSOR_TIMESTAMP_NS
+    raw_packet = {
+        "kind": "raw",
+        "schemaVersion": 2,
+        "sensorTimestampNs": sensor_timestamp_ns,
+        "ts": timestamp_ms,
+        "machineId": MACHINE_ID,
+        "point": POINT,
+        "sourceKind": "ANDROID_SENSOR",
+        "sourceId": "integration, accelerometer-01",
+        "channelId": "accelerometer|main",
+        "sensorType": 1,
+        "id": 1,
+        "sensor": 'Synthetic Accelerometer, "Rev B"',
+        "unit": "m/s²",
+        "v0": 1.25,
+        "v1": None,
+        "v2": 0.0,
+        "v3": None,
+        "v4": None,
+        "v5": None,
+    }
+    analysis_packet = {
+        "kind": "analysis",
+        "ts": timestamp_ms,
+        "machineId": MACHINE_ID,
+        "point": POINT,
+        "sampleRateHz": 100.0,
+        "overallRmsAccelMs2": 1.25,
+        "overallRmsVelocityMmS": None,
+        "overallRmsDisplacementUm": 0.0,
+        "dominantAxis": "X",
+        "dominantFreqHz": 30.0,
+        "envelopePeakFreqHz": None,
+        "isoZone": "A",
+        "bearingMatch": "",
+    }
 
     try:
+        async with websockets.connect(uri, open_timeout=5, close_timeout=2) as dashboard:
+            async with websockets.connect(uri, open_timeout=5, close_timeout=2) as sender:
+                await sender.send(json.dumps(raw_packet, allow_nan=False))
+                forwarded_raw = json.loads(await asyncio.wait_for(dashboard.recv(), timeout=3))
+                if forwarded_raw != raw_packet:
+                    failed("Dashboard did not receive the exact raw v2 packet")
+                    return False
 
-        async with websockets.connect(
-            uri,
-            open_timeout=5,
-            close_timeout=2,
-        ) as client:
+                await sender.send(json.dumps(analysis_packet, allow_nan=False))
+                forwarded_analysis = json.loads(await asyncio.wait_for(dashboard.recv(), timeout=3))
+                if forwarded_analysis != analysis_packet:
+                    failed("Dashboard did not receive the exact analysis packet")
+                    return False
 
-            # Send a current Android-shaped raw packet.
-            packet = {
-                "ts": int(
-                    time.time() * 1000
-                ),
-                "id": 1,
-                "sensorName":
-                    "Integration Test Accelerometer",
-                "v0": 0.10,
-                "v1": 9.81,
-                "v2": 0.05,
-                "v3": 0.0,
-                "v4": 0.0,
-                "v5": 0.0,
-            }
-
-            await client.send(
-                json.dumps(packet)
-            )
-
-            passed(
-                "WebSocket gateway accepted "
-                "current raw packet"
-            )
-
-            return True
-
+        passed("Gateway forwarded exact raw v2 and analysis packets to a separate dashboard client")
+        return True
     except Exception as exc:
-
-        failed(
-            "WebSocket client test failed: "
-            f"{type(exc).__name__}: {exc}"
-        )
-
+        failed(f"WebSocket end-to-end test failed: {type(exc).__name__}: {exc}")
         return False
 
 
 def test_web_server() -> bool:
+    banner("5. WEBSOCKET GATEWAY -> DASHBOARD -> CSV/JSON/XLSX")
 
-    banner(
-        "5. WEBSOCKET GATEWAY"
-    )
-
-    port = find_free_port(
-        WEBSOCKET_HOST
-    )
+    port = find_free_port(WEBSOCKET_HOST)
+    log_dir = TEST_DIR / "gateway_records"
+    if log_dir.exists():
+        shutil.rmtree(log_dir)
+    log_dir.mkdir(parents=True, exist_ok=True)
 
     command = [
         sys.executable,
-        str(
-            SCRIPT_DIR /
-            "web_server.py"
-        ),
+        "-u",
+        str(SCRIPT_DIR / "web_server.py"),
     ]
-
-    # The server currently listens on its configured port.
-    # The integration test therefore uses the project's expected
-    # 8765 port whenever available.
-    port = WEBSOCKET_PORT
-
-    if not is_port_available(
-        WEBSOCKET_HOST,
-        port,
-    ):
-
-        failed(
-            f"WebSocket test port "
-            f"{port} is already occupied"
-        )
-
-        return False
-
     env = os.environ.copy()
+    env["SENSORMAX_LISTEN_HOST"] = WEBSOCKET_HOST
+    env["SENSORMAX_LISTEN_PORT"] = str(port)
+    env["SENSORMAX_LOG_DIR"] = str(log_dir)
+
+    if not is_port_available(WEBSOCKET_HOST, port):
+        failed(f"Selected integration port {port} is already occupied")
+        return False
 
     process = subprocess.Popen(
         command,
-        cwd=str(
-            SCRIPT_DIR.parent
-        ),
+        cwd=str(SCRIPT_DIR.parent),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
         env=env,
     )
 
+    gateway_ok = False
+    process_stdout = ""
+    process_stderr = ""
     try:
-
-        ready = wait_for_port(
-            WEBSOCKET_HOST,
-            port,
-            process,
-            timeout=8,
-        )
-
+        ready = wait_for_port(WEBSOCKET_HOST, port, process, timeout=8)
         if not ready:
-
-            stderr = ""
-
-            try:
-
-                stderr = (
-                    process.stderr.read()
-                    if process.stderr
-                    else ""
-                )
-
-            except Exception:
-                pass
-
-            failed(
-                "WebSocket gateway did not "
-                "become ready"
-            )
-
-            if stderr.strip():
-
-                print(
-                    stderr.rstrip()
-                )
-
-            return False
-
-        passed(
-            f"WebSocket gateway listening "
-            f"on {WEBSOCKET_HOST}:{port}"
-        )
-
-        result = asyncio.run(
-            websocket_client_test(
-                port
-            )
-        )
-
-        return result
-
+            failed(f"Gateway did not become ready on 127.0.0.1:{port}")
+        else:
+            passed(f"Gateway listening on 127.0.0.1:{port}")
+            gateway_ok = asyncio.run(websocket_client_test(port))
     finally:
-
         if process.poll() is None:
-
             process.terminate()
+        try:
+            process_stdout, process_stderr = process.communicate(timeout=3)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process_stdout, process_stderr = process.communicate(timeout=3)
+        passed("WebSocket gateway process stopped")
 
-            try:
+    if not gateway_ok:
+        if process_stdout.strip():
+            print(process_stdout[-3000:])
+        if process_stderr.strip():
+            print(process_stderr[-3000:])
+        return False
 
-                process.wait(
-                    timeout=3
-                )
-
-            except subprocess.TimeoutExpired:
-
-                process.kill()
-
-                process.wait()
-
-        passed(
-            "WebSocket gateway process stopped"
+    # Verify files the gateway actually persisted, not merely the client send call.
+    raw_files = list(log_dir.glob("*_raw.csv"))
+    analysis_files = list(log_dir.glob("*_analysis.csv"))
+    if len(raw_files) != 1 or len(analysis_files) != 1:
+        failed(
+            f"Expected one raw and one analysis CSV; got raw={len(raw_files)}, "
+            f"analysis={len(analysis_files)}"
         )
+        return False
+
+    try:
+        with raw_files[0].open("r", encoding="utf-8", newline="") as file:
+            raw_reader = csv.DictReader(file)
+            raw_rows = list(raw_reader)
+            raw_columns = raw_reader.fieldnames
+        with analysis_files[0].open("r", encoding="utf-8", newline="") as file:
+            analysis_reader = csv.DictReader(file)
+            analysis_rows = list(analysis_reader)
+            analysis_columns = analysis_reader.fieldnames
+
+        if tuple(raw_columns or ()) != tuple(gateway_module.RAW_CSV_COLUMNS):
+            failed("Gateway raw CSV header differs from the canonical v2 header")
+            return False
+        if len(raw_rows) != 1 or len(analysis_rows) != 1:
+            failed("Gateway CSV row counts do not match the two emitted packets")
+            return False
+        raw = raw_rows[0]
+        if (
+            raw["Sensor_Timestamp_ns"] != INTEGRATION_SENSOR_TIMESTAMP_NS
+            or raw["Timestamp_ms"] == ""
+            or raw["Machine_ID"] != MACHINE_ID
+            or raw["Source_ID"] != "integration, accelerometer-01"
+            or raw["Channel_ID"] != "accelerometer|main"
+            or raw["Val_1"] != ""
+            or float(raw["Val_2"]) != 0.0
+        ):
+            failed("Gateway raw CSV failed provenance, timestamp or null-vs-zero assertions")
+            return False
+        expected_analysis = tuple(gateway_module.ANALYSIS_SNAPSHOT_CSV_COLUMNS)
+        if tuple(analysis_columns or ()) != expected_analysis:
+            failed("Gateway analysis CSV header differs from the documented snapshot contract")
+            return False
+        if analysis_rows[0]["RMS_Velocity_mms"] != "" or analysis_rows[0]["RMS_Displacement_um"] != "0.0":
+            failed("Analysis CSV failed missing-value vs real-zero assertions")
+            return False
+        passed("Gateway persisted canonical raw/analysis CSV with exact identity, timestamps, nulls and zero")
+
+        xlsx_path = log_dir / "gateway_raw.xlsx"
+        converter_ok = run_command(
+            "export_converter.py on the actual gateway CSV",
+            [
+                sys.executable,
+                str(SCRIPT_DIR / "export_converter.py"),
+                str(raw_files[0]),
+                str(xlsx_path),
+            ],
+            timeout=30,
+        )
+        if not converter_ok or not xlsx_path.exists():
+            failed("XLSX export of the actual gateway CSV did not produce an artifact")
+            return False
+        workbook_ok = validate_xlsx(xlsx_path, {"Session Metadata", "Accelerometer"})
+        if not workbook_ok:
+            return False
+        import openpyxl
+        workbook = openpyxl.load_workbook(xlsx_path, data_only=True, read_only=True)
+        try:
+            sheet = workbook["Accelerometer"]
+            headers = {sheet.cell(4, col).value: col for col in range(1, sheet.max_column + 1)}
+            if sheet.cell(5, headers["Sensor Timestamp (ns)"]).value != raw["Sensor_Timestamp_ns"]:
+                failed("XLSX did not preserve the exact nanosecond timestamp text")
+                return False
+            if sheet.cell(5, headers["Value 1"]).value is not None or sheet.cell(5, headers["Value 2"]).value != 0:
+                failed("XLSX changed unavailable channel or true zero semantics")
+                return False
+        finally:
+            workbook.close()
+
+        json_path = log_dir / raw_files[0].name.replace("_raw.csv", "_raw.json")
+        return_code = run_command(
+            "export_json.py on the actual gateway CSV",
+            [sys.executable, str(SCRIPT_DIR / "export_json.py"), str(raw_files[0])],
+            timeout=30,
+        )
+        if not return_code or not json_path.exists():
+            failed("JSON export of gateway CSV did not produce an artifact")
+            return False
+        json_data = json.loads(json_path.read_text(encoding="utf-8"))
+        if json_data.get("provenance", {}).get("source_schema") != "android_raw_v2":
+            failed("JSON export did not retain the v2 source schema")
+            return False
+        telemetry = json_data.get("sensor_telemetry", [])
+        if len(telemetry) != 1 or telemetry[0].get("Sensor_Timestamp_ns") != raw["Sensor_Timestamp_ns"]:
+            failed("JSON export changed row count or exact sensor timestamp")
+            return False
+        if telemetry[0].get("Val_1") is not None or float(telemetry[0].get("Val_2")) != 0.0:
+            failed("JSON export changed unavailable channel or true zero semantics")
+            return False
+        passed("JSON and XLSX exports agree with the gateway CSV's timestamp and nullable readings")
+        return True
+    except Exception as exc:
+        failed(f"Gateway artifact validation failed: {type(exc).__name__}: {exc}")
+        return False
 
 
 def is_port_available(
@@ -1386,7 +1453,7 @@ def main() -> int:
     )
 
     print(
-        "AndroidApp: UNTOUCHED"
+        "AndroidApp runtime/device: NOT RUN (gateway test uses a synthetic Android-shaped packet)"
     )
 
     print(

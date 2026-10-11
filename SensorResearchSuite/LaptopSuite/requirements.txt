@@ -1,69 +1,31 @@
-# ============================================================
-# SensorMax LaptopSuite - Python Dependencies
-# ============================================================
+# SensorMax LaptopSuite — runtime dependency compatibility ranges
 #
-# These dependencies support the desktop acquisition,
-# engineering analysis, WebSocket gateway, CBM dashboard,
-# CSV/Excel processing, and browser-oriented tooling.
+# This file is NOT a lockfile. Its minimum versions are aligned with the
+# corresponding direct pins in requirements-direct-pins-py313.txt. The direct
+# pin profile is the current install baseline for CPython 3.13.x; it pins only
+# these top-level packages and does not fully lock transitive dependencies.
 #
-# AndroidApp is intentionally NOT represented here.
-# AndroidApp has its own Gradle/Kotlin dependency system.
-#
-# ============================================================
+# Keep distribution names synchronized with requirements-direct-pins-py313.txt.
+# Generate and test a hash-locked transitive requirements file before claiming
+# reproducible installations. AndroidApp dependencies are managed by Gradle.
 
+# Numerical computing and data processing
+numpy>=2.3.5
+pandas>=2.2.3
 
-# ------------------------------------------------------------
-# Core numerical computing
-# ------------------------------------------------------------
+# Plotting and visualization
+matplotlib>=3.10.8
+plotly>=6.5.2
 
-numpy>=1.21.0
-
-
-# ------------------------------------------------------------
-# Data processing
-# ------------------------------------------------------------
-
-pandas>=1.5.0
-
-
-# ------------------------------------------------------------
-# Engineering plotting / visualization
-# ------------------------------------------------------------
-
-matplotlib>=3.5.0
-plotly>=5.15.0
-
-
-# ------------------------------------------------------------
 # Serial / hardware communication
-# ------------------------------------------------------------
-
 pyserial>=3.5
 
+# Local WebSocket gateway and asynchronous networking
+websockets>=16.0
+aiohttp>=3.13.3
 
-# ------------------------------------------------------------
-# WebSocket communication
-# ------------------------------------------------------------
+# Excel workbook processing
+openpyxl>=3.1.5
 
-websockets>=10.4
-
-
-# ------------------------------------------------------------
-# HTTP / asynchronous networking
-# ------------------------------------------------------------
-
-aiohttp>=3.8.0
-
-
-# ------------------------------------------------------------
-# Spreadsheet / Excel processing
-# ------------------------------------------------------------
-
-openpyxl>=3.1.0
-
-
-# ------------------------------------------------------------
-# Browser-based engineering dashboard
-# ------------------------------------------------------------
-
-streamlit>=1.28.0
+# Browser-oriented engineering dashboard
+streamlit>=1.65.0

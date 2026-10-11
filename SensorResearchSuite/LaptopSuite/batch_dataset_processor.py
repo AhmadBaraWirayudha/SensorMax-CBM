@@ -252,8 +252,8 @@ def safe_text(
 
 def safe_float(
     value: Any,
-    default: float = 0.0,
-) -> float:
+    default: float | None = 0.0,
+) -> float | None:
 
     try:
 
@@ -322,6 +322,33 @@ def rms(
             )
         )
     )
+
+
+def finite_channel_values(records: list[dict[str, Any]], key: str) -> list[float]:
+    """Return only finite numeric channel readings; preserve absence as absence."""
+    values: list[float] = []
+    for record in records:
+        value = record.get(key)
+        if value is None:
+            continue
+        try:
+            number = float(value)
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if math.isfinite(number):
+            values.append(number)
+    return values
+
+
+def mean_or_none(values: list[float]) -> float | None:
+    return float(np.mean(values)) if values else None
+
+
+def rms_or_none(values: list[float]) -> float | None:
+    if not values:
+        return None
+    array = np.asarray(values, dtype=float)
+    return float(np.sqrt(np.mean(array ** 2)))
 
 
 def timestamp_to_seconds(
@@ -518,42 +545,48 @@ def read_current_raw_csv(
                     safe_float(
                         row.get(
                             "Val_0"
-                        )
+                        ),
+                        default=None,
                     ),
 
                 "v1":
                     safe_float(
                         row.get(
                             "Val_1"
-                        )
+                        ),
+                        default=None,
                     ),
 
                 "v2":
                     safe_float(
                         row.get(
                             "Val_2"
-                        )
+                        ),
+                        default=None,
                     ),
 
                 "v3":
                     safe_float(
                         row.get(
                             "Val_3"
-                        )
+                        ),
+                        default=None,
                     ),
 
                 "v4":
                     safe_float(
                         row.get(
                             "Val_4"
-                        )
+                        ),
+                        default=None,
                     ),
 
                 "v5":
                     safe_float(
                         row.get(
                             "Val_5"
-                        )
+                        ),
+                        default=None,
                     ),
             }
 
@@ -931,55 +964,32 @@ def analyze_raw_records(
             "sensor_names": "",
         }
 
+    # Per-axis RMS uses available finite samples on that axis only. RSS-derived
+    # quantities require complete XYZ triplets so missing channels never become 0.
+    xs = finite_channel_values(acceleration_records, "v0")
+    ys = finite_channel_values(acceleration_records, "v1")
+    zs = finite_channel_values(acceleration_records, "v2")
+    complete_xyz_records = [
+        record for record in acceleration_records
+        if all(
+            record.get(key) is not None and math.isfinite(float(record[key]))
+            for key in ("v0", "v1", "v2")
+        )
+    ]
     timestamps = [
-        record["timestamp_ms"]
-        for record in acceleration_records
-        if record["timestamp_ms"] > 0
+        float(record["timestamp_ms"])
+        for record in complete_xyz_records
+        if record.get("timestamp_ms") is not None and float(record["timestamp_ms"]) > 0
     ]
-
-    xs = [
-        record["v0"]
-        for record in acceleration_records
-    ]
-
-    ys = [
-        record["v1"]
-        for record in acceleration_records
-    ]
-
-    zs = [
-        record["v2"]
-        for record in acceleration_records
-    ]
-
-    x_arr = np.asarray(
-        xs,
-        dtype=float,
-    )
-
-    y_arr = np.asarray(
-        ys,
-        dtype=float,
-    )
-
-    z_arr = np.asarray(
-        zs,
-        dtype=float,
-    )
-
-    rss = np.sqrt(
-        x_arr ** 2 +
-        y_arr ** 2 +
-        z_arr ** 2
-    )
-
-    # Dynamic vibration magnitude:
-    # remove the mean resultant component rather than using raw
-    # gravity-included magnitude directly.
-    dynamic_rss = (
-        rss -
-        np.mean(rss)
-    )
+    if complete_xyz_records:
+        x_arr = np.asarray([float(record["v0"]) for record in complete_xyz_records], dtype=float)
+        y_arr = np.asarray([float(record["v1"]) for record in complete_xyz_records], dtype=float)
+        z_arr = np.asarray([float(record["v2"]) for record in complete_xyz_records], dtype=float)
+        rss = np.sqrt(x_arr ** 2 + y_arr ** 2 + z_arr ** 2)
+        dynamic_rss = rss - np.mean(rss)
+    else:
+        rss = np.asarray([], dtype=float)
+        dynamic_rss = np.asarray([], dtype=float)
 
     if timestamps:
 
@@ -1039,7 +1049,7 @@ def analyze_raw_records(
             len(records),
 
         "accel_count":
-            len(acceleration_records),
+            len(complete_xyz_records),
 
         "duration_s":
             duration_s,
@@ -1048,29 +1058,22 @@ def analyze_raw_records(
             effective_rate_hz,
 
         "rms_x":
-            rms(xs),
+            rms_or_none(xs),
 
         "rms_y":
-            rms(ys),
+            rms_or_none(ys),
 
         "rms_z":
-            rms(zs),
+            rms_or_none(zs),
 
         "dynamic_rms":
-            rms(
-                dynamic_rss.tolist()
-            ),
+            rms_or_none(dynamic_rss.tolist()),
 
         "peak_to_peak":
-            float(
-                np.max(rss) -
-                np.min(rss)
-            ),
+            float(np.max(rss) - np.min(rss)) if rss.size else None,
 
         "max_rss":
-            float(
-                np.max(rss)
-            ),
+            float(np.max(rss)) if rss.size else None,
 
         "machine_ids":
             ", ".join(machine_ids),
@@ -1876,20 +1879,9 @@ def process_file(
                 ),
         ):
 
-            v0 = [
-                record["v0"]
-                for record in group
-            ]
-
-            v1 = [
-                record["v1"]
-                for record in group
-            ]
-
-            v2 = [
-                record["v2"]
-                for record in group
-            ]
+            v0 = finite_channel_values(group, "v0")
+            v1 = finite_channel_values(group, "v1")
+            v2 = finite_channel_values(group, "v2")
 
             machine_values = sorted(
                 {
@@ -1932,22 +1924,22 @@ def process_file(
                         ),
 
                     "mean_v0":
-                        mean_or_zero(v0),
+                        mean_or_none(v0),
 
                     "rms_v0":
-                        rms(v0),
+                        rms_or_none(v0),
 
                     "mean_v1":
-                        mean_or_zero(v1),
+                        mean_or_none(v1),
 
                     "rms_v1":
-                        rms(v1),
+                        rms_or_none(v1),
 
                     "mean_v2":
-                        mean_or_zero(v2),
+                        mean_or_none(v2),
 
                     "rms_v2":
-                        rms(v2),
+                        rms_or_none(v2),
                 }
             )
 

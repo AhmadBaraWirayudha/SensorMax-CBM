@@ -845,8 +845,7 @@ if not analysis_df.empty:
     )
 
 
-    latest_analysis =
-        analysis_df.iloc[-1]
+    latest_analysis = analysis_df.iloc[-1]
 
 
     sample_rate = latest_value(

@@ -13,17 +13,10 @@ AndroidApp is treated as the source of truth and is NOT modified here.
 Current Android raw CSV schema
 ------------------------------
 
-Timestamp_ms
-Machine_ID
-Point
-Sensor_Type
-Sensor_Name
-Val_0
-Val_1
-Val_2
-Val_3
-Val_4
-Val_5
+V1 fields: Timestamp_ms, Machine_ID, Point, Sensor_Type, Sensor_Name, Val_0..Val_5.
+V2 adds Schema_Version, Sensor_Timestamp_ns, Source_Kind, Source_ID,
+Channel_ID and Unit. Sensor_Timestamp_ns is preserved as a decimal string
+because JavaScript Number cannot exactly represent all 64-bit nanosecond values.
 
 Current Android analysis CSV schema
 -----------------------------------
@@ -114,6 +107,15 @@ ANDROID_RAW_COLUMNS = [
     "Val_3",
     "Val_4",
     "Val_5",
+]
+
+ANDROID_RAW_V2_COLUMNS = [
+    "Schema_Version",
+    "Sensor_Timestamp_ns",
+    "Source_Kind",
+    "Source_ID",
+    "Channel_ID",
+    "Unit",
 ]
 
 ANDROID_ANALYSIS_COLUMNS = [
@@ -316,7 +318,7 @@ def detect_schema(
     df: pd.DataFrame,
 ) -> str:
     """
-    Identify whether the input is the current SensorMax raw CSV,
+    Identify the versioned SensorMax raw CSV, legacy raw CSV,
     current analysis CSV, or an unknown/legacy CSV.
     """
 
@@ -325,9 +327,13 @@ def detect_schema(
         for column in df.columns
     )
 
-    if set(ANDROID_RAW_COLUMNS).issubset(
-        columns
+    if (
+        set(ANDROID_RAW_COLUMNS).issubset(columns)
+        and set(ANDROID_RAW_V2_COLUMNS).issubset(columns)
     ):
+        return "android_raw_v2"
+
+    if set(ANDROID_RAW_COLUMNS).issubset(columns):
         return "android_raw_v1"
 
     if set(ANDROID_ANALYSIS_COLUMNS).issubset(
@@ -800,10 +806,19 @@ def build_raw_telemetry(
         )
     )
 
-    return [
-        json_safe(record)
-        for record in records
-    ]
+    result = []
+    for record in records:
+        # A pandas integer column with nulls may otherwise become float64 and
+        # lose precision before serialization. Read as string (see compile_to_json)
+        # and normalize numeric-looking values here as a defensive invariant.
+        if "Sensor_Timestamp_ns" in record:
+            value = record.get("Sensor_Timestamp_ns")
+            if value is None or value == "":
+                record["Sensor_Timestamp_ns"] = None
+            else:
+                record["Sensor_Timestamp_ns"] = str(value).strip()
+        result.append(json_safe(record))
+    return result
 
 
 # ============================================================
@@ -870,9 +885,10 @@ def compile_to_json(
         f"{csv_path}"
     )
 
-    df = pd.read_csv(
-        csv_path
-    )
+    # Preserve 64-bit nanosecond timestamps before pandas infers a numeric dtype.
+    header = pd.read_csv(csv_path, nrows=0).columns
+    dtype = {"Sensor_Timestamp_ns": "string"} if "Sensor_Timestamp_ns" in header else None
+    df = pd.read_csv(csv_path, dtype=dtype)
 
     schema = detect_schema(
         df

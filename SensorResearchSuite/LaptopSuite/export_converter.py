@@ -10,17 +10,13 @@ workbook grouped by Android sensor type.
 Current Android raw CSV schema
 ------------------------------
 
-    Timestamp_ms,
-    Machine_ID,
-    Point,
-    Sensor_Type,
-    Sensor_Name,
-    Val_0,
-    Val_1,
-    Val_2,
-    Val_3,
-    Val_4,
-    Val_5
+Schema v2 adds distinct sensor-clock time, source/channel provenance and units:
+
+    Schema_Version, Sensor_Timestamp_ns, Timestamp_ms, Machine_ID, Point,
+    Source_Kind, Source_ID, Channel_ID, Sensor_Type, Sensor_Name, Unit,
+    Val_0, Val_1, Val_2, Val_3, Val_4, Val_5
+
+The previous 11-column header remains supported as schema v1.
 
 The Android application is treated as the source of truth.
 
@@ -51,10 +47,12 @@ from __future__ import annotations
 
 import argparse
 import csv
+import math
 import os
 import sys
 from collections import defaultdict
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
@@ -194,41 +192,36 @@ THIN_BORDER = Border(
 # Utility functions
 # ============================================================
 
-def safe_float(value: Any, default: float = 0.0) -> float:
-    """
-    Safely convert a CSV field to float.
-    """
-
+def safe_float(value: Any, default: float | None = 0.0) -> float | None:
+    """Parse a finite CSV number, preserving missing/invalid values when default=None."""
     if value is None:
         return default
-
     text = str(value).strip()
-
     if not text:
         return default
-
     try:
-        return float(text)
-    except (TypeError, ValueError):
+        number = float(text)
+    except (TypeError, ValueError, OverflowError):
         return default
+    return number if math.isfinite(number) else default
 
 
-def safe_int(value: Any, default: int = 0) -> int:
-    """
-    Safely convert a CSV field to int.
-    """
-
+def safe_int(value: Any, default: int | None = 0) -> int | None:
+    """Parse an exact integer without routing large timestamps through float."""
     if value is None:
         return default
-
     text = str(value).strip()
-
     if not text:
         return default
-
     try:
-        return int(float(text))
-    except (TypeError, ValueError):
+        number = Decimal(text)
+    except (InvalidOperation, ValueError, TypeError):
+        return default
+    if not number.is_finite() or number != number.to_integral_value():
+        return default
+    try:
+        return int(number)
+    except (OverflowError, ValueError):
         return default
 
 
@@ -381,7 +374,7 @@ def normalize_current_row(
 
     sensor_type = safe_int(
         row.get("Sensor_Type"),
-        0,
+        -1,
     )
 
     reported_name = clean_text(
@@ -389,38 +382,25 @@ def normalize_current_row(
     )
 
     return {
-        "timestamp_ms": parse_timestamp(
-            row.get("Timestamp_ms")
-        ),
-        "machine_id": clean_text(
-            row.get("Machine_ID")
-        ) or "UNSPECIFIED",
-        "point": clean_text(
-            row.get("Point")
-        ) or "UNSPECIFIED",
+        "schema_version": safe_int(row.get("Schema_Version"), 1),
+        "sensor_timestamp_ns": safe_int(row.get("Sensor_Timestamp_ns"), None),
+        "timestamp_ms": parse_timestamp(row.get("Timestamp_ms")),
+        "machine_id": clean_text(row.get("Machine_ID")) or "UNSPECIFIED",
+        "point": clean_text(row.get("Point")) or "UNSPECIFIED",
+        "source_kind": clean_text(row.get("Source_Kind")),
+        "source_id": clean_text(row.get("Source_ID")),
+        "channel_id": clean_text(row.get("Channel_ID")),
         "sensor_type": sensor_type,
-        "sensor_name": sensor_name(
-            sensor_type,
-            reported_name,
-        ),
-        "v0": safe_float(
-            row.get("Val_0")
-        ),
-        "v1": safe_float(
-            row.get("Val_1")
-        ),
-        "v2": safe_float(
-            row.get("Val_2")
-        ),
-        "v3": safe_float(
-            row.get("Val_3")
-        ),
-        "v4": safe_float(
-            row.get("Val_4")
-        ),
-        "v5": safe_float(
-            row.get("Val_5")
-        ),
+        "sensor_name": sensor_name(sensor_type, reported_name),
+        "unit": clean_text(row.get("Unit")),
+        # An unavailable/invalid numeric sample must remain unavailable; do not
+        # translate it into a valid-looking zero during normalization.
+        "v0": safe_float(row.get("Val_0"), None),
+        "v1": safe_float(row.get("Val_1"), None),
+        "v2": safe_float(row.get("Val_2"), None),
+        "v3": safe_float(row.get("Val_3"), None),
+        "v4": safe_float(row.get("Val_4"), None),
+        "v5": safe_float(row.get("Val_5"), None),
     }
 
 
@@ -603,78 +583,35 @@ def read_csv(
 
 def statistics(
     records: list[dict[str, Any]],
-) -> dict[str, float]:
+) -> dict[str, float | int | None]:
+    """Summarize only finite, available values for each channel."""
+    result: dict[str, float | int | None] = {"count": len(records)}
 
-    if not records:
+    def values(key: str) -> list[float]:
+        output = []
+        for record in records:
+            value = record.get(key)
+            if value is None:
+                continue
+            try:
+                number = float(value)
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if math.isfinite(number):
+                output.append(number)
+        return output
 
-        return {
-            "count": 0,
-            "min_v0": 0.0,
-            "max_v0": 0.0,
-            "mean_v0": 0.0,
-            "rms_v0": 0.0,
-            "min_v1": 0.0,
-            "max_v1": 0.0,
-            "mean_v1": 0.0,
-            "rms_v1": 0.0,
-            "min_v2": 0.0,
-            "max_v2": 0.0,
-            "mean_v2": 0.0,
-            "rms_v2": 0.0,
-        }
-
-    def values(
-        key: str,
-    ) -> list[float]:
-
-        return [
-            float(record[key])
-            for record in records
-        ]
-
-    def rms(
-        data: list[float],
-    ) -> float:
-
+    def rms(data: list[float]) -> float | None:
         if not data:
-            return 0.0
+            return None
+        return math.sqrt(sum(value * value for value in data) / len(data))
 
-        return (
-            sum(
-                value * value
-                for value in data
-            ) /
-            len(data)
-        ) ** 0.5
-
-    result = {}
-
-    for key in (
-        "v0",
-        "v1",
-        "v2",
-    ):
-
+    for key in ("v0", "v1", "v2"):
         data = values(key)
-
-        result[f"min_{key}"] = min(
-            data
-        )
-
-        result[f"max_{key}"] = max(
-            data
-        )
-
-        result[f"mean_{key}"] = (
-            sum(data) /
-            len(data)
-        )
-
-        result[f"rms_{key}"] = rms(
-            data
-        )
-
-    result["count"] = len(records)
+        result[f"min_{key}"] = min(data) if data else None
+        result[f"max_{key}"] = max(data) if data else None
+        result[f"mean_{key}"] = sum(data) / len(data) if data else None
+        result[f"rms_{key}"] = rms(data)
 
     return result
 
@@ -697,6 +634,19 @@ def style_header_row(
             vertical="center",
         )
         cell.border = THIN_BORDER
+
+
+def force_formula_like_input_to_text(wb: Workbook) -> None:
+    """Store formula-like CSV text as a literal string in XLSX output.
+
+    The exporter does not create intentional formulas. Any formula-typed cell
+    therefore came from imported text and must be stored as text before saving.
+    """
+    for ws in wb.worksheets:
+        for row in ws.iter_rows():
+            for cell in row:
+                if cell.data_type == "f" and isinstance(cell.value, str):
+                    cell.data_type = "s"
 
 
 def auto_width(
@@ -1004,42 +954,40 @@ def create_sensor_sheet(
     sensor_type: int,
     records: list[dict[str, Any]],
 ) -> None:
+    """Write one stable worksheet per sensor type, preserving v2 provenance.
 
-    canonical_name =
-        sensor_name(
-            sensor_type,
-            records[0]["sensor_name"]
-            if records
-            else "",
-        )
+    The worksheet title is based on the Android sensor type, not the vendor
+    reported hardware name. Hardware names remain row-level data so devices
+    from different vendors do not change the expected sheet name.
+    """
 
-    sheet_name =
-        unique_sheet_name(
-            wb,
-            canonical_name,
-        )
-
-    ws = wb.create_sheet(
-        title=sheet_name
+    category_name = SENSOR_NAMES.get(
+        sensor_type,
+        f"Sensor Type {sensor_type}",
     )
+    sheet_name = unique_sheet_name(wb, category_name)
+    ws = wb.create_sheet(title=sheet_name)
 
-    ws["A1"] = (
-        f"SensorMax Dataset: {canonical_name}"
-    )
+    ws["A1"] = f"SensorMax Dataset: {category_name}"
     ws["A1"].font = TITLE_FONT
-
-    ws["A2"] = (
-        f"Android Sensor Type {sensor_type}"
-    )
+    ws["A2"] = f"Android Sensor Type {sensor_type}; hardware name is recorded per row"
     ws["A2"].font = SUBTITLE_FONT
 
+    # Relative Time is a derived display column. All source contract fields
+    # remain present so that v2 provenance is not lost during XLSX export.
     headers = [
+        "Schema Version",
+        "Sensor Timestamp (ns)",
         "Timestamp (ms)",
         "Relative Time (s)",
         "Machine ID",
         "Measurement Point",
+        "Source Kind",
+        "Source ID",
+        "Channel ID",
         "Sensor Type",
         "Sensor Hardware Name",
+        "Unit",
         "Value 0",
         "Value 1",
         "Value 2",
@@ -1047,184 +995,118 @@ def create_sensor_sheet(
         "Value 4",
         "Value 5",
     ]
-
     header_row = 4
-
-    for col, header in enumerate(
-        headers,
-        start=1,
-    ):
-
-        ws.cell(
-            row=header_row,
-            column=col,
-            value=header,
-        )
-
-    style_header_row(
-        ws,
-        header_row,
-    )
+    for col, header in enumerate(headers, start=1):
+        ws.cell(row=header_row, column=col, value=header)
+    style_header_row(ws, header_row)
 
     sorted_records = sorted(
         records,
-        key=lambda x:
-            x["timestamp_ms"],
+        key=lambda record: record.get("timestamp_ms", 0.0),
     )
-
     start_ts = (
-        sorted_records[0]["timestamp_ms"]
+        sorted_records[0].get("timestamp_ms", 0.0)
         if sorted_records
         else 0.0
     )
 
+    value_keys = ("v0", "v1", "v2", "v3", "v4", "v5")
     for record in sorted_records:
+        timestamp_ms = record.get("timestamp_ms")
+        if timestamp_ms is None:
+            relative_sec = None
+        elif start_ts:
+            relative_sec = (timestamp_ms - start_ts) / 1000.0
+        else:
+            relative_sec = 0.0
 
-        relative_sec = (
-            (
-                record["timestamp_ms"] -
-                start_ts
-            ) / 1000.0
-            if start_ts
-            else 0.0
+        sensor_timestamp_ns = record.get("sensor_timestamp_ns")
+        # Excel stores only 15 significant decimal digits in numeric cells.
+        # Keep nanosecond timestamps as text so a 16+ digit clock value remains exact.
+        sensor_timestamp_ns_text = (
+            str(sensor_timestamp_ns)
+            if sensor_timestamp_ns is not None
+            else None
         )
-
+        values = [record.get(key) for key in value_keys]
         ws.append(
             [
-                record["timestamp_ms"],
+                record.get("schema_version", 1),
+                sensor_timestamp_ns_text,
+                timestamp_ms,
                 relative_sec,
-                record["machine_id"],
-                record["point"],
-                record["sensor_type"],
-                record["sensor_name"],
-                record["v0"],
-                record["v1"],
-                record["v2"],
-                record["v3"],
-                record["v4"],
-                record["v5"],
+                record.get("machine_id", ""),
+                record.get("point", ""),
+                record.get("source_kind", ""),
+                record.get("source_id", ""),
+                record.get("channel_id", ""),
+                record.get("sensor_type", sensor_type),
+                record.get("sensor_name", ""),
+                record.get("unit", ""),
+                *values,
             ]
         )
 
-    # --------------------------------------------------------
-    # Number formats
-    # --------------------------------------------------------
-
+    first_data_row = header_row + 1
+    last_data_row = header_row + len(sorted_records)
     for row in ws.iter_rows(
-        min_row=header_row + 1,
+        min_row=first_data_row,
+        max_row=last_data_row,
         min_col=1,
-        max_col=12,
+        max_col=len(headers),
     ):
+        row[0].number_format = "0"  # schema version
+        row[1].number_format = "@"  # exact sensor timestamp text
+        row[2].number_format = "0"  # epoch milliseconds
+        row[3].number_format = "0.0000"
+        for cell in row[12:18]:
+            cell.number_format = "0.000000"
 
-        row[0].number_format = (
-            "0"
-        )
-
-        row[1].number_format = (
-            "0.0000"
-        )
-
-        for cell in row[6:12]:
-
-            cell.number_format = (
-                "0.000000"
-            )
-
-    # --------------------------------------------------------
-    # Summary section
-    # --------------------------------------------------------
-
-    summary_row = (
-        header_row +
-        len(sorted_records) +
-        3
-    )
-
-    ws.cell(
-        row=summary_row,
-        column=1,
-        value="Summary Statistics",
-    )
-
-    ws.cell(
-        row=summary_row,
-        column=1,
-    ).font = TITLE_FONT
-
+    # Summary section only aggregates finite, available values. None values
+    # remain blank, and measured numeric zero remains a valid zero.
+    summary_row = header_row + len(sorted_records) + 3
+    ws.cell(row=summary_row, column=1, value="Summary Statistics")
+    ws.cell(row=summary_row, column=1).font = TITLE_FONT
     summary_row += 1
 
-    summary_headers = [
-        "Channel",
-        "Minimum",
-        "Maximum",
-        "Mean",
-        "RMS",
-    ]
+    summary_headers = ["Channel", "Minimum", "Maximum", "Mean", "RMS", "Unit"]
+    for col, header in enumerate(summary_headers, start=1):
+        ws.cell(row=summary_row, column=col, value=header)
+    style_header_row(ws, summary_row)
 
-    for col, header in enumerate(
-        summary_headers,
-        start=1,
-    ):
+    summary_data_start = summary_row + 1
+    unit_groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for record in sorted_records:
+        reported_unit = clean_text(record.get("unit")) or "(unspecified)"
+        unit_groups[reported_unit].append(record)
 
-        ws.cell(
-            row=summary_row,
-            column=col,
-            value=header,
-        )
-
-    style_header_row(
-        ws,
-        summary_row,
-    )
-
-    stats = statistics(
-        sorted_records
-    )
-
-    summary_row += 1
-
-    for channel, key in (
-        ("Value 0", "v0"),
-        ("Value 1", "v1"),
-        ("Value 2", "v2"),
-    ):
-
-        ws.append(
-            [
+    # Never aggregate numerically incompatible units together. This matters
+    # especially for external/custom sources that share the -1 sensor-type sentinel.
+    for unit, unit_records in sorted(unit_groups.items()):
+        stats = statistics(unit_records)
+        for channel, key in (("Value 0", "v0"), ("Value 1", "v1"), ("Value 2", "v2")):
+            ws.append([
                 channel,
                 stats[f"min_{key}"],
                 stats[f"max_{key}"],
                 stats[f"mean_{key}"],
                 stats[f"rms_{key}"],
-            ]
-        )
+                unit,
+            ])
 
+    summary_data_end = ws.max_row
     for row in ws.iter_rows(
-        min_row=summary_row,
-        max_row=summary_row + 2,
+        min_row=summary_data_start,
+        max_row=summary_data_end,
         min_col=2,
         max_col=5,
     ):
-
         for cell in row:
-            cell.number_format = (
-                "0.000000"
-            )
+            cell.number_format = "0.000000"
 
-    # --------------------------------------------------------
-    # Visual formatting
-    # --------------------------------------------------------
-
-    freeze_header(
-        ws,
-        header_row,
-    )
-
-    ws.auto_filter.ref = (
-        f"A{header_row}:L"
-        f"{header_row + len(sorted_records)}"
-    )
-
+    freeze_header(ws, header_row)
+    if sorted_records:
+        ws.auto_filter.ref = f"A{header_row}:R{last_data_row}"
     auto_width(ws)
 
 
@@ -1287,6 +1169,7 @@ def convert_csv_to_excel(
             csv_path.name
         )
 
+        force_formula_like_input_to_text(wb)
         wb.save(xlsx_path)
 
         print(
@@ -1367,6 +1250,7 @@ def convert_csv_to_excel(
         exist_ok=True,
     )
 
+    force_formula_like_input_to_text(wb)
     wb.save(
         xlsx_path
     )
