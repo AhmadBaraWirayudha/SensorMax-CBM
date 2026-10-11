@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Narrow spinner (three across): field shape plus a corner triangle instead of a full chevron. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/sm_surface_well" />
+            <stroke android:width="1dp" android:color="@color/sm_border_field" />
+            <corners android:radius="@dimen/sm_radius_inner" />
+        </shape>
+    </item>
+    <item
+        android:width="10dp"
+        android:height="10dp"
+        android:bottom="6dp"
+        android:end="6dp"
+        android:drawable="@drawable/sm_ic_dropdown_corner"
+        android:gravity="end|bottom" />
+</layer-list>

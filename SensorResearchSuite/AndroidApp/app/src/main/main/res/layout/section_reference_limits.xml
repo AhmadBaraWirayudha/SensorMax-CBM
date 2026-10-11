@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Reference + limits: ISO 20816 class and custom acceleration thresholds.
+Styles: res/values/sensormax_styles.xml - colours: res/values/colors.xml - strings: res/values/strings.xml
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SensorMax.Card.Collapsible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:tag="card:reference_limits">
+    <LinearLayout
+        style="@style/SensorMax.CardHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_header">
+        <TextView
+            style="@style/SensorMax.Text.CardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/reference_title" />
+        <ImageView
+            style="@style/SensorMax.Chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:tag="card_chevron" />
+    </LinearLayout>
+    <LinearLayout
+        style="@style/SensorMax.CardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_body">
+        <TextView
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/reference_subtitle" />
+        <TextView
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:labelFor="@id/spinnerIsoClass"
+            android:text="@string/reference_iso_label" />
+        <Spinner
+            android:id="@+id/spinnerIsoClass"
+            style="@style/SensorMax.Spinner"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sm_control_height"
+            android:layout_marginTop="6dp" />
+        <TextView
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/reference_thresholds_label" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvWarnThresholdLabel"
+                    style="@style/SensorMax.Text.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@id/etWarnThreshold"
+                    android:text="@string/reference_warn_label" />
+                <EditText
+                    android:id="@+id/etWarnThreshold"
+                    style="@style/SensorMax.Field.Mono"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/sm_control_height"
+                    android:layout_marginTop="6dp"
+                    android:hint="@string/reference_threshold_hint"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvAlertThresholdLabel"
+                    style="@style/SensorMax.Text.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@id/etAlertThreshold"
+                    android:text="@string/reference_alert_label" />
+                <EditText
+                    android:id="@+id/etAlertThreshold"
+                    style="@style/SensorMax.Field.Mono"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/sm_control_height"
+                    android:layout_marginTop="6dp"
+                    android:hint="@string/reference_threshold_hint"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

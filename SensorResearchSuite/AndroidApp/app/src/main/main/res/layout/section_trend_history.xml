@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Trend + history: overall RMS trend and spectral waterfall.
+Styles: res/values/sensormax_styles.xml - colours: res/values/colors.xml - strings: res/values/strings.xml
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SensorMax.Card.Collapsible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:tag="card:trend_history">
+    <LinearLayout
+        style="@style/SensorMax.CardHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_header">
+        <TextView
+            style="@style/SensorMax.Text.CardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/trend_title" />
+        <ImageView
+            style="@style/SensorMax.Chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:tag="card_chevron" />
+    </LinearLayout>
+    <LinearLayout
+        style="@style/SensorMax.CardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_body">
+        <TextView
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/trend_subtitle" />
+        <TextView
+            android:id="@+id/tvTrendUnitLabel"
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/trend_rms_label" />
+        <com.research.sensormax.SensorMaxLineChart
+            android:id="@+id/trendChart"
+            style="@style/SensorMax.Chart"
+            android:layout_width="match_parent"
+            android:layout_height="135dp"
+            android:layout_marginTop="6dp"
+            android:contentDescription="@string/cd_trend_chart" />
+        <TextView
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/waterfall_label" />
+        <com.research.sensormax.WaterfallView
+            android:id="@+id/waterfallView"
+            style="@style/SensorMax.Chart"
+            android:layout_width="match_parent"
+            android:layout_height="155dp"
+            android:layout_marginTop="6dp"
+            android:contentDescription="@string/cd_waterfall" />
+        <TextView
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/waterfall_note" />
+    </LinearLayout>
+</LinearLayout>

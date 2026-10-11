@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sensormax-experiment schema-version="1.0" source-version="1.14" source-file="pressure.legacy.xml" source-sha256="66ef0859ca07571241de9e226d926cb17d23de49ced7162f1510ac382867af36">
+  <metadata>
+    <title>Pressure</title>
+    <category>Raw Sensors</category>
+    <description>Get raw data from the barometer.</description>
+  </metadata>
+  <data-containers>
+    <container size="0">pressure</container>
+    <container size="0">p_time</container>
+  </data-containers>
+  <sensors>
+    <sensor type="pressure">
+      <output component="t">p_time</output>
+      <output component="x">pressure</output>
+    </sensor>
+  </sensors>
+  <analysis />
+  <views>
+    <view label="Graph">
+      <element type="graph" label="Pressure" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_pressure]]" unitY="[[unit_short_hecto_pascal]]" partialUpdate="true">
+        <input>p_time</input>
+        <input>pressure</input>
+      </element>
+    </view>
+    <view label="Simple">
+      <element type="value" label="Pressure" size="2" precision="3" unit="[[unit_short_hecto_pascal]]">
+        <input>pressure</input>
+      </element>
+    </view>
+  </views>
+  <exports>
+    <set name="Raw Data">
+      <data name="Time (s)">p_time</data>
+      <data name="Pressure (hPa)">pressure</data>
+    </set>
+  </exports>
+  <translation-status>
+    <mode>descriptor-only</mode>
+    <execution>SensorMax-native runtime required; foreign analysis/network/Bluetooth/camera/audio modules are not executed.</execution>
+    <source-format>legacy-experiment-xml</source-format>
+  </translation-status>
+  <source-features>
+  </source-features>
+</sensormax-experiment>

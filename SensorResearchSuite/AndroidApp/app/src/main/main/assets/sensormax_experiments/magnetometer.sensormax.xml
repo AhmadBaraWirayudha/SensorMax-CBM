@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sensormax-experiment schema-version="1.0" source-version="1.14" source-file="magnetometer.legacy.xml" source-sha256="b0acac01030a01c7b19e58194aeaace36f627bbf7ae7123cc5ba18ba8f6b0ca8">
+  <metadata>
+    <title>Magnetometer</title>
+    <category>Raw Sensors</category>
+    <description>Get raw data from the magnetometer.
+
+        The magnetometer is quite sensitive as it is designed to measure the earth&#x27;s magnetic field to act as a compass. However, it is always exposed to internal fields from the electronics in your phone, which lead to incorrect results. Therefore SensorMax tries to get the calibrated magnetic field from the system. In some cases, you might not get any data, if it is not yet calibrated (for example after the phone has just started). In this case you should rotate your phone a few times while the experiment is running. This helps the system to calibrate the sensor. Also, on many devices (not all) you can switch to uncalibrated magnetometer data via the menu in the top right.
+
+        Do not expose your phone to strong magnetic fields!</description>
+  </metadata>
+  <data-containers>
+    <container size="0">mag_time</container>
+    <container size="0">magX</container>
+    <container size="0">magY</container>
+    <container size="0">magZ</container>
+    <container size="0">mag</container>
+    <container size="0">magAccuracy</container>
+  </data-containers>
+  <sensors>
+    <sensor type="magnetic_field">
+      <output component="x">magX</output>
+      <output component="y">magY</output>
+      <output component="z">magZ</output>
+      <output component="t">mag_time</output>
+      <output component="abs">mag</output>
+      <output component="accuracy">magAccuracy</output>
+    </sensor>
+  </sensors>
+  <analysis />
+  <views>
+    <view label="Graph">
+      <element type="value" label="Accuracy">
+        <input>magAccuracy</input>
+      </element>
+      <element type="separator" height="0.5" />
+      <element type="graph" label="Magnetometer x" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_magnetic_field]]" unitY="[[unit_short_micro_tesla]]" partialUpdate="true" color="green">
+        <input>mag_time</input>
+        <input>magX</input>
+      </element>
+      <element type="graph" label="Magnetometer y" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_magnetic_field]]" unitY="[[unit_short_micro_tesla]]" partialUpdate="true" color="blue">
+        <input>mag_time</input>
+        <input>magY</input>
+      </element>
+      <element type="graph" label="Magnetometer z" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_magnetic_field]]" unitY="[[unit_short_micro_tesla]]" partialUpdate="true" color="yellow">
+        <input>mag_time</input>
+        <input>magZ</input>
+      </element>
+    </view>
+    <view label="Absolute">
+      <element type="value" label="Accuracy">
+        <input>magAccuracy</input>
+      </element>
+      <element type="separator" height="0.5" />
+      <element type="graph" label="Absolute" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_magnetic_field]]" unitY="[[unit_short_micro_tesla]]" partialUpdate="true" color="white">
+        <input>mag_time</input>
+        <input>mag</input>
+      </element>
+      <element type="value" label="Absolute" size="2" precision="2" unit="[[unit_short_micro_tesla]]">
+        <input>mag</input>
+      </element>
+    </view>
+    <view label="Multi">
+      <element type="value" label="Accuracy">
+        <input>magAccuracy</input>
+      </element>
+      <element type="graph" label="Magnetometer" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_magnetic_field]]" unitY="[[unit_short_micro_tesla]]" partialUpdate="true">
+        <input>mag_time</input>
+        <input>magX</input>
+        <input>mag_time</input>
+        <input>magY</input>
+        <input>mag_time</input>
+        <input>magZ</input>
+        <input>mag_time</input>
+        <input>mag</input>
+      </element>
+      <element type="value" label="Magnetometer x" size="2" precision="2" unit="[[unit_short_micro_tesla]]" color="green">
+        <input>magX</input>
+      </element>
+      <element type="value" label="Magnetometer y" size="2" precision="2" unit="[[unit_short_micro_tesla]]" color="blue">
+        <input>magY</input>
+      </element>
+      <element type="value" label="Magnetometer z" size="2" precision="2" unit="[[unit_short_micro_tesla]]" color="yellow">
+        <input>magZ</input>
+      </element>
+      <element type="value" label="Absolute" size="2" precision="2" unit="[[unit_short_micro_tesla]]" color="white">
+        <input>mag</input>
+      </element>
+    </view>
+    <view label="Simple">
+      <element type="value" label="Accuracy">
+        <input>magAccuracy</input>
+      </element>
+      <element type="separator" height="0.5" />
+      <element type="value" label="Magnetometer x" size="2" precision="2" unit="[[unit_short_micro_tesla]]" color="green">
+        <input>magX</input>
+      </element>
+      <element type="value" label="Magnetometer y" size="2" precision="2" unit="[[unit_short_micro_tesla]]" color="blue">
+        <input>magY</input>
+      </element>
+      <element type="value" label="Magnetometer z" size="2" precision="2" unit="[[unit_short_micro_tesla]]" color="yellow">
+        <input>magZ</input>
+      </element>
+      <element type="value" label="Absolute" size="2" precision="2" unit="[[unit_short_micro_tesla]]" color="white">
+        <input>mag</input>
+      </element>
+    </view>
+    <view label="Help">
+      <element type="info" label="The magnetometer in your phone is always exposed to internal fields from the electronics in your phone, which lead to incorrect results. Therefore SensorMax tries to get the calibrated magnetic field from the system. In some cases, you might not get any data, if it is not yet calibrated (for example after the phone has just started). In this case you should rotate your phone a few times while the experiment is running. This helps the system to calibrate the sensor. Also, on many devices (not all) you can switch to uncalibrated magnetometer data via the menu in the top right." />
+    </view>
+  </views>
+  <exports>
+    <set name="Raw Data">
+      <data name="Time (s)">mag_time</data>
+      <data name="Magnetic Field x (µT)">magX</data>
+      <data name="Magnetic Field y (µT)">magY</data>
+      <data name="Magnetic Field z (µT)">magZ</data>
+      <data name="Absolute field (µT)">mag</data>
+    </set>
+  </exports>
+  <translation-status>
+    <mode>descriptor-only</mode>
+    <execution>SensorMax-native runtime required; foreign analysis/network/Bluetooth/camera/audio modules are not executed.</execution>
+    <source-format>legacy-experiment-xml</source-format>
+  </translation-status>
+  <source-features>
+  </source-features>
+</sensormax-experiment>

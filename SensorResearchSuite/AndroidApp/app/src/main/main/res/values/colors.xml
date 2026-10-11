@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="splash_background">#0F172A</color>
+    <color name="splash_icon">#FFFFFF</color>
+
+    <!-- SensorMax palette: semantic UI/chart colours (referenced from code, do not rename) -->
+    <color name="sm_info_blue">#0284C7</color>
+    <color name="sm_success_green">#059669</color>
+    <color name="sm_info_cyan">#0891B2</color>
+    <color name="sm_chart_dark">#0B1220</color>
+    <color name="sm_teal_dark">#0F766E</color>
+    <color name="sm_teal">#14B8A6</color>
+    <color name="sm_green">#22C55E</color>
+    <color name="sm_cyan">#22D3EE</color>
+    <color name="sm_blue">#2563EB</color>
+    <color name="sm_chart_grid">#263449</color>
+    <color name="sm_slate">#334155</color>
+    <color name="sm_blue_500">#3B82F6</color>
+    <color name="sm_gray">#64748B</color>
+    <color name="sm_lime">#84CC16</color>
+    <color name="sm_purple">#A855F7</color>
+    <color name="sm_orange_dark">#C2410C</color>
+    <color name="sm_text_muted">#CBD5E1</color>
+    <color name="sm_amber_dark">#D97706</color>
+    <color name="sm_danger_red">#DC2626</color>
+    <color name="sm_text_light">#E2E8F0</color>
+    <color name="sm_danger">#EF4444</color>
+    <color name="sm_warning">#F59E0B</color>
+    <color name="sm_orange">#F97316</color>
+
+    <!-- =====================================================================
+         SensorMax UI tokens - used by layouts, styles and drawables.
+         Change the look of the app HERE; layouts never hard-code hex values.
+         ===================================================================== -->
+
+    <!-- Surfaces: screen < card < raised. Wells (charts, inputs, log) are recessed. -->
+    <color name="sm_surface_screen">#070B12</color>
+    <color name="sm_surface_card">#0E1623</color>
+    <color name="sm_surface_raised">#162135</color>
+    <color name="sm_surface_well">#080D16</color>
+    <color name="sm_surface_log">#05080E</color>
+    <color name="sm_surface_banner">#1B2636</color>
+    <color name="sm_surface_ok_chip">#123329</color>
+    <color name="sm_surface_segment_on">#1D3350</color>
+
+    <!-- Borders: hairline for cards, 3:1 outline for controls, cyan when focused -->
+    <color name="sm_border_subtle">#1F2D44</color>
+    <color name="sm_border_field">@color/sm_gray</color>
+    <color name="sm_border_focus">@color/sm_cyan</color>
+
+    <!-- Text: every pair below is at least 4.5:1 on the surfaces above -->
+    <color name="sm_text_primary">#F8FAFC</color>
+    <color name="sm_text_body">@color/sm_text_light</color>
+    <color name="sm_text_label">#AAB7CB</color>
+    <color name="sm_text_secondary">#8C9BB2</color>
+    <color name="sm_text_hint">#8391A8</color>
+    <color name="sm_text_accent">#67E8F9</color>
+    <color name="sm_text_ok">#86EFAC</color>
+    <color name="sm_text_info">#93C5FD</color>
+    <color name="sm_text_warn">#FDE68A</color>
+    <color name="sm_text_fault_hint">#C4B5FD</color>
+    <color name="sm_text_bearing_hint">#7DD3FC</color>
+    <color name="sm_text_on_action">#FFFFFF</color>
+    <color name="sm_text_bad">#FCA5A5</color>
+    <color name="sm_text_disabled">#7C8AA0</color>
+
+    <!-- Severity banner fills (set from code): white text is at least 5:1 on each -->
+    <color name="sm_banner_alert">#B91C1C</color>
+    <color name="sm_banner_warn">#B45309</color>
+    <color name="sm_banner_ok">#15803D</color>
+
+    <!-- Axis colours (same hues as the waveform legend) -->
+    <color name="sm_axis_x">#F87171</color>
+    <color name="sm_axis_y">#4ADE80</color>
+    <color name="sm_axis_z">#60A5FA</color>
+    <color name="sm_axis_rss">#2DD4BF</color>
+
+    <!-- Action fills: white text is at least 5:1 on each -->
+    <color name="sm_action_record_fill">#15803D</color>
+    <color name="sm_action_accent_fill">#0E7490</color>
+    <color name="sm_action_neutral_fill">#475569</color>
+    <color name="sm_action_disabled_fill">@color/sm_gray</color>
+    <color name="sm_ripple">#33FFFFFF</color>
+
+</resources>

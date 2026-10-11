@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Sensor characterization: static check of a still sensor burst.
+Styles: res/values/sensormax_styles.xml - colours: res/values/colors.xml - strings: res/values/strings.xml
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SensorMax.Card.Collapsible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:tag="card:sensor_characterization">
+    <LinearLayout
+        style="@style/SensorMax.CardHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_header">
+        <TextView
+            style="@style/SensorMax.Text.CardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/char_title" />
+        <ImageView
+            style="@style/SensorMax.Chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:tag="card_chevron" />
+    </LinearLayout>
+    <LinearLayout
+        style="@style/SensorMax.CardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_body">
+        <TextView
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/char_subtitle" />
+        <TextView
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:labelFor="@id/etCalibrationOperator"
+            android:text="@string/char_operator_label" />
+        <EditText
+            android:id="@+id/etCalibrationOperator"
+            style="@style/SensorMax.Field"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sm_control_height"
+            android:layout_marginTop="6dp"
+            android:hint="@string/char_operator_hint"
+            android:inputType="textCapWords" />
+        <Button
+            android:id="@+id/btnRunCalibration"
+            style="@style/SensorMax.Button.Accent"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sm_action_height"
+            android:layout_marginTop="16dp"
+            android:text="@string/action_run_static_check" />
+        <TextView
+            android:id="@+id/tvCalibrationResult"
+            style="@style/SensorMax.Text.Result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/char_result_initial" />
+    </LinearLayout>
+</LinearLayout>

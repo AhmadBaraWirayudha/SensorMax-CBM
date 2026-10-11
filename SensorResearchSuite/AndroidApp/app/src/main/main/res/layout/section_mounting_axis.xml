@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Mounting + axis mapping: mounting method, axis roles and the hold-still check.
+Styles: res/values/sensormax_styles.xml - colours: res/values/colors.xml - strings: res/values/strings.xml
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SensorMax.Card.Collapsible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:tag="card:mounting_axis">
+    <LinearLayout
+        style="@style/SensorMax.CardHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_header">
+        <TextView
+            style="@style/SensorMax.Text.CardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/mounting_title" />
+        <ImageView
+            style="@style/SensorMax.Chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:tag="card_chevron" />
+    </LinearLayout>
+    <LinearLayout
+        style="@style/SensorMax.CardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_body">
+        <TextView
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/mounting_subtitle" />
+        <TextView
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:labelFor="@id/spinnerMountingMethod"
+            android:text="@string/mounting_method_label" />
+        <Spinner
+            android:id="@+id/spinnerMountingMethod"
+            style="@style/SensorMax.Spinner"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sm_control_height"
+            android:layout_marginTop="6dp" />
+        <TextView
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/mounting_axis_label" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                style="@style/SensorMax.Text.Axis"
+                android:layout_width="32dp"
+                android:layout_height="@dimen/sm_control_height"
+                android:labelFor="@id/spinnerAxisRoleX"
+                android:text="@string/axis_x"
+                android:textColor="@color/sm_axis_x" />
+            <Spinner
+                android:id="@+id/spinnerAxisRoleX"
+                style="@style/SensorMax.Spinner"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/sm_control_height"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                style="@style/SensorMax.Text.Axis"
+                android:layout_width="32dp"
+                android:layout_height="@dimen/sm_control_height"
+                android:labelFor="@id/spinnerAxisRoleY"
+                android:text="@string/axis_y"
+                android:textColor="@color/sm_axis_y" />
+            <Spinner
+                android:id="@+id/spinnerAxisRoleY"
+                style="@style/SensorMax.Spinner"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/sm_control_height"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                style="@style/SensorMax.Text.Axis"
+                android:layout_width="32dp"
+                android:layout_height="@dimen/sm_control_height"
+                android:labelFor="@id/spinnerAxisRoleZ"
+                android:text="@string/axis_z"
+                android:textColor="@color/sm_axis_z" />
+            <Spinner
+                android:id="@+id/spinnerAxisRoleZ"
+                style="@style/SensorMax.Spinner"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/sm_control_height"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <Button
+            android:id="@+id/btnCheckMounting"
+            style="@style/SensorMax.Button.Accent"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sm_action_height"
+            android:layout_marginTop="16dp"
+            android:text="@string/action_check_mounting" />
+        <TextView
+            android:id="@+id/tvMountingCheck"
+            style="@style/SensorMax.Text.Result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/mounting_check_initial" />
+    </LinearLayout>
+</LinearLayout>

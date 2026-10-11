@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sensormax-experiment schema-version="1.0" source-version="1.14" source-file="accelerometer.legacy.xml" source-sha256="d7a2d6a62a7178fcd669770e8a5918f6a0d2bc87bc39c84e1d2d93e181a3d574">
+  <metadata>
+    <title>Acceleration with g</title>
+    <category>Raw Sensors</category>
+    <description>Get raw data from the accelerometer. This sensor will not subtract the gravitational force, so it will report an acceleration of 9.81 m/s² even when the phone is resting.</description>
+  </metadata>
+  <data-containers>
+    <container size="0">accX</container>
+    <container size="0">accY</container>
+    <container size="0">accZ</container>
+    <container size="0">acc</container>
+    <container size="0">acc_time</container>
+  </data-containers>
+  <sensors>
+    <sensor type="accelerometer">
+      <output component="x">accX</output>
+      <output component="y">accY</output>
+      <output component="z">accZ</output>
+      <output component="t">acc_time</output>
+      <output component="abs">acc</output>
+    </sensor>
+  </sensors>
+  <analysis />
+  <views>
+    <view label="Graph">
+      <element type="graph" label="Accelerometer x" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_acceleration]]" unitY="[[unit_short_meter_per_square_second]]" unitYperX="m/s³" partialUpdate="true" color="green">
+        <input>acc_time</input>
+        <input>accX</input>
+      </element>
+      <element type="graph" label="Accelerometer y" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_acceleration]]" unitY="[[unit_short_meter_per_square_second]]" unitYperX="m/s³" partialUpdate="true" color="blue">
+        <input>acc_time</input>
+        <input>accY</input>
+      </element>
+      <element type="graph" label="Accelerometer z" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_acceleration]]" unitY="[[unit_short_meter_per_square_second]]" unitYperX="m/s³" partialUpdate="true" color="yellow">
+        <input>acc_time</input>
+        <input>accZ</input>
+      </element>
+    </view>
+    <view label="Absolute">
+      <element type="graph" label="Absolute acceleration" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_acceleration]]" unitY="[[unit_short_meter_per_square_second]]" unitYperX="m/s³" partialUpdate="true" color="white">
+        <input>acc_time</input>
+        <input>acc</input>
+      </element>
+      <element type="value" label="Absolute acceleration" size="2" precision="2" unit="[[unit_short_meter_per_square_second]]">
+        <input>acc</input>
+      </element>
+    </view>
+    <view label="Multi">
+      <element type="graph" label="Acceleration" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_acceleration]]" unitY="[[unit_short_meter_per_square_second]]" unitYperX="m/s³" partialUpdate="true">
+        <input>acc_time</input>
+        <input>accX</input>
+        <input>acc_time</input>
+        <input>accY</input>
+        <input>acc_time</input>
+        <input>accZ</input>
+        <input>acc_time</input>
+        <input>acc</input>
+      </element>
+      <element type="value" label="Accelerometer x" size="2" precision="2" unit="[[unit_short_meter_per_square_second]]" color="green">
+        <input>accX</input>
+      </element>
+      <element type="value" label="Accelerometer y" size="2" precision="2" unit="[[unit_short_meter_per_square_second]]" color="blue">
+        <input>accY</input>
+      </element>
+      <element type="value" label="Accelerometer z" size="2" precision="2" unit="[[unit_short_meter_per_square_second]]" color="yellow">
+        <input>accZ</input>
+      </element>
+      <element type="value" label="Absolute acceleration" size="2" precision="2" unit="[[unit_short_meter_per_square_second]]" color="white">
+        <input>acc</input>
+      </element>
+    </view>
+    <view label="Simple">
+      <element type="value" label="Accelerometer x" size="2" precision="2" unit="[[unit_short_meter_per_square_second]]" color="green">
+        <input>accX</input>
+      </element>
+      <element type="value" label="Accelerometer y" size="2" precision="2" unit="[[unit_short_meter_per_square_second]]" color="blue">
+        <input>accY</input>
+      </element>
+      <element type="value" label="Accelerometer z" size="2" precision="2" unit="[[unit_short_meter_per_square_second]]" color="yellow">
+        <input>accZ</input>
+      </element>
+      <element type="value" label="Absolute acceleration" size="2" precision="2" unit="[[unit_short_meter_per_square_second]]" color="white">
+        <input>acc</input>
+      </element>
+    </view>
+  </views>
+  <exports>
+    <set name="Raw Data">
+      <data name="Time (s)">acc_time</data>
+      <data name="Acceleration x (m/s^2)">accX</data>
+      <data name="Acceleration y (m/s^2)">accY</data>
+      <data name="Acceleration z (m/s^2)">accZ</data>
+      <data name="Absolute acceleration (m/s^2)">acc</data>
+    </set>
+  </exports>
+  <translation-status>
+    <mode>descriptor-only</mode>
+    <execution>SensorMax-native runtime required; foreign analysis/network/Bluetooth/camera/audio modules are not executed.</execution>
+    <source-format>legacy-experiment-xml</source-format>
+  </translation-status>
+  <source-features>
+  </source-features>
+</sensormax-experiment>

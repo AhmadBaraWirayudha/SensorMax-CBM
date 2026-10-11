@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SensorMax by Bara</string>
+
+    <!-- Cards that fold (state description read by TalkBack) -->
+    <string name="card_state_expanded">Expanded</string>
+    <string name="card_state_collapsed">Collapsed</string>
+
+    <!-- Header + status -->
+    <string name="header_title">SensorMax</string>
+    <string name="header_subtitle">Field condition monitor</string>
+    <string name="header_badge_field">● FIELD</string>
+    <string name="status_initial">Initializing sensor array...</string>
+    <string name="status_ready">READY · Measurement service connected</string>
+
+    <!-- Action dock -->
+    <string name="action_snapshot">CAPTURE SNAPSHOT</string>
+    <string name="action_import_profile">IMPORT PROFILE</string>
+    <string name="action_stream_log">STREAM + LOG</string>
+    <string name="action_offline_log">OFFLINE LOG</string>
+    <string name="action_stop_stream_log">STOP STREAM + LOG</string>
+    <string name="action_stop_offline_log">STOP OFFLINE LOG</string>
+    <string name="status_active_stream_format">ACTIVE · STREAM + LOG · %1$d ms · %2$.1f Hz requested</string>
+    <string name="status_active_offline_format">ACTIVE · OFFLINE LOG · %1$d ms · %2$.1f Hz requested</string>
+    <string name="status_stopped">READY · Measurement stopped</string>
+    <string name="notification_channel_name">SensorMax measurement</string>
+    <string name="notification_channel_description">Shows when SensorMax is actively acquiring sensor data.</string>
+    <string name="notification_title">SensorMax measurement</string>
+    <string name="notification_ready_summary">Ready for sensor acquisition</string>
+    <string name="notification_measurement_active_stream">Measurement active · stream + log</string>
+    <string name="notification_measurement_active_offline">Measurement active · offline log</string>
+    <string name="notification_streaming_active">Streaming + local logging active</string>
+    <string name="notification_offline_active">Offline local logging active</string>
+
+    <!-- Condition summary -->
+    <string name="summary_title">Condition summary</string>
+    <string name="summary_banner_initial">WAITING · First spectrum window not available</string>
+    <string name="summary_rms_label">Overall RMS</string>
+    <string name="summary_rms_initial">-- m/s²</string>
+    <string name="summary_quality_label">Quality</string>
+    <string name="summary_quality_initial">-- / 100</string>
+    <string name="summary_sampling_label">Sampling</string>
+    <string name="summary_dominant_label">Dominant peak</string>
+    <string name="value_hz_initial">-- Hz</string>
+    <string name="summary_disclaimer">Derived velocity/displacement and all spectral diagnostics depend on the measured window and sampling quality.</string>
+
+    <!-- Live waveform -->
+    <string name="waveform_title">Live waveform</string>
+    <string name="waveform_subtitle">Acceleration • display path</string>
+    <string name="waveform_window">14 s</string>
+    <string name="cd_waveform_chart">Live triaxial acceleration waveform</string>
+    <string name="axis_auto">AUTO</string>
+    <string name="axis_x">X</string>
+    <string name="axis_y">Y</string>
+    <string name="axis_z">Z</string>
+    <string name="axis_rss">RSS</string>
+    <string name="waveform_note">Display smoothing: 10 Hz low-pass • fixed display range ±15 m/s² • raw acquisition remains separate</string>
+
+    <!-- Spectrum analyzer -->
+    <string name="spectrum_title">Spectrum analyzer</string>
+    <string name="spectrum_subtitle">Single-sided FFT • full measured bandwidth • dominant-peak screening</string>
+    <string name="cd_spectrum_chart">Vibration frequency spectrum</string>
+    <string name="rpm_label">Running speed / order reference</string>
+    <string name="rpm_hint">Running speed RPM (optional)</string>
+    <string name="fault_hint_initial">Screening hint: enter RPM for 1X / 2X / 3X order context.</string>
+
+    <!-- Fault screening -->
+    <string name="fault_title">Fault screening</string>
+    <string name="fault_subtitle">Order-related and bearing-related heuristics are screening aids, not diagnoses.</string>
+    <string name="envelope_label">Envelope spectrum</string>
+    <string name="cd_envelope_chart">Envelope spectrum for bearing screening</string>
+    <string name="bearing_hint_initial">Bearing screening: waiting for analysis...</string>
+    <string name="bearing_geometry_collapsed">"▸  Bearing geometry · optional"</string>
+    <string name="bearing_geometry_expanded">"▾  Bearing geometry · collapse"</string>
+    <string name="bearing_elements_label">Balls / rollers</string>
+    <string name="bearing_elements_hint">Count</string>
+    <string name="bearing_ball_label">Ball diameter (mm)</string>
+    <string name="bearing_ball_hint">mm</string>
+    <string name="bearing_pitch_label">Pitch diameter (mm)</string>
+    <string name="bearing_pitch_hint">mm</string>
+    <string name="bearing_angle_label">Contact angle (°)</string>
+    <string name="bearing_angle_hint">°</string>
+
+    <!-- Trend + history -->
+    <string name="trend_title">Trend + history</string>
+    <string name="trend_subtitle">Session trend helps establish context; waterfall shows spectral persistence over windows.</string>
+    <string name="trend_rms_label">Overall RMS trend</string>
+    <string name="cd_trend_chart">Overall vibration RMS trend</string>
+    <string name="waterfall_label">Spectral waterfall</string>
+    <string name="cd_waterfall">Recent spectral waterfall history</string>
+    <string name="waterfall_note">Relative logarithmic display • newest window at top</string>
+
+    <!-- Secondary telemetry -->
+    <string name="telemetry_collapsed">"▸  Secondary sensor telemetry · expand"</string>
+    <string name="telemetry_expanded">"▾  Secondary sensor telemetry · collapse"</string>
+    <string name="telemetry_mag">Magnetic flux</string>
+    <string name="telemetry_light">Ambient light</string>
+    <string name="telemetry_gravity">Gravity</string>
+    <string name="telemetry_activity">Activity / motion</string>
+    <string name="value_dash">--</string>
+
+    <!-- Asset + measurement point -->
+    <string name="asset_title">Asset + measurement point</string>
+    <string name="asset_subtitle">Use a stable machine and point identifier for repeatable evidence.</string>
+    <string name="asset_machine_label">Machine ID</string>
+    <string name="asset_machine_hint">Asset code</string>
+    <string name="asset_point_label">Measurement point</string>
+    <string name="asset_point_hint">Point / axis</string>
+    <string name="asset_label_label">Measurement label</string>
+    <string name="asset_label_hint">Optional</string>
+    <string name="action_add_label">ADD LABEL</string>
+    <string name="action_delete_label">DELETE LABEL</string>
+    <string name="asset_saved_label">Saved label</string>
+
+    <!-- Reference + limits -->
+    <string name="reference_title">Reference + limits</string>
+    <string name="reference_subtitle">ISO class provides an advisory vibration-velocity reference. Custom thresholds apply only when unclassified.</string>
+    <string name="reference_iso_label">ISO 20816 machine class</string>
+    <string name="reference_thresholds_label">Custom acceleration thresholds · unclassified only</string>
+    <string name="reference_warn_label">Warn (m/s²)</string>
+    <string name="reference_alert_label">Alert (m/s²)</string>
+    <string name="reference_threshold_hint">m/s²</string>
+
+    <!-- Mounting + axis mapping -->
+    <string name="mounting_title">Mounting + axis mapping</string>
+    <string name="mounting_subtitle">Verify the phone is physically settled before relying on the measurement.</string>
+    <string name="mounting_method_label">Mounting method</string>
+    <string name="mounting_axis_label">Axis role</string>
+    <string name="action_check_mounting">CHECK MOUNTING · HOLD STILL 2 s</string>
+    <string name="mounting_check_initial">Mounting: not checked this session</string>
+
+    <!-- Sensor characterization -->
+    <string name="char_title">Sensor characterization</string>
+    <string name="char_subtitle">Static characterization checks a still sensor burst. It is not a full multi-orientation accelerometer calibration.</string>
+    <string name="char_operator_label">Operator (optional)</string>
+    <string name="char_operator_hint">Operator name</string>
+    <string name="action_run_static_check">RUN STATIC CHECK · HOLD STILL 3 s</string>
+    <string name="char_result_initial">Static characterization: not run this session</string>
+
+    <!-- Acquisition + telemetry -->
+    <string name="acq_title">Acquisition + telemetry</string>
+    <string name="acq_subtitle">Acquisition rate controls the measured bandwidth. Network streaming is optional; local evidence can run independently.</string>
+    <string name="acq_host_label">WebSocket host / IP</string>
+    <string name="acq_host_hint">Hostname or IP</string>
+    <string name="acq_port_label">Port</string>
+    <string name="acq_port_hint">1–65535</string>
+    <string name="capture_interval_initial">Capture interval: —</string>
+    <string name="capture_min">5 ms</string>
+    <string name="capture_max">500 ms</string>
+
+    <!-- Device + debug -->
+    <string name="device_title">Device + debug</string>
+    <string name="device_subtitle">Hardware, source and diagnostic details for validation.</string>
+    <string name="device_source_label">Acquisition source</string>
+    <string name="ble_label">BLE / GATT profile</string>
+    <string name="ble_address_label">BLE MAC address (optional)</string>
+    <string name="ble_address_hint">AA:BB:CC:DD:EE:FF</string>
+    <string name="ble_note">Profile is source/reference-backed. Hardware acceptance remains open.</string>
+    <string name="camera_label">Camera / photometric</string>
+    <string name="camera_note">Camera2 Y-plane statistics: mean relative luma plus under/over-exposure fractions. Exposure normalization and preview UI are not implemented yet.</string>
+    <string name="network_label">SensorMax network / TCP NDJSON</string>
+    <string name="network_port_label">Listen port</string>
+    <string name="network_port_hint">8765</string>
+    <string name="network_port_default">8765</string>
+    <string name="network_note">SensorMax-native TCP/NDJSON listener. Remote timestamps are metadata only; SensorMax assigns local monotonic timestamps at receipt.</string>
+    <string name="depth_label">Depth / ToF</string>
+    <string name="depth_note">Camera2 DEPTH16, capability-gated. Emits scalar range/confidence statistics; device validation remains open.</string>
+    <string name="sensor_matrix_label">Sensor matrix</string>
+    <string name="log_label">Diagnostic log</string>
+    <string name="log_initial">SYSTEM BOOT INITIALIZED...</string>
+
+    <!-- Footer -->
+    <string name="footer_tagline">Triaxial vibration acquisition • spectral analysis • field evidence</string>
+    <string name="footer_note">SensorMax • field evidence first • diagnostic outputs remain advisory</string>
+
+
+    <!-- Display preferences -->
+    <string name="preferences_title">Display preferences</string>
+    <string name="preferences_language_label">Language</string>
+    <string name="language_selector_heading">App language</string>
+    <string name="language_selector_hint">Changes immediately</string>
+    <string name="language_selector_content_description">Select the app language</string>
+    <string name="preferences_units_label">Measurement units</string>
+    <string name="preferences_units_note">Display only. Acquisition, analysis, thresholds and stored evidence remain SI internally.</string>
+    <string name="language_english">English</string>
+    <string name="language_indonesian">Bahasa Indonesia</string>
+    <string name="language_chinese_simplified">简体中文</string>
+    <string name="language_system">System default</string>
+    <string name="units_metric">Metric (SI)</string>
+    <string name="units_imperial">Imperial</string>
+    <string name="reference_warn_label_format">Warn (%1$s)</string>
+    <string name="reference_alert_label_format">Alert (%1$s)</string>
+    <string name="network_allow_lan_label">Allow LAN devices to connect (unencrypted, no authentication)</string>
+    <string name="numeric_input_invalid">Enter a valid number. Use either a comma or a period as the decimal separator, not both.</string>
+    <string name="network_note_loopback">TCP/NDJSON listens only on this device by default (127.0.0.1). Enable LAN access only on a trusted network; this listener has no TLS or authentication.</string>
+    <string name="network_note_lan">LAN mode listens on all interfaces (0.0.0.0). Traffic is unencrypted and unauthenticated; use only on a trusted, isolated network.</string>
+    <string name="network_listener_port_invalid">Use a listener port from 1024 to 65535.</string>
+    <string name="network_wss_required">Release builds require a secure WebSocket URL (wss://). Plain ws:// is available only in debug builds.</string>
+    <string name="waveform_note_format">Display smoothing: 10 Hz low-pass • fixed display range ±%1$.1f %2$s • raw acquisition remains separate</string>
+    <string name="waveform_empty_state">Waiting for triaxial sensor samples</string>
+    <string name="trend_empty_state">Waiting for first completed analysis window</string>
+    <string name="network_label_local">SensorMax network / TCP NDJSON</string>
+
+
+    <string name="chart_acceleration_label_format">%1$s · acceleration (%2$s)</string>
+    <string name="chart_envelope_label_format">%1$s · envelope (%2$s)</string>
+    <string name="chart_rms_trend_label_format">RMS trend (%1$s)</string>
+    <string name="bearing_ball_label_format">Ball diameter (%1$s)</string>
+    <string name="bearing_pitch_label_format">Pitch diameter (%1$s)</string>
+
+
+<string name="otg_title">USB-OTG sensor diagnostics</string>
+    <string name="otg_note">Refresh attached devices, grant permission, then read raw bytes from a bulk-IN endpoint. Bytes are not converted into measurements until the sensor protocol and calibration are known.</string>
+    <string name="otg_refresh_button">Refresh USB devices</string>
+    <string name="otg_read_button">Read raw data</string>
+    <string name="otg_stop_button">Stop USB read</string>
+    <string name="otg_no_devices">No USB host devices detected.</string>
+    <string name="otg_devices_found">USB devices detected: %1$d</string>
+    <string name="otg_select_device">Select a USB device first.</string>
+    <string name="otg_permission_pending">Waiting for USB permission…</string>
+    <string name="otg_permission_denied">USB permission was not granted.</string>
+    <string name="otg_reader_not_started">USB reader could not start: %1$s</string>
+    <string name="otg_raw_empty">Raw USB data will appear here. No decoded measurements are inferred.</string>
+    <string name="otg_reader_idle">USB reader stopped.</string>
+    <string name="network_websocket_port_invalid">Use a target port from 1 to 65535.</string>
+    <string name="network_websocket_url_invalid">Enter a valid WebSocket URL or hostname.</string>
+    <string name="spectrum_empty_state">Waiting for first 256-sample FFT window</string>
+    <string name="envelope_empty_state">Waiting for spectral analysis</string>
+    <string name="summary_detail_format">%1$.3f g\nVelocity %2$.3f %3$s\nDisplacement %4$.1f %5$s</string>
+    <string name="impact_event_format">Shock %1$.2f %2$s · Axis %3$s · Baseline %4$.2f %5$s · Threshold %6$.2f %7$s\n%8$s</string>
+    <string name="dominant_rss_detail_format">%1$.3f %2$s · %3$s</string>
+    <string name="dominant_axis_detail_format">%1$.3f %2$s · %3$s\nCrest %4$.2f · Kurtosis %5$.2f</string>
+    <string name="otg_reader_reading">Reading raw USB bytes; values are not decoded.</string>
+    <string name="otg_reader_stopped">Raw USB read stopped.</string>
+    <string name="otg_reader_disconnected">USB device disconnected.</string>
+    <string name="otg_reader_error">USB read stopped: %1$s</string>
+
+    <!-- Sprint 28: localized user-facing feedback -->
+    <string name="measurement_service_connecting">Measurement service is still connecting.</string>
+    <string name="experiment_import_failed">Could not import experiment profile.</string>
+    <string name="translation_exported">SensorMax translation exported.</string>
+    <string name="translation_export_failed">Could not export translation.</string>
+    <string name="asset_point_required">Enter both asset and measurement point first.</string>
+    <string name="asset_point_save_failed">Could not save measurement point.</string>
+
+    <!-- Sprint 28: localized acquisition and validation feedback -->
+    <string name="permission_bluetooth_required">Bluetooth permissions are required for BLE acquisition.</string>
+    <string name="permission_microphone_required">Microphone permission is required for audio acquisition.</string>
+    <string name="location_services_enable">Enable Location services before starting GNSS acquisition.</string>
+    <string name="permission_location_required">Location permission is required for GNSS acquisition.</string>
+    <string name="permission_camera_photometric_required">Camera permission is required for photometric acquisition.</string>
+    <string name="permission_camera_depth_required">Camera permission is required for depth acquisition.</string>
+    <string name="measurement_session_required">Start a measurement session first.</string>
+    <string name="measurement_service_unavailable">Measurement service is unavailable.</string>
+    <string name="snapshot_captured_format">Snapshot captured\n%1$s / %2$s</string>
+    <string name="spectrum_not_ready">No completed spectrum yet.\nContinue measuring until the first analysis window is available.</string>
+    <string name="enter_ble_address">Enter the BLE device MAC address first.</string>
+    <string name="enter_websocket_host">Enter a WebSocket host or URL first.</string>
+    <string name="deployment_rejected">Measurement service is unavailable or deployment was rejected.</string>
+    <string name="sensor_required">Select at least one hardware sensor.</string>
+
+    <!-- Sprint 28: localized workflow labels and profile summary -->
+    <string name="capture_interval_format">Capture interval: %1$d ms · requested %2$.1f Hz</string>
+    <string name="source_android_sensor">Android Sensor Framework</string>
+    <string name="source_ble_gatt">BLE / GATT</string>
+    <string name="source_audio_microphone">Audio / Microphone</string>
+    <string name="source_location_gnss">Location / GNSS</string>
+    <string name="source_camera_photometric">Camera / Photometric</string>
+    <string name="source_depth_tof">Depth / ToF</string>
+    <string name="source_network_tcp_ndjson">SensorMax Network (TCP/NDJSON)</string>
+    <string name="profile_import_dialog_title">Experiment profile imported</string>
+    <string name="profile_summary_format">%1$s\n\nFormat: %2$s\nSource: %3$s\nSensors:\n%4$s\n\nAnalysis: %5$s\n\nUnsupported runtime features:\n%6$s\n\nSHA-256:\n%7$s</string>
+    <string name="profile_unmapped">unmapped</string>
+    <string name="profile_no_sensor_bindings">• No sensor bindings</string>
+    <string name="profile_none">None</string>
+    <string name="profile_close">CLOSE</string>
+    <string name="profile_export">EXPORT XML + KOTLIN</string>
+    <string name="profile_apply">APPLY PROFILE</string>
+    <string name="depth_acquisition_note">Camera2 DEPTH16, capability-gated. Emits scalar range/confidence statistics; supported-device and physical-depth validation remain open.</string>
+    <string name="ble_profile_note_format">%1$s. Enter a MAC address; SensorMax subscribes to the defined notification characteristic. This provider does not write device configuration.</string>
+    <string name="ble_profile_unavailable">No runnable BLE profile is available.</string>
+</resources>

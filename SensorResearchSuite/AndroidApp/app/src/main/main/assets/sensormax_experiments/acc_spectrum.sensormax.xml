@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sensormax-experiment schema-version="1.0" source-version="1.20" source-file="acc_spectrum.legacy.xml" source-sha256="7cde34989ba0fdfa992e5f4367684b78266774a90bcd6b20357c7dcc8b696ff9">
+  <metadata>
+    <title>Acceleration Spectrum</title>
+    <category>Tools</category>
+    <description>Display the frequency spectrum of data from the accelerometer.
+
+            This experiment records data from the accelerometer and calculates its frequency spectrum through a Fourier transformation (FFT). The maximum detectable frequency depends on the maximum acquisition rate of your sensor.</description>
+  </metadata>
+  <data-containers>
+    <container size="4096">accInX</container>
+    <container size="4096">accInY</container>
+    <container size="4096">accInZ</container>
+    <container size="4096">accX</container>
+    <container size="4096">accY</container>
+    <container size="4096">accZ</container>
+    <container size="4096">time</container>
+    <container size="4096">accX_subrange</container>
+    <container size="4096">accY_subrange</container>
+    <container size="4096">accZ_subrange</container>
+    <container size="4096">time_subrange</container>
+    <container size="1">recording_length</container>
+    <container size="1">subrange_start</container>
+    <container init="256" clearGroup="Settings">samples</container>
+    <container size="1">actual_samples</container>
+    <container size="1">actual_samples+1</container>
+    <container size="1">period</container>
+    <container size="1">count-1</container>
+    <container size="1">count+1</container>
+    <container size="1">count/2</container>
+    <container size="1">count</container>
+    <container size="1">t0</container>
+    <container size="1">t1</container>
+    <container size="1">Dt</container>
+    <container size="1">dt</container>
+    <container size="1">maxf</container>
+    <container size="1">df</container>
+    <container size="1">arate</container>
+    <container size="4096">frequency</container>
+    <container size="4096">fftXX</container>
+    <container size="4096">fftYX</container>
+    <container size="4096">fftZX</container>
+    <container size="4096">fftXY</container>
+    <container size="4096">fftYY</container>
+    <container size="4096">fftZY</container>
+    <container size="2048">halfFrequency</container>
+    <container size="2048">halfFFTtempX</container>
+    <container size="2048">halfFFTtempY</container>
+    <container size="2048">halfFFTtempX2</container>
+    <container size="2048">halfFFTtempY2</container>
+    <container size="2048">fftX</container>
+    <container size="2048">fftY</container>
+    <container size="2048">fftZ</container>
+    <container size="2048">fft2</container>
+    <container size="2048">fft</container>
+    <container size="0">f0</container>
+    <container size="0">t</container>
+    <container size="1">resolutionRatio</container>
+    <container size="256">timeline</container>
+    <container size="256">reducedf</container>
+    <container size="256">reducedfft</container>
+    <container size="1">firstfft</container>
+    <container size="256">subf</container>
+    <container size="256">subfft</container>
+    <container size="32768">tmap</container>
+    <container size="32768">fmap</container>
+    <container size="32768">fftmap</container>
+  </data-containers>
+  <sensors>
+    <sensor type="accelerometer" rate="0">
+      <output component="x">accInX</output>
+      <output component="y">accInY</output>
+      <output component="z">accInZ</output>
+      <output component="t">time</output>
+    </sensor>
+  </sensors>
+  <analysis sleep="0.1">
+    <operation type="timer">
+      <outputs>
+        <output>t</output>
+      </outputs>
+    </operation>
+    <operation type="const">
+      <inputs>
+        <input>t</input>
+        <input>256</input>
+      </inputs>
+      <outputs>
+        <output>timeline</output>
+      </outputs>
+    </operation>
+    <operation type="append">
+      <inputs>
+        <input>accInX</input>
+      </inputs>
+      <outputs>
+        <output>accX</output>
+      </outputs>
+    </operation>
+    <operation type="append">
+      <inputs>
+        <input>accInY</input>
+      </inputs>
+      <outputs>
+        <output>accY</output>
+      </outputs>
+    </operation>
+    <operation type="append">
+      <inputs>
+        <input>accInZ</input>
+      </inputs>
+      <outputs>
+        <output>accZ</output>
+      </outputs>
+    </operation>
+    <operation type="count">
+      <inputs>
+        <input>accX</input>
+      </inputs>
+      <outputs>
+        <output>count</output>
+      </outputs>
+    </operation>
+    <operation type="subtract">
+      <inputs>
+        <input>count</input>
+        <input>1</input>
+      </inputs>
+      <outputs>
+        <output>count-1</output>
+      </outputs>
+    </operation>
+    <operation type="first">
+      <inputs>
+        <input>time</input>
+      </inputs>
+      <outputs>
+        <output>t0</output>
+      </outputs>
+    </operation>
+    <operation type="subrange">
+      <inputs>
+        <input>count-1</input>
+        <input>1</input>
+        <input>time</input>
+      </inputs>
+      <outputs>
+        <output>t1</output>
+      </outputs>
+    </operation>
+    <operation type="subtract">
+      <inputs>
+        <input>t1</input>
+        <input>t0</input>
+      </inputs>
+      <outputs>
+        <output>Dt</output>
+      </outputs>
+    </operation>
+    <operation type="divide">
+      <inputs>
+        <input>Dt</input>
+        <input>count-1</input>
+      </inputs>
+      <outputs>
+        <output>dt</output>
+      </outputs>
+    </operation>
+    <operation type="count">
+      <inputs>
+        <input>accX</input>
+      </inputs>
+      <outputs>
+        <output>recording_length</output>
+      </outputs>
+    </operation>
+    <operation type="subtract">
+      <inputs>
+        <input>recording_length</input>
+        <input>samples</input>
+      </inputs>
+      <outputs>
+        <output>subrange_start</output>
+      </outputs>
+    </operation>
+    <operation type="subrange">
+      <inputs>
+        <input>subrange_start</input>
+        <input>accX</input>
+      </inputs>
+      <outputs>
+        <output>accX_subrange</output>
+      </outputs>
+    </operation>
+    <operation type="subrange">
+      <inputs>
+        <input>subrange_start</input>
+        <input>accY</input>
+      </inputs>
+      <outputs>
+        <output>accY_subrange</output>
+      </outputs>
+    </operation>
+    <operation type="subrange">
+      <inputs>
+        <input>subrange_start</input>
+        <input>accZ</input>
+      </inputs>
+      <outputs>
+        <output>accZ_subrange</output>
+      </outputs>
+    </operation>
+    <operation type="subrange">
+      <inputs>
+        <input>subrange_start</input>
+        <input>time</input>
+      </inputs>
+      <outputs>
+        <output>time_subrange</output>
+      </outputs>
+    </operation>
+    <operation type="count">
+      <inputs>
+        <input>accX_subrange</input>
+      </inputs>
+      <outputs>
+        <output>actual_samples</output>
+      </outputs>
+    </operation>
+    <operation type="add">
+      <inputs>
+        <input>actual_samples</input>
+        <input>1</input>
+      </inputs>
+      <outputs>
+        <output>actual_samples+1</output>
+      </outputs>
+    </operation>
+    <operation type="multiply">
+      <inputs>
+        <input>actual_samples</input>
+        <input>dt</input>
+      </inputs>
+      <outputs>
+        <output>period</output>
+      </outputs>
+    </operation>
+    <operation type="divide">
+      <inputs>
+        <input>1</input>
+        <input>period</input>
+      </inputs>
+      <outputs>
+        <output>df</output>
+      </outputs>
+    </operation>
+    <operation type="fft">
+      <inputs>
+        <input>accX_subrange</input>
+      </inputs>
+      <outputs>
+        <output>fftXX</output>
+        <output>fftXY</output>
+      </outputs>
+    </operation>
+    <operation type="fft">
+      <inputs>
+        <input>accY_subrange</input>
+      </inputs>
+      <outputs>
+        <output>fftYX</output>
+        <output>fftYY</output>
+      </outputs>
+    </operation>
+    <operation type="fft">
+      <inputs>
+        <input>accZ_subrange</input>
+      </inputs>
+      <outputs>
+        <output>fftZX</output>
+        <output>fftZY</output>
+      </outputs>
+    </operation>
+    <operation type="count">
+      <inputs>
+        <input>fftXX</input>
+      </inputs>
+      <outputs>
+        <output>count</output>
+      </outputs>
+    </operation>
+    <operation type="divide">
+      <inputs>
+        <input>actual_samples</input>
+        <input>2</input>
+      </inputs>
+      <outputs>
+        <output>count/2</output>
+      </outputs>
+    </operation>
+    <operation type="divide">
+      <inputs>
+        <input>0.5</input>
+        <input>dt</input>
+      </inputs>
+      <outputs>
+        <output>maxf</output>
+      </outputs>
+    </operation>
+    <operation type="divide">
+      <inputs>
+        <input>1</input>
+        <input>dt</input>
+      </inputs>
+      <outputs>
+        <output>arate</output>
+      </outputs>
+    </operation>
+    <operation type="ramp">
+      <inputs>
+        <input>0</input>
+        <input>arate</input>
+        <input>actual_samples+1</input>
+      </inputs>
+      <outputs>
+        <output>frequency</output>
+      </outputs>
+    </operation>
+    <operation type="subrange">
+      <inputs>
+        <input>1</input>
+        <input>count/2</input>
+        <input>frequency</input>
+        <input>fftXX</input>
+        <input>fftXY</input>
+      </inputs>
+      <outputs>
+        <output>halfFrequency</output>
+        <output>halfFFTtempX</output>
+        <output>halfFFTtempY</output>
+      </outputs>
+    </operation>
+    <operation type="multiply">
+      <inputs>
+        <input>halfFFTtempX</input>
+        <input>halfFFTtempX</input>
+      </inputs>
+      <outputs>
+        <output>halfFFTtempX2</output>
+      </outputs>
+    </operation>
+    <operation type="multiply">
+      <inputs>
+        <input>halfFFTtempY</input>
+        <input>halfFFTtempY</input>
+      </inputs>
+      <outputs>
+        <output>halfFFTtempY2</output>
+      </outputs>
+    </operation>
+    <operation type="add">
+      <inputs>
+        <input>halfFFTtempX2</input>
+        <input>halfFFTtempY2</input>
+      </inputs>
+      <outputs>
+        <output>fftX</output>
+      </outputs>
+    </operation>
+    <operation type="subrange">
+      <inputs>
+        <input>1</input>
+        <input>count/2</input>
+        <input>frequency</input>
+        <input>fftYX</input>
+        <input>fftYY</input>
+      </inputs>
+      <outputs>
+        <output>halfFrequency</output>
+        <output>halfFFTtempX</output>
+        <output>halfFFTtempY</output>
+      </outputs>
+    </operation>
+    <operation type="multiply">
+      <inputs>
+        <input>halfFFTtempX</input>
+        <input>halfFFTtempX</input>
+      </inputs>
+      <outputs>
+        <output>halfFFTtempX2</output>
+      </outputs>
+    </operation>
+    <operation type="multiply">
+      <inputs>
+        <input>halfFFTtempY</input>
+        <input>halfFFTtempY</input>
+      </inputs>
+      <outputs>
+        <output>halfFFTtempY2</output>
+      </outputs>
+    </operation>
+    <operation type="add">
+      <inputs>
+        <input>halfFFTtempX2</input>
+        <input>halfFFTtempY2</input>
+      </inputs>
+      <outputs>
+        <output>fftY</output>
+      </outputs>
+    </operation>
+    <operation type="subrange">
+      <inputs>
+        <input>1</input>
+        <input>count/2</input>
+        <input>frequency</input>
+        <input>fftZX</input>
+        <input>fftZY</input>
+      </inputs>
+      <outputs>
+        <output>halfFrequency</output>
+        <output>halfFFTtempX</output>
+        <output>halfFFTtempY</output>
+      </outputs>
+    </operation>
+    <operation type="multiply">
+      <inputs>
+        <input>halfFFTtempX</input>
+        <input>halfFFTtempX</input>
+      </inputs>
+      <outputs>
+        <output>halfFFTtempX2</output>
+      </outputs>
+    </operation>
+    <operation type="multiply">
+      <inputs>
+        <input>halfFFTtempY</input>
+        <input>halfFFTtempY</input>
+      </inputs>
+      <outputs>
+        <output>halfFFTtempY2</output>
+      </outputs>
+    </operation>
+    <operation type="add">
+      <inputs>
+        <input>halfFFTtempX2</input>
+        <input>halfFFTtempY2</input>
+      </inputs>
+      <outputs>
+        <output>fftZ</output>
+      </outputs>
+    </operation>
+    <operation type="add">
+      <inputs>
+        <input>fftX</input>
+        <input>fftY</input>
+        <input>fftZ</input>
+      </inputs>
+      <outputs>
+        <output>fft2</output>
+      </outputs>
+    </operation>
+    <operation type="power">
+      <inputs>
+        <input>fft2</input>
+        <input>0.5</input>
+      </inputs>
+      <outputs>
+        <output>fft</output>
+      </outputs>
+    </operation>
+    <operation type="max">
+      <inputs>
+        <input>fft</input>
+        <input>halfFrequency</input>
+      </inputs>
+      <outputs>
+        <output>f0</output>
+      </outputs>
+    </operation>
+    <operation type="divide">
+      <inputs>
+        <input>actual_samples</input>
+        <input>512</input>
+      </inputs>
+      <outputs>
+        <output>resolutionRatio</output>
+      </outputs>
+    </operation>
+    <operation type="reduce" averageY="true" averageX="false">
+      <inputs>
+        <input>resolutionRatio</input>
+        <input>halfFrequency</input>
+        <input>fft</input>
+      </inputs>
+      <outputs>
+        <output>reducedf</output>
+        <output>reducedfft</output>
+      </outputs>
+    </operation>
+    <operation type="const">
+      <outputs>
+        <output>subf</output>
+      </outputs>
+    </operation>
+    <operation type="first">
+      <inputs>
+        <input>reducedfft</input>
+      </inputs>
+      <outputs>
+        <output>firstfft</output>
+      </outputs>
+    </operation>
+    <operation type="const">
+      <inputs>
+        <input>firstfft</input>
+      </inputs>
+      <outputs>
+        <output>subfft</output>
+      </outputs>
+    </operation>
+    <operation type="subrange">
+      <inputs>
+        <input>0</input>
+        <input>256</input>
+        <input>reducedf</input>
+        <input>reducedfft</input>
+      </inputs>
+      <outputs>
+        <output>subf</output>
+        <output>subfft</output>
+      </outputs>
+    </operation>
+    <operation type="append">
+      <inputs>
+        <input>timeline</input>
+      </inputs>
+      <outputs>
+        <output>tmap</output>
+      </outputs>
+    </operation>
+    <operation type="append">
+      <inputs>
+        <input>subf</input>
+      </inputs>
+      <outputs>
+        <output>fmap</output>
+      </outputs>
+    </operation>
+    <operation type="append">
+      <inputs>
+        <input>subfft</input>
+      </inputs>
+      <outputs>
+        <output>fftmap</output>
+      </outputs>
+    </operation>
+  </analysis>
+  <views>
+    <view label="Spectrum">
+      <element type="value" label="Peak-Frequency" unit="[[unit_short_hertz]]">
+        <input>f0</input>
+      </element>
+      <element type="value" label="Peak-Frequency" factor="60" unit="1/min">
+        <input>f0</input>
+      </element>
+      <element type="separator" height="1" />
+      <element type="graph" label="Fourier Transform" logX="false" logY="true" labelX="Frequency" unitX="[[unit_short_hertz]]" labelY="FFT Mag" unitY="[[unit_short_arbitrary_unit]]">
+        <input>halfFrequency</input>
+        <input>fft</input>
+      </element>
+      <element type="separator" height="1" />
+      <element type="value" label="Samples used" precision="0">
+        <input>actual_samples</input>
+      </element>
+      <element type="value" label="Period used" unit="[[unit_short_second]]" precision="2">
+        <input>period</input>
+      </element>
+      <element type="value" label="Resolution" unit="[[unit_short_hertz]]" precision="2">
+        <input>df</input>
+      </element>
+      <element type="value" label="Acquisition rate" unit="[[unit_short_hertz]]" precision="0">
+        <input>arate</input>
+      </element>
+      <element type="value" label="Nyquist frequency" unit="[[unit_short_hertz]]" precision="0">
+        <input>maxf</input>
+      </element>
+    </view>
+    <view label="History">
+      <element type="graph" label="Fourier Transform" logZ="true" labelX="Frequency" unitX="[[unit_short_hertz]]" labelY="Time" unitY="[[unit_short_second]]" labelZ="FFT Mag" unitZ="[[unit_short_arbitrary_unit]]" aspectRatio="1" style="map" mapWidth="256" partialUpdate="true">
+        <input>fmap</input>
+        <input>tmap</input>
+        <input>fftmap</input>
+      </element>
+      <element type="graph" label="History" labelX="Time" unitX="[[unit_short_second]]" labelY="Peak-Frequency" unitY="[[unit_short_hertz]]" partialUpdate="true" style="dots">
+        <input>t</input>
+        <input>f0</input>
+      </element>
+    </view>
+    <view label="Settings">
+      <element type="info" label="Below you can set the number of samples used for the Fourier transform. More samples means slower updates, but higher spectral resolution." />
+      <element type="dropdown" label="Samples" />
+    </view>
+    <view label="Raw data">
+      <element type="graph" label="Acceleration x" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_acceleration]]" unitY="[[unit_short_meter_per_square_second]]" unitYperX="m/s³">
+        <input>time_subrange</input>
+        <input>accX_subrange</input>
+      </element>
+      <element type="graph" label="Acceleration y" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_acceleration]]" unitY="[[unit_short_meter_per_square_second]]" unitYperX="m/s³">
+        <input>time_subrange</input>
+        <input>accY_subrange</input>
+      </element>
+      <element type="graph" label="Acceleration z" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_acceleration]]" unitY="[[unit_short_meter_per_square_second]]" unitYperX="m/s³">
+        <input>time_subrange</input>
+        <input>accZ_subrange</input>
+      </element>
+    </view>
+  </views>
+  <exports>
+    <set name="FFT Spectrum">
+      <data name="Frequency (Hz)">halfFrequency</data>
+      <data name="Absolute Amplitude (a.u.)">fft</data>
+    </set>
+    <set name="Peak History">
+      <data name="Time (s)">t</data>
+      <data name="Peak-Frequency">f0</data>
+    </set>
+    <set name="Raw data">
+      <data name="Time (s)">time_subrange</data>
+      <data name="Acceleration x (m/s²)">accX_subrange</data>
+      <data name="Acceleration y (m/s²)">accY_subrange</data>
+      <data name="Acceleration z (m/s²)">accZ_subrange</data>
+    </set>
+  </exports>
+  <translation-status>
+    <mode>descriptor-only</mode>
+    <execution>SensorMax-native runtime required; foreign analysis/network/Bluetooth/camera/audio modules are not executed.</execution>
+    <source-format>legacy-experiment-xml</source-format>
+  </translation-status>
+  <source-features>
+    <feature>analysis-op:add</feature>
+    <feature>analysis-op:append</feature>
+    <feature>analysis-op:const</feature>
+    <feature>analysis-op:count</feature>
+    <feature>analysis-op:divide</feature>
+    <feature>analysis-op:fft</feature>
+    <feature>analysis-op:first</feature>
+    <feature>analysis-op:max</feature>
+    <feature>analysis-op:multiply</feature>
+    <feature>analysis-op:power</feature>
+    <feature>analysis-op:ramp</feature>
+    <feature>analysis-op:reduce</feature>
+    <feature>analysis-op:subrange</feature>
+    <feature>analysis-op:subtract</feature>
+    <feature>analysis-op:timer</feature>
+  </source-features>
+</sensormax-experiment>

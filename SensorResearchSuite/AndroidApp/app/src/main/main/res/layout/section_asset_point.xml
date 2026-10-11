@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Asset + measurement point: machine, point and saved measurement labels.
+Styles: res/values/sensormax_styles.xml - colours: res/values/colors.xml - strings: res/values/strings.xml
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SensorMax.Card.Collapsible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:tag="card:asset_point">
+    <LinearLayout
+        style="@style/SensorMax.CardHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_header">
+        <TextView
+            style="@style/SensorMax.Text.CardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/asset_title" />
+        <ImageView
+            style="@style/SensorMax.Chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:tag="card_chevron" />
+    </LinearLayout>
+    <LinearLayout
+        style="@style/SensorMax.CardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_body">
+        <TextView
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/asset_subtitle" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
+                <TextView
+                    style="@style/SensorMax.Text.Label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@id/etMachineId"
+                    android:text="@string/asset_machine_label" />
+                <EditText
+                    android:id="@+id/etMachineId"
+                    style="@style/SensorMax.Field.Mono"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/sm_control_height"
+                    android:layout_marginTop="6dp"
+                    android:hint="@string/asset_machine_hint"
+                    android:inputType="textCapCharacters" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    style="@style/SensorMax.Text.Label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@id/etPointTag"
+                    android:text="@string/asset_point_label" />
+                <EditText
+                    android:id="@+id/etPointTag"
+                    style="@style/SensorMax.Field.Mono"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/sm_control_height"
+                    android:layout_marginTop="6dp"
+                    android:hint="@string/asset_point_hint"
+                    android:inputType="textCapCharacters" />
+            </LinearLayout>
+        </LinearLayout>
+        <TextView
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:labelFor="@id/etCustomTagLabel"
+            android:text="@string/asset_label_label" />
+        <EditText
+            android:id="@+id/etCustomTagLabel"
+            style="@style/SensorMax.Field"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sm_control_height"
+            android:layout_marginTop="6dp"
+            android:hint="@string/asset_label_hint"
+            android:inputType="textCapSentences" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btnAddTag"
+                style="@style/SensorMax.Button.Accent.Compact"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/sm_action_height_secondary"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="@string/action_add_label" />
+            <Button
+                android:id="@+id/btnDeleteTag"
+                style="@style/SensorMax.Button.Outlined.Compact"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/sm_action_height_secondary"
+                android:layout_weight="1"
+                android:text="@string/action_delete_label" />
+        </LinearLayout>
+        <TextView
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:labelFor="@id/spinnerSavedTags"
+            android:text="@string/asset_saved_label" />
+        <Spinner
+            android:id="@+id/spinnerSavedTags"
+            style="@style/SensorMax.Spinner"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sm_control_height"
+            android:layout_marginTop="6dp" />
+    </LinearLayout>
+</LinearLayout>

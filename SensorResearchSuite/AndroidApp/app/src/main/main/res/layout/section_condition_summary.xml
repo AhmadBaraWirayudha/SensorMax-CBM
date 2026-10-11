@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Condition summary: severity banner and key metrics. This is the at-a-glance block.
+Styles: res/values/sensormax_styles.xml - colours: res/values/colors.xml - strings: res/values/strings.xml
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SensorMax.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        style="@style/SensorMax.Text.CardTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/summary_title" />
+
+    <!-- Severity banner: the wrapper rounds and clips it, so any colour set from code keeps the rounded shape -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/sm_bg_banner"
+        android:clipToOutline="true"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/tvSeverityBanner"
+            style="@style/SensorMax.Text.Banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/summary_banner_initial" />
+    </LinearLayout>
+
+    <!-- Key metrics. The big value is set from code as one short number; the grey lines under it are the details (hidden until data arrives) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+        <LinearLayout
+            style="@style/SensorMax.Tile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:layout_marginEnd="8dp">
+            <TextView
+                style="@style/SensorMax.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/summary_rms_label" />
+            <TextView
+                android:id="@+id/tvOverallRms"
+                style="@style/SensorMax.Text.Hero"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/summary_rms_initial" />
+            <TextView
+                android:id="@+id/tvOverallRmsDetail"
+                style="@style/SensorMax.Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:visibility="gone" />
+        </LinearLayout>
+        <LinearLayout
+            style="@style/SensorMax.Tile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <TextView
+                style="@style/SensorMax.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/summary_quality_label" />
+            <TextView
+                android:id="@+id/tvQualityScore"
+                style="@style/SensorMax.Text.Metric"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/summary_quality_initial"
+                android:textColor="@color/sm_text_ok" />
+            <TextView
+                android:id="@+id/tvQualityDetail"
+                style="@style/SensorMax.Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+        <LinearLayout
+            style="@style/SensorMax.Tile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp">
+            <TextView
+                style="@style/SensorMax.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/summary_sampling_label" />
+            <TextView
+                android:id="@+id/tvSampleRate"
+                style="@style/SensorMax.Text.Value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/value_hz_initial" />
+            <TextView
+                android:id="@+id/tvSampleRateDetail"
+                style="@style/SensorMax.Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:visibility="gone" />
+        </LinearLayout>
+        <LinearLayout
+            style="@style/SensorMax.Tile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <TextView
+                style="@style/SensorMax.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/summary_dominant_label" />
+            <TextView
+                android:id="@+id/tvDominantFreq"
+                style="@style/SensorMax.Text.Value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/value_hz_initial" />
+            <TextView
+                android:id="@+id/tvDominantFreqDetail"
+                style="@style/SensorMax.Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tvSamplingDiagnostics"
+        style="@style/SensorMax.Text.Caption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:visibility="gone" />
+    <TextView
+        style="@style/SensorMax.Text.Caption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/summary_disclaimer" />
+</LinearLayout>

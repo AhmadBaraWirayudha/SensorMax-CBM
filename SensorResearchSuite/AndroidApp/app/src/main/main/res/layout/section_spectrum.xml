@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Spectrum analyzer: FFT chart plus the running-speed (RPM) reference field.
+Styles: res/values/sensormax_styles.xml - colours: res/values/colors.xml - strings: res/values/strings.xml
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SensorMax.Card.Collapsible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:tag="card:spectrum">
+    <LinearLayout
+        style="@style/SensorMax.CardHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_header">
+        <TextView
+            style="@style/SensorMax.Text.CardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/spectrum_title" />
+        <ImageView
+            style="@style/SensorMax.Chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:tag="card_chevron" />
+    </LinearLayout>
+    <LinearLayout
+        style="@style/SensorMax.CardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_body">
+        <TextView
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/spectrum_subtitle" />
+        <com.research.sensormax.SensorMaxLineChart
+            android:id="@+id/spectrumChart"
+            style="@style/SensorMax.Chart"
+            android:layout_width="match_parent"
+            android:layout_height="245dp"
+            android:layout_marginTop="12dp"
+            android:contentDescription="@string/cd_spectrum_chart" />
+        <TextView
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:labelFor="@id/etRpm"
+            android:text="@string/rpm_label" />
+        <EditText
+            android:id="@+id/etRpm"
+            style="@style/SensorMax.Field.Mono"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sm_control_height"
+            android:layout_marginTop="6dp"
+            android:hint="@string/rpm_hint"
+            android:inputType="numberDecimal" />
+        <TextView
+            android:id="@+id/tvFaultHint"
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/fault_hint_initial"
+            android:textColor="@color/sm_text_fault_hint" />
+    </LinearLayout>
+</LinearLayout>

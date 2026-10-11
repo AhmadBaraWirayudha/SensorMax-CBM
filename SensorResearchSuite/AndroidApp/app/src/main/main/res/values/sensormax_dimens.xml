@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Spacing, shape and touch-target tokens shared by SensorMax layouts, styles and drawables -->
+    <dimen name="sm_screen_padding">12dp</dimen>
+    <dimen name="sm_card_padding">16dp</dimen>
+    <dimen name="sm_card_gap">12dp</dimen>
+
+    <dimen name="sm_radius_card">14dp</dimen>
+    <dimen name="sm_radius_inner">10dp</dimen>
+    <dimen name="sm_radius_chip">20dp</dimen>
+
+    <!-- Touch targets: fields and secondary actions 48dp+, primary actions 56dp -->
+    <dimen name="sm_control_height">52dp</dimen>
+    <dimen name="sm_action_height">56dp</dimen>
+    <dimen name="sm_action_height_secondary">48dp</dimen>
+
+</resources>

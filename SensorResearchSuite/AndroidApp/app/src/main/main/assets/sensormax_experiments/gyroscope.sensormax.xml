@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sensormax-experiment schema-version="1.0" source-version="1.14" source-file="gyroscope.legacy.xml" source-sha256="cd5cdece6a03a748451503feccc4ec826d97ca11de199c795b746e7f151afb78">
+  <metadata>
+    <title>Gyroscope (Rotation Rate)</title>
+    <category>Raw Sensors</category>
+    <description>Get raw data from the gyroscope.</description>
+  </metadata>
+  <data-containers>
+    <container size="0">gyrX</container>
+    <container size="0">gyrY</container>
+    <container size="0">gyrZ</container>
+    <container size="0">gyr</container>
+    <container size="0">gyr_time</container>
+  </data-containers>
+  <sensors>
+    <sensor type="gyroscope">
+      <output component="x">gyrX</output>
+      <output component="y">gyrY</output>
+      <output component="z">gyrZ</output>
+      <output component="t">gyr_time</output>
+      <output component="abs">gyr</output>
+    </sensor>
+  </sensors>
+  <analysis />
+  <views>
+    <view label="Graph">
+      <element type="graph" label="Gyroscope x" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_angular_velocity]]" unitY="[[unit_short_radian_per_second]]" unitYperX="rad/s²" partialUpdate="true" color="green">
+        <input>gyr_time</input>
+        <input>gyrX</input>
+      </element>
+      <element type="graph" label="Gyroscope y" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_angular_velocity]]" unitY="[[unit_short_radian_per_second]]" unitYperX="rad/s²" partialUpdate="true" color="blue">
+        <input>gyr_time</input>
+        <input>gyrY</input>
+      </element>
+      <element type="graph" label="Gyroscope z" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_angular_velocity]]" unitY="[[unit_short_radian_per_second]]" unitYperX="rad/s²" partialUpdate="true" color="yellow">
+        <input>gyr_time</input>
+        <input>gyrZ</input>
+      </element>
+    </view>
+    <view label="Absolute">
+      <element type="graph" label="Absolute" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_angular_velocity]]" unitY="[[unit_short_radian_per_second]]" unitYperX="rad/s²" partialUpdate="true" color="white">
+        <input>gyr_time</input>
+        <input>gyr</input>
+      </element>
+      <element type="value" label="Absolute" size="2" precision="3" unit="[[unit_short_radian_per_second]]">
+        <input>gyr</input>
+      </element>
+    </view>
+    <view label="Multi">
+      <element type="graph" label="Gyroscope" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_angular_velocity]]" unitY="[[unit_short_radian_per_second]]" unitYperX="rad/s²" partialUpdate="true">
+        <input>gyr_time</input>
+        <input>gyrX</input>
+        <input>gyr_time</input>
+        <input>gyrY</input>
+        <input>gyr_time</input>
+        <input>gyrZ</input>
+        <input>gyr_time</input>
+        <input>gyr</input>
+      </element>
+      <element type="value" label="Gyroscope x" size="2" precision="3" unit="[[unit_short_radian_per_second]]" color="green">
+        <input>gyrX</input>
+      </element>
+      <element type="value" label="Gyroscope y" size="2" precision="3" unit="[[unit_short_radian_per_second]]" color="blue">
+        <input>gyrY</input>
+      </element>
+      <element type="value" label="Gyroscope z" size="2" precision="3" unit="[[unit_short_radian_per_second]]" color="yellow">
+        <input>gyrZ</input>
+      </element>
+      <element type="value" label="Absolute" size="2" precision="3" unit="[[unit_short_radian_per_second]]" color="white">
+        <input>gyr</input>
+      </element>
+    </view>
+    <view label="Simple">
+      <element type="value" label="Gyroscope x" size="2" precision="3" unit="[[unit_short_radian_per_second]]" color="green">
+        <input>gyrX</input>
+      </element>
+      <element type="value" label="Gyroscope y" size="2" precision="3" unit="[[unit_short_radian_per_second]]" color="blue">
+        <input>gyrY</input>
+      </element>
+      <element type="value" label="Gyroscope z" size="2" precision="3" unit="[[unit_short_radian_per_second]]" color="yellow">
+        <input>gyrZ</input>
+      </element>
+      <element type="value" label="Absolute" size="2" precision="3" unit="[[unit_short_radian_per_second]]" color="white">
+        <input>gyr</input>
+      </element>
+    </view>
+  </views>
+  <exports>
+    <set name="Raw Data">
+      <data name="Time (s)">gyr_time</data>
+      <data name="Gyroscope x (rad/s)">gyrX</data>
+      <data name="Gyroscope y (rad/s)">gyrY</data>
+      <data name="Gyroscope z (rad/s)">gyrZ</data>
+      <data name="Absolute (rad/s)">gyr</data>
+    </set>
+  </exports>
+  <translation-status>
+    <mode>descriptor-only</mode>
+    <execution>SensorMax-native runtime required; foreign analysis/network/Bluetooth/camera/audio modules are not executed.</execution>
+    <source-format>legacy-experiment-xml</source-format>
+  </translation-status>
+  <source-features>
+  </source-features>
+</sensormax-experiment>

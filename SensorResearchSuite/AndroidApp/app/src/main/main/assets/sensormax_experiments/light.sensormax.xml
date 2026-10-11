@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sensormax-experiment schema-version="1.0" source-version="1.14" source-file="light.legacy.xml" source-sha256="e1ffd831cb1ee3aa71fbf57869e8516fad5d3076f37632d69358cc993614516b">
+  <metadata>
+    <title></title>
+    <category></category>
+    <description></description>
+  </metadata>
+  <data-containers>
+    <container size="0">illum</container>
+    <container size="0">illum_time</container>
+  </data-containers>
+  <sensors>
+    <sensor type="light">
+      <output component="x">illum</output>
+      <output component="t">illum_time</output>
+    </sensor>
+  </sensors>
+  <analysis />
+  <views>
+    <view label="Graph">
+      <element type="graph" label="Illuminance" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_illuminance]]" unitY="[[unit_short_lux]]" partialUpdate="true">
+        <input>illum_time</input>
+        <input>illum</input>
+      </element>
+      <element type="separator" height="1" />
+      <element type="info" label="Info" />
+    </view>
+    <view label="Simple">
+      <element type="value" label="Illuminance" size="2" precision="1" unit="[[unit_short_lux]]">
+        <input>illum</input>
+      </element>
+    </view>
+  </views>
+  <exports>
+    <set name="Raw Data">
+      <data name="Time (s)">illum_time</data>
+      <data name="Illuminance (lx)">illum</data>
+    </set>
+  </exports>
+  <translation-status>
+    <mode>descriptor-only</mode>
+    <execution>SensorMax-native runtime required; foreign analysis/network/Bluetooth/camera/audio modules are not executed.</execution>
+    <source-format>legacy-experiment-xml</source-format>
+  </translation-status>
+  <source-features>
+  </source-features>
+</sensormax-experiment>

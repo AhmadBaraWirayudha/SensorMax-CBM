@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- App theme (applied once the splash screen is dismissed).
+         The base is the DARK Material theme on purpose: SensorMax is a dark-only field instrument,
+         so spinner popups, dialogs, text-selection handles and any view without an explicit colour
+         must be dark-theme too, whatever the phone's day/night setting is. -->
+    <style
+        name="Theme.SensorMax"
+        parent="Theme.MaterialComponents.NoActionBar">
+
+        <!-- Typography -->
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+
+        <!-- Brand: cyan accent. colorSecondary drives cursor, seek bar and selection tints. -->
+        <item name="colorPrimary">@color/sm_info_cyan</item>
+        <item name="colorPrimaryVariant">@color/sm_action_accent_fill</item>
+        <item name="colorOnPrimary">@color/sm_text_on_action</item>
+        <item name="colorSecondary">@color/sm_cyan</item>
+        <item name="colorSecondaryVariant">@color/sm_info_cyan</item>
+        <item name="colorOnSecondary">@color/sm_surface_screen</item>
+        <item name="android:colorAccent">@color/sm_text_accent</item>
+        <item name="colorError">@color/sm_danger</item>
+
+        <!-- Surfaces -->
+        <item name="colorSurface">@color/sm_surface_card</item>
+        <item name="colorOnSurface">@color/sm_text_body</item>
+        <item name="android:colorBackground">@color/sm_surface_screen</item>
+        <item name="android:windowBackground">@color/sm_surface_screen</item>
+        <item name="android:colorBackgroundFloating">@color/sm_surface_raised</item>
+
+        <!-- Rows of every Spinner (selected value and dropdown list) -->
+        <item name="android:spinnerItemStyle">@style/SensorMax.SpinnerItem</item>
+        <item name="android:spinnerDropDownItemStyle">@style/SensorMax.SpinnerDropDownItem</item>
+
+        <!-- Controls -->
+        <item name="colorControlNormal">@color/sm_text_secondary</item>
+        <item name="colorControlHighlight">@color/sm_ripple</item>
+        <item name="android:textColorHint">@color/sm_text_hint</item>
+
+        <!-- System bars: status bar blends with the screen, navigation bar with the action dock -->
+        <item name="android:statusBarColor">@color/sm_surface_screen</item>
+        <item name="android:navigationBarColor">@color/sm_surface_card</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- Splash screen theme (set on the launcher activity in the manifest) -->
+    <style
+        name="Theme.SensorMax.Starting"
+        parent="Theme.SplashScreen">
+
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_sensormax</item>
+        <item name="postSplashScreenTheme">@style/Theme.SensorMax</item>
+    </style>
+
+</resources>

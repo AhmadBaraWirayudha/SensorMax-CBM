@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Raised inset (metric tiles, status line, result boxes). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/sm_surface_raised" />
+    <corners android:radius="@dimen/sm_radius_inner" />
+</shape>

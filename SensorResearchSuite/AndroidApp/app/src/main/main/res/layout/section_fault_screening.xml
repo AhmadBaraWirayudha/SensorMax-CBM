@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Fault screening: envelope spectrum, bearing hint and optional bearing geometry (collapsible).
+Styles: res/values/sensormax_styles.xml - colours: res/values/colors.xml - strings: res/values/strings.xml
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SensorMax.Card.Collapsible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:tag="card:fault_screening">
+    <LinearLayout
+        style="@style/SensorMax.CardHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_header">
+        <TextView
+            style="@style/SensorMax.Text.CardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/fault_title" />
+        <ImageView
+            style="@style/SensorMax.Chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:tag="card_chevron" />
+    </LinearLayout>
+    <LinearLayout
+        style="@style/SensorMax.CardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_body">
+        <TextView
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/fault_subtitle" />
+        <TextView
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/envelope_label" />
+        <com.research.sensormax.SensorMaxLineChart
+            android:id="@+id/envelopeChart"
+            style="@style/SensorMax.Chart"
+            android:layout_width="match_parent"
+            android:layout_height="175dp"
+            android:layout_marginTop="6dp"
+            android:contentDescription="@string/cd_envelope_chart" />
+        <TextView
+            android:id="@+id/tvBearingHint"
+            style="@style/SensorMax.Text.Result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/bearing_hint_initial"
+            android:textColor="@color/sm_text_bearing_hint" />
+        <TextView
+            android:id="@+id/tvBearingGeometryHeader"
+            style="@style/SensorMax.Text.Toggle"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sm_action_height"
+            android:layout_marginTop="14dp"
+            android:text="@string/bearing_geometry_collapsed" />
+        <LinearLayout
+            android:id="@+id/llBearingGeometryInputs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+                    <TextView
+                        style="@style/SensorMax.Text.Label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bearing_elements_label" />
+                    <EditText
+                        android:id="@+id/etBearingElements"
+                        style="@style/SensorMax.Field.Mono"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/sm_control_height"
+                        android:layout_marginTop="6dp"
+                        android:hint="@string/bearing_elements_hint"
+                        android:inputType="number" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tvBearingBallLabel"
+                        style="@style/SensorMax.Text.Label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bearing_ball_label" />
+                    <EditText
+                        android:id="@+id/etBearingBallDiameter"
+                        style="@style/SensorMax.Field.Mono"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/sm_control_height"
+                        android:layout_marginTop="6dp"
+                        android:hint="@string/bearing_ball_hint"
+                        android:inputType="numberDecimal" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tvBearingPitchLabel"
+                        style="@style/SensorMax.Text.Label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bearing_pitch_label" />
+                    <EditText
+                        android:id="@+id/etBearingPitchDiameter"
+                        style="@style/SensorMax.Field.Mono"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/sm_control_height"
+                        android:layout_marginTop="6dp"
+                        android:hint="@string/bearing_pitch_hint"
+                        android:inputType="numberDecimal" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        style="@style/SensorMax.Text.Label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bearing_angle_label" />
+                    <EditText
+                        android:id="@+id/etBearingContactAngle"
+                        style="@style/SensorMax.Field.Mono"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/sm_control_height"
+                        android:layout_marginTop="6dp"
+                        android:hint="@string/bearing_angle_hint"
+                        android:inputType="numberDecimal" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

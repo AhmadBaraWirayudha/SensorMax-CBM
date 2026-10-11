@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Acquisition + telemetry: WebSocket endpoint and capture interval.
+Styles: res/values/sensormax_styles.xml - colours: res/values/colors.xml - strings: res/values/strings.xml
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SensorMax.Card.Collapsible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:tag="card:acquisition">
+    <LinearLayout
+        style="@style/SensorMax.CardHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_header">
+        <TextView
+            style="@style/SensorMax.Text.CardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/acq_title" />
+        <ImageView
+            style="@style/SensorMax.Chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:tag="card_chevron" />
+    </LinearLayout>
+    <LinearLayout
+        style="@style/SensorMax.CardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_body">
+        <TextView
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/acq_subtitle" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
+                <TextView
+                    style="@style/SensorMax.Text.Label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@id/etTargetIp"
+                    android:text="@string/acq_host_label" />
+                <EditText
+                    android:id="@+id/etTargetIp"
+                    style="@style/SensorMax.Field.Mono"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/sm_control_height"
+                    android:layout_marginTop="6dp"
+                    android:hint="@string/acq_host_hint"
+                    android:inputType="textUri" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    style="@style/SensorMax.Text.Label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@id/etTargetPort"
+                    android:text="@string/acq_port_label" />
+                <EditText
+                    android:id="@+id/etTargetPort"
+                    style="@style/SensorMax.Field.Mono"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/sm_control_height"
+                    android:layout_marginTop="6dp"
+                    android:hint="@string/acq_port_hint"
+                    android:inputType="number" />
+            </LinearLayout>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/tvCaptureRate"
+            style="@style/SensorMax.Text.Value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/capture_interval_initial" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                style="@style/SensorMax.Text.Meta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/capture_min" />
+            <SeekBar
+                android:id="@+id/seekCaptureRate"
+                style="@style/SensorMax.SeekBar"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/sm_action_height_secondary"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:max="495" />
+            <TextView
+                style="@style/SensorMax.Text.Meta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/capture_max" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Base Canvas Fill (incorporating dark background base) -->
+    <path
+        android:fillColor="#0B111E"
+        android:pathData="M0,0h108v108H0z" />
+
+    <!-- 1. Blueprint Grid & Implicit Sacred Geometry -->
+    <!-- Vertical Plumb Line -->
+    <path
+        android:strokeColor="#1E293B"
+        android:strokeWidth="1.2"
+        android:strokeAlpha="0.6"
+        android:pathData="M54,16 L54,92" />
+
+    <!-- Isometric 30-Degree Reference Lines -->
+    <path
+        android:strokeColor="#1E293B"
+        android:strokeWidth="1.2"
+        android:strokeAlpha="0.6"
+        android:pathData="M23,72 L85,36 M23,36 L85,72" />
+
+    <!-- Hexagonal Asset Boundary -->
+    <path
+        android:strokeColor="#1E293B"
+        android:strokeWidth="1.2"
+        android:strokeAlpha="0.4"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M54,24 L80,39 L80,69 L54,84 L28,69 L28,39 Z" />
+
+    <!-- Calibrated Outer Sensor Ring -->
+    <path
+        android:strokeColor="#334155"
+        android:strokeWidth="2"
+        android:strokeAlpha="0.5"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M54,18 A36,36 0 1,0 54,90 A36,36 0 1,0 54,18" />
+
+    <!-- 2. The Square (Lower Inverted Right-Angle Frame) -->
+    <path
+        android:strokeColor="#E0A93B"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="miter"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M33,48 L54,77 L75,48" />
+
+    <!-- 3. The Compasses (Upper Acute Measuring Chevron) -->
+    <path
+        android:strokeColor="#E0A93B"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M37,68 L54,29 L71,68" />
+
+    <!-- 4. Dynamic Tri-Axial Vibration Signals -->
+    <!-- Z-Axis Vibration Oscillation -->
+    <path
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="2.2"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M54,34 L52,38 L56,42 L54,46" />
+
+    <!-- X and Y Radial Sensor Pulses -->
+    <path
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M40,59 L44,63 M68,59 L64,63" />
+
+    <!-- 5. The Sensor Eye (Delta Housing & Telemetry Pupil) -->
+    <!-- Diamond Delta Frame -->
+    <path
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="1.8"
+        android:fillColor="#0B111E"
+        android:pathData="M54,46 L62,54 L54,62 L46,54 Z" />
+
+    <!-- Core Accelerometer Node -->
+    <path
+        android:fillColor="#F8FAFC"
+        android:pathData="M54,51 A3,3 0 1,0 54,57 A3,3 0 1,0 54,51" />
+
+    <!-- Apex Harmonic Alignment Beacon -->
+    <path
+        android:fillColor="#E0A93B"
+        android:pathData="M54,23 L56,27 L52,27 Z" />
+
+</vector>

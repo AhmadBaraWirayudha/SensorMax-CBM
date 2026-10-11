@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Device + debug: acquisition source (provider-specific panels start hidden), sensor matrix and log.
+Styles: res/values/sensormax_styles.xml - colours: res/values/colors.xml - strings: res/values/strings.xml
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SensorMax.Card.Collapsible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:tag="card:device_debug">
+    <LinearLayout
+        style="@style/SensorMax.CardHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_header">
+        <TextView
+            style="@style/SensorMax.Text.CardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/device_title" />
+        <ImageView
+            style="@style/SensorMax.Chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:tag="card_chevron" />
+    </LinearLayout>
+    <LinearLayout
+        style="@style/SensorMax.CardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_body">
+        <TextView
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/device_subtitle" />
+        <TextView
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:labelFor="@id/spinnerAcquisitionSource"
+            android:text="@string/device_source_label" />
+        <Spinner
+            android:id="@+id/spinnerAcquisitionSource"
+            style="@style/SensorMax.Spinner"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sm_control_height"
+            android:layout_marginTop="6dp" />
+        <LinearLayout
+            android:id="@+id/llBleAcquisitionConfig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <TextView
+                style="@style/SensorMax.Text.Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/spinnerBleProfile"
+                android:text="@string/ble_label" />
+            <Spinner
+                android:id="@+id/spinnerBleProfile"
+                style="@style/SensorMax.Spinner"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/sm_control_height"
+                android:layout_marginTop="6dp" />
+            <TextView
+                style="@style/SensorMax.Text.Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:labelFor="@id/etBleDeviceAddress"
+                android:text="@string/ble_address_label" />
+            <EditText
+                android:id="@+id/etBleDeviceAddress"
+                style="@style/SensorMax.Field.Mono"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/sm_control_height"
+                android:layout_marginTop="6dp"
+                android:hint="@string/ble_address_hint"
+                android:inputType="textCapCharacters" />
+            <TextView
+                android:id="@+id/tvBleProfileNote"
+                style="@style/SensorMax.Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/ble_note" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/llCameraAcquisitionConfig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <TextView
+                style="@style/SensorMax.Text.Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_label" />
+            <TextView
+                android:id="@+id/tvCameraAcquisitionNote"
+                style="@style/SensorMax.Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/camera_note" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/llNetworkAcquisitionConfig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <TextView
+                style="@style/SensorMax.Text.Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/network_label" />
+            <TextView
+                style="@style/SensorMax.Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:labelFor="@id/etNetworkListenPort"
+                android:text="@string/network_port_label" />
+            <EditText
+                android:id="@+id/etNetworkListenPort"
+                style="@style/SensorMax.Field.Mono"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/sm_control_height"
+                android:layout_marginTop="4dp"
+                android:hint="@string/network_port_hint"
+                android:inputType="number"
+                android:maxLength="5"
+                android:text="@string/network_port_default" />
+            <TextView
+                android:id="@+id/tvNetworkAcquisitionNote"
+                style="@style/SensorMax.Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/network_note" />
+            <CheckBox
+                android:id="@+id/cbNetworkAllowLan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/sm_action_height_secondary"
+                android:layout_marginTop="4dp"
+                android:buttonTint="@color/sm_cyan"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:text="@string/network_allow_lan_label"
+                android:textColor="@color/sm_text_body" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/llDepthAcquisitionConfig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <TextView
+                style="@style/SensorMax.Text.Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/depth_label" />
+            <TextView
+                android:id="@+id/tvDepthAcquisitionNote"
+                style="@style/SensorMax.Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/depth_note" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/llUsbOtgControls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/sm_bg_raised"
+            android:orientation="vertical"
+            android:padding="12dp">
+            <TextView
+                style="@style/SensorMax.Text.Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/otg_title" />
+            <TextView
+                style="@style/SensorMax.Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/otg_note" />
+            <Spinner
+                android:id="@+id/spinnerUsbOtgDevices"
+                style="@style/SensorMax.Spinner"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/sm_control_height"
+                android:layout_marginTop="6dp"
+                android:contentDescription="@string/otg_title" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/btnRefreshUsbOtg"
+                    style="@style/SensorMax.Button.Outlined.Compact"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/sm_action_height_secondary"
+                    android:layout_weight="1"
+                    android:text="@string/otg_refresh_button" />
+                <Button
+                    android:id="@+id/btnReadUsbOtg"
+                    style="@style/SensorMax.Button.Accent.Compact"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/sm_action_height_secondary"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/otg_read_button" />
+                <Button
+                    android:id="@+id/btnStopUsbOtg"
+                    style="@style/SensorMax.Button.Outlined.Compact"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/sm_action_height_secondary"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/otg_stop_button" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/tvUsbOtgStatus"
+                style="@style/SensorMax.Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/otg_reader_idle" />
+            <TextView
+                android:id="@+id/tvUsbOtgRawData"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/sm_bg_log"
+                android:fontFamily="monospace"
+                android:padding="8dp"
+                android:scrollbars="vertical"
+                android:text="@string/otg_raw_empty"
+                android:textColor="@color/sm_text_ok"
+                android:textIsSelectable="true"
+                android:textSize="11sp" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/tvSensorMatrixLabel"
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/sensor_matrix_label" />
+        <LinearLayout
+            android:id="@+id/llSensorList"
+            style="@style/SensorMax.Tile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp" />
+        <TextView
+            style="@style/SensorMax.Text.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/log_label" />
+        <TextView
+            android:id="@+id/tvLog"
+            android:layout_width="match_parent"
+            android:layout_height="190dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/sm_bg_log"
+            android:fontFamily="monospace"
+            android:gravity="top|start"
+            android:includeFontPadding="true"
+            android:lineSpacingExtra="2dp"
+            android:padding="12dp"
+            android:scrollbars="vertical"
+            android:text="@string/log_initial"
+            android:textColor="@color/sm_text_primary"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
+    </LinearLayout>
+</LinearLayout>

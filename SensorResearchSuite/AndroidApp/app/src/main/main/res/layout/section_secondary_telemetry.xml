@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Secondary sensor telemetry: collapsible card (header row + table of values).
+Styles: res/values/sensormax_styles.xml - colours: res/values/colors.xml - strings: res/values/strings.xml
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SensorMax.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="0dp">
+
+    <!-- Folds through the existing code path (setupCollapsibleSections); the labels live in strings.xml -->
+    <TextView
+        android:id="@+id/tvSecondaryTelemetryHeader"
+        style="@style/SensorMax.Text.Accordion"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/sm_action_height"
+        android:text="@string/telemetry_expanded" />
+    <TableLayout
+        android:id="@+id/gridSecondaryTelemetry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="12dp"
+        android:paddingEnd="@dimen/sm_card_padding"
+        android:paddingStart="@dimen/sm_card_padding"
+        android:paddingTop="0dp"
+        android:stretchColumns="1">
+        <TableRow
+            android:gravity="center_vertical"
+            android:paddingBottom="6dp"
+            android:paddingTop="6dp">
+            <TextView
+                style="@style/SensorMax.Text.RowLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/telemetry_mag" />
+            <TextView
+                android:id="@+id/tvMagData"
+                style="@style/SensorMax.Text.RowValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/value_dash" />
+        </TableRow>
+        <TableRow
+            android:gravity="center_vertical"
+            android:paddingBottom="6dp"
+            android:paddingTop="6dp">
+            <TextView
+                style="@style/SensorMax.Text.RowLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/telemetry_light" />
+            <TextView
+                android:id="@+id/tvLightData"
+                style="@style/SensorMax.Text.RowValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/value_dash" />
+        </TableRow>
+        <TableRow
+            android:gravity="center_vertical"
+            android:paddingBottom="6dp"
+            android:paddingTop="6dp">
+            <TextView
+                style="@style/SensorMax.Text.RowLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/telemetry_gravity" />
+            <TextView
+                android:id="@+id/tvGravityData"
+                style="@style/SensorMax.Text.RowValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/value_dash" />
+        </TableRow>
+        <TableRow
+            android:gravity="center_vertical"
+            android:paddingBottom="6dp"
+            android:paddingTop="6dp">
+            <TextView
+                style="@style/SensorMax.Text.RowLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/telemetry_activity" />
+            <TextView
+                android:id="@+id/tvActivityData"
+                style="@style/SensorMax.Text.RowValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/value_dash" />
+        </TableRow>
+    </TableLayout>
+</LinearLayout>

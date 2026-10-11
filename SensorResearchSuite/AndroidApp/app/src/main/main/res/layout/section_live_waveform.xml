@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Live waveform: triaxial chart plus the AUTO / X / Y / Z / RSS axis selector.
+Styles: res/values/sensormax_styles.xml - colours: res/values/colors.xml - strings: res/values/strings.xml
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SensorMax.Card.Collapsible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:tag="card:live_waveform">
+    <LinearLayout
+        style="@style/SensorMax.CardHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_header">
+        <TextView
+            style="@style/SensorMax.Text.CardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/waveform_title" />
+        <TextView
+            style="@style/SensorMax.Text.Meta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="@string/waveform_window" />
+        <ImageView
+            style="@style/SensorMax.Chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:tag="card_chevron" />
+    </LinearLayout>
+    <LinearLayout
+        style="@style/SensorMax.CardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="card_body">
+        <TextView
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/waveform_subtitle" />
+        <com.research.sensormax.SensorMaxLineChart
+            android:id="@+id/vibrationChart"
+            style="@style/SensorMax.Chart"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginTop="12dp"
+            android:contentDescription="@string/cd_waveform_chart" />
+        <RadioGroup
+            android:id="@+id/rgAxisSelect"
+            style="@style/SensorMax.Segmented"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+            <RadioButton
+                android:id="@+id/rbAxisAuto"
+                style="@style/SensorMax.Segment"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/sm_action_height_secondary"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="@string/axis_auto" />
+            <RadioButton
+                android:id="@+id/rbAxisX"
+                style="@style/SensorMax.Segment"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/sm_action_height_secondary"
+                android:layout_weight="1"
+                android:text="@string/axis_x"
+                android:textColor="@color/sm_axis_x" />
+            <RadioButton
+                android:id="@+id/rbAxisY"
+                style="@style/SensorMax.Segment"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/sm_action_height_secondary"
+                android:layout_weight="1"
+                android:text="@string/axis_y"
+                android:textColor="@color/sm_axis_y" />
+            <RadioButton
+                android:id="@+id/rbAxisZ"
+                style="@style/SensorMax.Segment"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/sm_action_height_secondary"
+                android:layout_weight="1"
+                android:text="@string/axis_z"
+                android:textColor="@color/sm_axis_z" />
+            <RadioButton
+                android:id="@+id/rbAxisRss"
+                style="@style/SensorMax.Segment"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/sm_action_height_secondary"
+                android:layout_weight="1"
+                android:text="@string/axis_rss"
+                android:textColor="@color/sm_axis_rss" />
+        </RadioGroup>
+        <TextView
+            android:id="@+id/tvWaveformNote"
+            style="@style/SensorMax.Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/waveform_note" />
+    </LinearLayout>
+</LinearLayout>
