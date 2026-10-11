@@ -50,7 +50,7 @@ VENV_DIR="$SCRIPT_DIR/sensormax_env"
 
 WEB_SERVER="$LAPTOP_DIR/web_server.py"
 
-WEB_DASHBOARD="$LAPTOP_DIR/web_dashboard.html"
+WEB_DASHBOARD="$SCRIPT_DIR/web_dashboard.html"
 
 IMPORT_DIR="$LAPTOP_DIR/Imported_Records"
 
@@ -134,6 +134,12 @@ activate_environment() {
     # shellcheck disable=SC1091
 
     source "$VENV_DIR/bin/activate"
+
+    if ! python "$LAPTOP_DIR/verify_environment.py" --imports-only; then
+        echo -e "${RED}[ERROR] Python environment check failed.${RESET}"
+        echo "Run the documented setup in LaptopSuite/PYTHON_ENVIRONMENT.md."
+        return 1
+    fi
 
     return 0
 

@@ -204,10 +204,10 @@ REM ------------------------------------------------------------
 REM Launch browser dashboard
 REM ------------------------------------------------------------
 
-if not exist "%SUITE_DIR%LaptopSuite\web_dashboard.html" (
+if not exist "%SUITE_DIR%web_dashboard.html" (
     echo [ERROR] web_dashboard.html not found.
     echo:
-    echo         %SUITE_DIR%LaptopSuite\web_dashboard.html
+    echo         %SUITE_DIR%web_dashboard.html
     echo.
     adb reverse --remove tcp:8765 >nul 2>&1
     call deactivate >nul 2>&1
@@ -217,7 +217,7 @@ if not exist "%SUITE_DIR%LaptopSuite\web_dashboard.html" (
 
 echo [*] Launching SensorMax browser dashboard...
 
-start "" "%SUITE_DIR%LaptopSuite\web_dashboard.html"
+start "" "%SUITE_DIR%web_dashboard.html"
 
 echo.
 
@@ -234,7 +234,7 @@ echo   Gateway:
 echo       ws://127.0.0.1:8765
 echo.
 echo   Browser:
-echo       %SUITE_DIR%LaptopSuite\web_dashboard.html
+echo       %SUITE_DIR%web_dashboard.html
 echo.
 echo   USB Android bridge:
 echo       adb reverse tcp:8765 tcp:8765

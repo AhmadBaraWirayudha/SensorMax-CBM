@@ -1,0 +1,4678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SensorMax CBM Reliability Dashboard</title>
+
+    <style>
+        :root {
+            --bg: #0b1120;
+            --panel: #111827;
+            --panel-2: #0f172a;
+            --border: #263244;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --green: #4ade80;
+            --red: #f87171;
+            --yellow: #facc15;
+            --orange: #fb923c;
+            --purple: #c084fc;
+            --cyan: #22d3ee;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 18px;
+            background: var(--bg);
+            color: var(--text);
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 0.2px;
+        }
+
+        h2 {
+            margin: 0 0 12px;
+            font-size: 16px;
+        }
+
+        h3 {
+            margin: 0 0 10px;
+            font-size: 14px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .subtitle {
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 7px;
+            min-width: 230px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #1e293b;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #64748b;
+        }
+
+        .badge.connected {
+            background: #063c2a;
+            color: var(--green);
+        }
+
+        .badge.connected::before {
+            background: var(--green);
+        }
+
+        .badge.sim {
+            background: #1e3a5f;
+            color: var(--accent);
+        }
+
+        .badge.sim::before {
+            background: var(--accent);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+            gap: 14px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            min-width: 0;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        button,
+        select,
+        input {
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: #162033;
+            color: var(--text);
+            padding: 9px 11px;
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        button:hover {
+            background: #1d2a40;
+        }
+
+        button.primary {
+            background: #075985;
+            border-color: #0ea5e9;
+        }
+
+        button.primary:hover {
+            background: #0369a1;
+        }
+
+        button.danger {
+            background: #7f1d1d;
+            border-color: #ef4444;
+        }
+
+        button.active {
+            background: #14532d;
+            border-color: #22c55e;
+        }
+
+        select {
+            min-width: 150px;
+        }
+
+        input {
+            min-width: 120px;
+        }
+
+        .small {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .stat {
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 11px;
+            min-width: 0;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat-unit {
+            color: var(--muted);
+            font-size: 11px;
+            margin-left: 3px;
+        }
+
+        .x {
+            color: var(--red);
+        }
+
+        .y {
+            color: var(--green);
+        }
+
+        .z {
+            color: var(--accent);
+        }
+
+        .warn {
+            color: var(--yellow);
+        }
+
+        .fail {
+            color: var(--red);
+        }
+
+        .pass {
+            color: var(--green);
+        }
+
+        .canvas-wrap {
+            width: 100%;
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 280px;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .three-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .kv {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 7px 10px;
+            font-size: 13px;
+        }
+
+        .kv div:nth-child(odd) {
+            color: var(--muted);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th,
+        td {
+            padding: 8px 7px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .empty {
+            padding: 16px;
+            color: var(--muted);
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .log {
+            height: 180px;
+            overflow: auto;
+            background: #070b14;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 11px;
+            line-height: 1.45;
+        }
+
+        .log-line {
+            margin-bottom: 3px;
+        }
+
+        .log-info {
+            color: #cbd5e1;
+        }
+
+        .log-warn {
+            color: var(--yellow);
+        }
+
+        .log-error {
+            color: var(--red);
+        }
+
+        .log-good {
+            color: var(--green);
+        }
+
+        .bar {
+            position: relative;
+            height: 10px;
+            margin-top: 7px;
+            background: #1e293b;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 0%;
+            background: var(--green);
+            transition: width 0.15s ease;
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .section-title span {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .footer-note {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 1100px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                flex-direction: column;
+            }
+
+            .header-right {
+                align-items: flex-start;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .two-col,
+            .three-col {
+                grid-template-columns: 1fr;
+            }
+
+            .kv {
+                grid-template-columns: 120px 1fr;
+            }
+        }
+    
+        /* Phone portrait layout: real devices */
+        @media (max-width: 420px) {
+            body { padding: 8px; }
+            header { gap: 10px; padding-bottom: 12px; margin-bottom: 12px; }
+            h1 { font-size: 20px; line-height: 1.2; }
+            .subtitle { font-size: 11px; line-height: 1.4; }
+            .header-right { min-width: 0; width: 100%; gap: 5px; }
+            .controls {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 6px;
+            }
+            .controls button,
+            .controls select,
+            .controls input { width: 100%; min-width: 0; max-width: 100%; }
+            .controls button { min-height: 42px; padding: 8px 6px; font-size: 12px; }
+            .controls input { font-size: 12px; }
+            .panel { padding: 10px; border-radius: 9px; }
+            .layout { grid-template-columns: minmax(0, 1fr); gap: 9px; }
+            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+            .stat { padding: 8px; }
+            .stat-label { font-size: 10px; line-height: 1.3; }
+            .stat-value { font-size: 16px; }
+            .stat-unit { font-size: 10px; }
+            .two-col, .three-col { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+            .kv { grid-template-columns: 100px minmax(0, 1fr); gap: 6px 8px; overflow-wrap: anywhere; }
+            .section-title { align-items: flex-start; flex-wrap: wrap; }
+            .section-title h2 { font-size: 14px; margin-bottom: 0; }
+            .section-title span { max-width: 100%; overflow-wrap: anywhere; }
+            canvas { height: 215px; }
+            .log { height: 160px; font-size: 10px; }
+            .table-wrap { max-width: 100%; }
+            .footer-note { line-height: 1.4; }
+            .preview-tools { display: none; }
+        }
+
+
+    
+
+        /* Continuous portrait scroll layout: all dashboard sections remain in document flow. */
+        html { background: var(--bg); min-height: 100%; overflow-x: hidden; }
+        body {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 8px 7px 24px;
+            overflow-x: hidden;
+        }
+        header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+        h1 { font-size: 20px; line-height: 1.2; }
+        .subtitle { font-size: 11px; line-height: 1.45; }
+        .header-right { align-items: flex-start; width: 100%; min-width: 0; gap: 5px; }
+        .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 9px; }
+        .panel { min-width: 0; padding: 10px; border-radius: 9px; }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            align-items: stretch;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .controls button, .controls select, .controls input {
+            width: 100%; min-width: 0; max-width: 100%;
+            font-size: 12px; padding: 8px 6px;
+        }
+        .controls button { min-height: 42px; }
+        .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+        .stat { min-width: 0; padding: 8px; }
+        .stat-label { font-size: 10px; line-height: 1.3; overflow-wrap: anywhere; }
+        .stat-value { font-size: 15px; overflow-wrap: anywhere; }
+        .stat-unit { font-size: 10px; }
+        .two-col, .three-col { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+        .kv { grid-template-columns: 100px minmax(0, 1fr); gap: 6px 8px; overflow-wrap: anywhere; }
+        .section-title { align-items: flex-start; flex-wrap: wrap; }
+        .section-title h2 { font-size: 14px; margin-bottom: 0; }
+        .section-title span { max-width: 100%; overflow-wrap: anywhere; }
+        .canvas-wrap { max-width: 100%; }
+        canvas { height: 205px; max-width: 100%; }
+        .log { height: 145px; padding: 7px; font-size: 10px; overflow-wrap: anywhere; }
+        .table-wrap { max-width: 100%; overflow-x: auto; }
+        table { min-width: 540px; }
+        .footer-note { line-height: 1.4; }
+        @media (min-width: 600px) {
+            body { border-left: 1px solid #1e293b; border-right: 1px solid #1e293b; }
+        }
+        @media (max-width: 350px) {
+            body { padding-left: 5px; padding-right: 5px; }
+            .controls { grid-template-columns: minmax(0, 1fr); }
+            .stats { grid-template-columns: minmax(0, 1fr); }
+            .kv { grid-template-columns: 88px minmax(0, 1fr); }
+            canvas { height: 180px; }
+        }
+
+    
+        /* Python-dashboard parity controls; file inputs use the browser's explicit file grant. */
+        .python-controls-panel { margin-bottom: 10px; }
+        .file-import-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .control-label { display: flex; flex-direction: column; gap: 5px; min-width: 0; color: var(--muted); font-size: 11px; }
+        .control-label input[type="file"] { width: 100%; min-width: 0; padding: 8px 6px; font-size: 11px; }
+        .python-options { margin: 10px 0 0; }
+        .python-options .control-label { min-width: 0; }
+        .inline-toggle { display: flex; flex-direction: row; align-items: center; gap: 7px; min-height: 38px; font-size: 11px; color: var(--text); }
+        .inline-toggle input { min-width: 0; width: 16px; height: 16px; margin: 0; }
+        .source-status-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+        .source-status { display: flex; flex-direction: column; gap: 5px; min-width: 0; background: var(--panel-2); border: 1px solid var(--border); border-radius: 7px; padding: 9px; font-size: 11px; overflow-wrap: anywhere; }
+        .source-status strong { color: var(--muted); font-size: 11px; }
+        .source-status span { color: var(--text); line-height: 1.4; }
+        .source-status.ok span { color: var(--green); }
+        .source-status.warn span { color: var(--yellow); }
+        .source-status.fail span { color: var(--red); }
+        .data-table-host { overflow-x: auto; max-width: 100%; }
+        .data-table-host table { min-width: 620px; }
+        .data-table-host td { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+        .legend-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 8px; color: var(--muted); font-size: 11px; }
+        .legend-item { display: inline-flex; align-items: center; gap: 5px; }
+        .legend-dot { display: inline-block; width: 9px; height: 3px; border-radius: 2px; }
+        .axis-x-color { color: #f87171; }
+        .axis-y-color { color: #4ade80; }
+        .axis-z-color { color: #38bdf8; }
+        [hidden] { display: none !important; }
+        @media (max-width: 420px) {
+            .file-import-grid, .source-status-grid { grid-template-columns: minmax(0, 1fr); }
+            .python-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .python-options .control-label select { width: 100%; min-width: 0; }
+        }
+
+
+
+        /* Desktop landscape: use monitor width while preserving phone portrait rules. */
+        @media screen and (min-width: 900px) and (orientation: landscape) {
+            body {
+                width: 100%;
+                max-width: 1920px;
+                min-height: 100vh;
+                margin: 0 auto;
+                padding: 16px clamp(18px, 1.6vw, 32px) 24px;
+                overflow-x: hidden;
+            }
+
+            header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 24px;
+                padding-bottom: 14px;
+                margin-bottom: 14px;
+            }
+
+            h1 { font-size: clamp(22px, 1.6vw, 30px); }
+            .subtitle { font-size: 12px; line-height: 1.4; }
+
+            .header-right {
+                align-items: flex-end;
+                width: auto;
+                min-width: 230px;
+            }
+
+            .controls {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+
+            .controls button,
+            .controls select,
+            .controls input {
+                width: auto;
+                min-width: 0;
+                max-width: 260px;
+                font-size: 12px;
+                padding: 8px 10px;
+            }
+
+            .layout {
+                display: grid;
+                grid-template-columns: minmax(0, 1.65fr) minmax(340px, 1fr);
+                align-items: start;
+                gap: 12px;
+            }
+
+            .layout > .panel.full,
+            .layout > .full {
+                grid-column: 1 / -1;
+            }
+
+            /* Keep the principal waveform broad enough to compare X/Y/Z. */
+            #rawWaveformPanel,
+            #browserSensorMatrixPanel,
+            #browserDiagnosticPanel,
+            #browserBearingPanel {
+                grid-column: 1 / -1;
+            }
+
+            .panel {
+                min-width: 0;
+                padding: 12px;
+                border-radius: 9px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 8px;
+            }
+
+            .stat { min-width: 0; padding: 9px; }
+            .stat-label { font-size: 11px; line-height: 1.35; }
+            .stat-value { font-size: clamp(16px, 1.2vw, 21px); }
+            .stat-unit { font-size: 11px; }
+
+            .two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+            .three-col { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+            .kv { grid-template-columns: minmax(130px, 0.6fr) minmax(0, 1.4fr); gap: 7px 12px; }
+
+            .file-import-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .source-status-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .python-options { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px; }
+            .python-options .control-label { min-width: 150px; }
+
+            .canvas-wrap { width: 100%; max-width: 100%; }
+            canvas { width: 100%; height: clamp(240px, 30vh, 360px); max-width: 100%; }
+            #rawWaveformPanel canvas { height: clamp(260px, 34vh, 400px); }
+            #rmsVelocityTrendPanel canvas,
+            #browserQualityPanel canvas { height: clamp(220px, 27vh, 320px); }
+
+            .log { height: clamp(160px, 22vh, 260px); font-size: 11px; }
+            .table-wrap, .data-table-host { max-width: 100%; overflow-x: auto; }
+            table { min-width: 0; }
+            .data-table-host table { min-width: 760px; }
+            .section-title { align-items: center; flex-wrap: nowrap; }
+            .section-title h2 { font-size: 15px; }
+            .section-title span { max-width: 60%; text-align: right; overflow-wrap: anywhere; }
+            .footer-note { line-height: 1.45; }
+        }
+
+        /* Compact landscape laptops: retain two usable columns down to 900px. */
+        @media screen and (min-width: 900px) and (max-width: 1100px) and (orientation: landscape) {
+            body { padding: 12px; }
+            .layout { grid-template-columns: minmax(0, 1.2fr) minmax(300px, 1fr); gap: 9px; }
+            .panel { padding: 9px; }
+            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .section-title { align-items: flex-start; flex-wrap: wrap; }
+            .section-title span { text-align: left; max-width: 100%; }
+            canvas { height: 240px; }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div>
+        <h1>SensorMax CBM Reliability Dashboard</h1>
+        <div class="subtitle">
+            Live condition-monitoring view for SensorMax acquisition and analysis streams
+        </div>
+    </div>
+
+    <div class="header-right">
+        <div id="connectionBadge" class="badge sim">
+            Simulation Mode
+        </div>
+
+        <div id="connectionText" class="small">
+            No live Android stream connected
+        </div>
+    </div>
+</header>
+
+<section class="panel full python-controls-panel" aria-labelledby="dashboardControlsHeading">
+    <div class="section-title">
+        <h2 id="dashboardControlsHeading">Dashboard Controls</h2>
+        <span>Python dashboard parity</span>
+    </div>
+    <div class="file-import-grid">
+        <label class="control-label">Analysis CSV
+            <input id="analysisCsvInput" type="file" accept=".csv,text/csv" />
+        </label>
+        <label class="control-label">Raw CSV
+            <input id="rawCsvInput" type="file" accept=".csv,text/csv" />
+        </label>
+    </div>
+    <div class="controls python-options">
+        <label class="inline-toggle"><input id="autoRefreshCheck" type="checkbox" checked /> Auto refresh</label>
+        <label class="control-label">Refresh interval
+            <select id="refreshIntervalSelect">
+                <option value="1">1 second</option><option value="2" selected>2 seconds</option>
+                <option value="3">3 seconds</option><option value="5">5 seconds</option>
+                <option value="10">10 seconds</option>
+            </select>
+        </label>
+        <label class="control-label">Waveform points
+            <select id="waveformPointsSelect">
+                <option value="100">100</option><option value="150">150</option>
+                <option value="200">200</option><option value="250">250</option>
+                <option value="300" selected>300</option><option value="350">350</option>
+                <option value="400">400</option><option value="450">450</option>
+                <option value="500">500</option><option value="550">550</option>
+                <option value="600">600</option>
+            </select>
+        </label>
+        <label class="inline-toggle"><input id="showRawToggle" type="checkbox" /> Show raw telemetry table</label>
+        <label class="inline-toggle"><input id="showAnalysisToggle" type="checkbox" /> Show analysis table</label>
+    </div>
+    <p class="small-note">Choose the latest *_analysis.csv and *_raw.csv from LaptopSuite/Imported_Records. Browsers cannot automatically scan that folder; reselect a file after it changes. WebSocket and browser simulation modes remain available below.</p>
+</section>
+
+<section class="panel full" id="sourceStatusPanel" aria-label="Data source status">
+    <div class="section-title"><h2>Data Sources</h2><span id="sourceStatusSummary">Waiting for a SensorMax source</span></div>
+    <div class="source-status-grid">
+        <div class="source-status"><strong>Analysis stream</strong><span id="analysisSourceDetail">No analysis stream</span></div>
+        <div class="source-status"><strong>Raw stream</strong><span id="rawSourceDetail">No raw stream</span></div>
+        <div class="source-status"><strong>Application</strong><span>AndroidApp: unchanged by this HTML</span></div>
+    </div>
+</section>
+
+<div class="panel full" id="noRecordsNotice" role="status">
+    <strong>No SensorMax records found.</strong>
+    <p>Import an analysis/raw CSV or connect to the desktop WebSocket gateway. Browser simulation is synthetic demo data, not a measurement.</p>
+</div>
+
+<div class="small-note" style="margin: 0 0 6px;">Live/browser tools</div>
+<div class="controls">
+<button
+        id="connectButton"
+        class="primary"
+        onclick="toggleConnection()">
+        Connect WebSocket
+    </button>
+
+    <button
+        id="simulationButton"
+        onclick="toggleSimulation()">
+        Stop Simulation
+    </button>
+
+    <button
+        id="recordButton"
+        onclick="toggleRecording()">
+        Start Browser Recording
+    </button>
+
+    <button
+        onclick="downloadRawCSV()">
+        Export Raw CSV
+    </button>
+
+    <button
+        onclick="downloadAnalysisCSV()">
+        Export Analysis CSV
+    </button>
+
+    <select id="axisSelect" onchange="drawAll()" aria-label="Raw waveform display">
+        <option value="TRIAXIAL" selected>Raw waveform X / Y / Z</option>
+        <option value="X">Waveform X only</option>
+        <option value="Y">Waveform Y only</option>
+        <option value="Z">Waveform Z only</option>
+        <option value="RSS">Vector RSS</option>
+    </select>
+
+    <select id="spectrumSelect" onchange="drawAll()">
+        <option value="X">FFT X</option>
+        <option value="Y">FFT Y</option>
+        <option value="Z">FFT Z</option>
+        <option value="RSS">FFT RSS</option>
+    </select>
+
+    <input
+        id="rpmInput"
+        type="number"
+        min="0"
+        step="1"
+        value="1800"
+        placeholder="RPM">
+
+    <input
+        id="machineInput"
+        type="text"
+        value="DEMO-MOTOR-01"
+        placeholder="Machine ID">
+
+    <input
+        id="pointInput"
+        type="text"
+        value="DE-BRG-X"
+        placeholder="Point">
+
+</div>
+
+<div class="layout">
+
+    <!-- ======================================================
+         ASSET CONTEXT
+         ====================================================== -->
+
+    <section class="panel full">
+
+        <div class="section-title">
+            <h2>Asset Context</h2>
+            <span>Machine and measurement context</span>
+        </div>
+
+        <div class="kv">
+
+            <div>Machine ID</div>
+            <div id="contextMachine">DEMO-MOTOR-01</div>
+
+            <div>Measurement Point</div>
+            <div id="contextPoint">DE-BRG-X</div>
+
+            <div>RPM Hint</div>
+            <div id="contextRPM">1800 RPM</div>
+
+            <div>Data Source</div>
+            <div id="contextSource">Browser simulation</div>
+
+            <div>Sensor</div>
+            <div id="contextSensor">Accelerometer</div>
+
+            <div>Protocol</div>
+            <div>WebSocket / CSV</div>
+
+            <div>Analysis Windows</div>
+            <div id="assetAnalysisRows">0</div>
+            <div>Raw Records</div>
+            <div id="assetRawRows">0</div>
+            <div>Latest Source</div>
+            <div id="assetLatestSource">No file imported</div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ======================================================
+         TOP METRICS
+         ====================================================== -->
+
+    <section class="panel full" id="analysisSnapshotPanel">
+
+        <div class="section-title">
+            <h2>Current Condition Snapshot</h2>
+            <span id="lastTimestamp">No samples received</span>
+        </div>
+
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-label">Overall RMS Acceleration</div>
+                <div class="stat-value">
+                    <span id="overallRmsAccel">--</span>
+                    <span class="stat-unit">m/s²</span>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Overall RMS Velocity</div>
+                <div class="stat-value">
+                    <span id="overallRmsVelocity">--</span>
+                    <span class="stat-unit">mm/s</span>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Dominant Frequency</div>
+                <div class="stat-value">
+                    <span id="dominantFreq">--</span>
+                    <span class="stat-unit">Hz</span>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Sample Rate</div>
+                <div class="stat-value">
+                    <span id="sampleRate">--</span>
+                    <span class="stat-unit">Hz</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-label">Dominant Axis</div>
+                <div class="stat-value" id="dominantAxis">--</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Envelope Peak</div>
+                <div class="stat-value">
+                    <span id="envelopePeak">--</span>
+                    <span class="stat-unit">Hz</span>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">RPM Input</div>
+                <div class="stat-value"><span id="rpmInputSnapshot">--</span><span class="stat-unit">rpm</span></div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Displacement</div>
+                <div class="stat-value"><span id="overallRmsDisplacement">--</span><span class="stat-unit">µm</span></div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    
+<section class="panel full" id="engineeringStatusPanel">
+    <div class="section-title"><h2>Engineering Status</h2><span>Values supplied by analysis stream; not a diagnosis</span></div>
+    <div class="stats">
+        <div class="stat"><div class="stat-label">ISO 20816 Zone</div><div class="stat-value" id="isoZone">--</div></div>
+        <div class="stat"><div class="stat-label">Bearing Match</div><div class="stat-value" id="bearingMatch">--</div></div>
+        <div class="stat"><div class="stat-label">Impact Events</div><div class="stat-value" id="impactEvents">0</div></div>
+    </div>
+</section>
+<!-- ======================================================
+         ENGINEERING INTERPRETATION
+         ====================================================== -->
+
+    <section class="panel" id="runningSpeedPanel">
+
+        <div class="section-title">
+            <h2>Running-Speed Context</h2>
+            <span>Advisory only</span>
+        </div>
+
+        <div class="three-col">
+
+            <div class="stat">
+                <div class="stat-label">1X</div>
+                <div class="stat-value">
+                    <span id="oneXHint">0.0</span>
+                    <span class="stat-unit">Hz</span>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">2X</div>
+                <div class="stat-value">
+                    <span id="twoXHint">0.0</span>
+                    <span class="stat-unit">Hz</span>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">3X</div>
+                <div class="stat-value">
+                    <span id="threeXHint">0.0</span>
+                    <span class="stat-unit">Hz</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="stats" style="margin-top:8px">
+            <div class="stat"><div class="stat-label">Peak / 1X</div><div class="stat-value" id="peakRatio">--</div></div>
+        </div>
+
+        <div style="margin-top:12px">
+            <div class="stat-label">Advisory</div>
+            <div
+                id="faultHint"
+                style="font-size:15px;font-weight:800;">
+                Waiting for vibration data
+            </div>
+        </div>
+
+        <div class="footer-note">
+            Peak-pattern hints are not machine diagnosis.
+        </div>
+
+    </section>
+
+
+    <!-- ======================================================
+         RMS TREND
+         ====================================================== -->
+
+    <section class="panel" id="rmsVelocityTrendPanel">
+
+        <div class="section-title">
+            <h2>RMS Velocity Trend</h2>
+            <span>Latest 300 analysis windows · mm/s</span>
+        </div>
+
+        <div class="canvas-wrap">
+            <canvas id="trendCanvas"></canvas>
+        </div>
+
+    </section>
+
+
+    
+<section class="panel full" id="dominantFrequencyTrendPanel">
+    <div class="section-title"><h2>Dominant Frequency Trend</h2><span>Latest analysis windows · Hz</span></div>
+    <div class="canvas-wrap"><canvas id="frequencyTrendCanvas"></canvas></div>
+</section>
+
+<section class="panel full" id="envelopePeakTrendPanel">
+    <div class="section-title"><h2>Envelope Peak Trend</h2><span>Latest analysis windows · Hz</span></div>
+    <div class="canvas-wrap"><canvas id="envelopeTrendCanvas"></canvas></div>
+</section>
+
+<section class="panel full" id="analysisTablePanel" hidden>
+    <div class="section-title"><h2>Recent Analysis Windows</h2><span>Most recent 300 records</span></div>
+    <div class="data-table-host" id="analysisTableHost"></div>
+</section>
+<!-- ======================================================
+         WAVEFORM
+         ====================================================== -->
+
+    <section class="panel" id="rawWaveformPanel">
+
+        <div class="section-title">
+            <h2>Raw Vibration Waveform</h2>
+            <span id="waveformSource">Recent triaxial raw sensor data</span>
+        </div>
+
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-label">X</div>
+                <div class="stat-value x">
+                    <span id="valueX">0.000</span>
+                    <span class="stat-unit">m/s²</span>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Y</div>
+                <div class="stat-value y">
+                    <span id="valueY">0.000</span>
+                    <span class="stat-unit">m/s²</span>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Z</div>
+                <div class="stat-value z">
+                    <span id="valueZ">0.000</span>
+                    <span class="stat-unit">m/s²</span>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Vector RSS</div>
+                <div class="stat-value">
+                    <span id="valueRSS">0.000</span>
+                    <span class="stat-unit">m/s²</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="legend-row" aria-label="Triaxial waveform legend">
+            <span class="legend-item axis-x-color"><span class="legend-dot" style="background:#f87171"></span>X</span>
+            <span class="legend-item axis-y-color"><span class="legend-dot" style="background:#4ade80"></span>Y</span>
+            <span class="legend-item axis-z-color"><span class="legend-dot" style="background:#38bdf8"></span>Z</span>
+            <span class="small-note">Shared amplitude scale</span>
+        </div>
+        <div class="canvas-wrap">
+            <canvas id="waveformCanvas"></canvas>
+        </div>
+
+    </section>
+
+
+    
+<section class="panel full" id="rawTablePanel" hidden>
+    <div class="section-title"><h2>Raw Telemetry</h2><span>Most recent selected waveform-point count</span></div>
+    <div class="data-table-host" id="rawTableHost"></div>
+</section>
+
+<section class="panel full" id="streamInformationPanel">
+    <div class="section-title"><h2>Stream Information</h2><span>File and dataset metadata</span></div>
+    <div class="kv">
+        <div>Analysis file</div><div id="streamAnalysisFile">NONE</div>
+        <div>Raw file</div><div id="streamRawFile">NONE</div>
+        <div>Import directory</div><div id="streamImportDirectory">Browser local-file selection (directory scan unavailable)</div>
+        <div>Dataset duration</div><div id="datasetDuration">--</div>
+    </div>
+</section>
+<section class="panel full" id="engineeringBoundaryPanel">
+    <div class="section-title"><h2>Engineering Boundary</h2><span>Important limitation</span></div>
+    <div class="status warn">SensorMax reports measurement and analysis evidence. RMS, frequency peaks, ISO zones, bearing-match codes and running-speed relationships are not a confirmed machine diagnosis without appropriate engineering validation and supporting evidence.</div>
+</section>
+<!-- ======================================================
+         FFT
+         ====================================================== -->
+
+    <section class="panel" id="browserFftPanel">
+
+        <div class="section-title">
+            <h2>Browser FFT Spectrum (HTML extension)</h2>
+            <span id="spectrumStatus">Waiting for valid samples</span>
+        </div>
+
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-label">Peak Frequency</div>
+                <div class="stat-value">
+                    <span id="browserPeakFreq">0.00</span>
+                    <span class="stat-unit">Hz</span>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">FFT Resolution</div>
+                <div class="stat-value">
+                    <span id="fftResolution">0.00</span>
+                    <span class="stat-unit">Hz/bin</span>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">RPM</div>
+                <div class="stat-value" id="rpmDisplay">1800</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">1X Frequency</div>
+                <div class="stat-value">
+                    <span id="oneX">30.00</span>
+                    <span class="stat-unit">Hz</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="canvas-wrap">
+            <canvas id="spectrumCanvas"></canvas>
+        </div>
+
+    </section>
+
+
+    <!-- ======================================================
+         ACQUISITION / QUALITY
+         ====================================================== -->
+
+    <section class="panel" id="browserQualityPanel">
+
+        <div class="section-title">
+            <h2>Browser Acquisition Diagnostics (HTML extension)</h2>
+            <span id="qualityOrigin">Browser estimate</span>
+        </div>
+
+        <div class="two-col">
+
+            <div>
+
+                <div class="stat">
+                    <div class="stat-label">Raw Packets</div>
+                    <div class="stat-value" id="rawPackets">0</div>
+                </div>
+
+                <div style="height:8px"></div>
+
+                <div class="stat">
+                    <div class="stat-label">Analysis Windows</div>
+                    <div class="stat-value" id="analysisWindows">0</div>
+                </div>
+
+                <div style="height:8px"></div>
+
+                <div class="stat">
+                    <div class="stat-label">Browser Estimated Rate</div>
+                    <div class="stat-value">
+                        <span id="browserSampleRate">0.0</span>
+                        <span class="stat-unit">Hz</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="stat">
+                    <div class="stat-label">Data Quality</div>
+                    <div class="stat-value">
+                        <span id="browserQuality">--</span>
+                        <span class="stat-unit">/100</span>
+                    </div>
+
+                    <div class="bar">
+                        <div
+                            id="qualityBar"
+                            class="bar-fill">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="height:8px"></div>
+
+                <div class="stat">
+                    <div class="stat-label">Latest Impact</div>
+                    <div
+                        class="stat-value"
+                        id="impactState">
+                        NONE
+                    </div>
+                </div>
+
+                <div style="height:8px"></div>
+
+                <div class="stat">
+                    <div class="stat-label">Stream State</div>
+                    <div
+                        class="stat-value"
+                        id="streamState">
+                        SIMULATION
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ======================================================
+         ENVELOPE
+         ====================================================== -->
+
+    <section class="panel" id="browserBearingPanel">
+
+        <div class="section-title">
+            <h2>Envelope Spectrum / Bearing Context (HTML extension)</h2>
+            <span>Uses Android analysis packet when available</span>
+        </div>
+
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-label">Envelope Peak</div>
+                <div class="stat-value">
+                    <span id="envFreq2">0.00</span>
+                    <span class="stat-unit">Hz</span>
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Bearing Code</div>
+                <div class="stat-value" id="bearingCode2">
+                    N/A
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">RPM</div>
+                <div class="stat-value" id="rpm2">
+                    1800
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Machine</div>
+                <div
+                    class="stat-value"
+                    id="machine2">
+                    DEMO-MOTOR-01
+                </div>
+            </div>
+
+        </div>
+
+        <div class="canvas-wrap">
+            <canvas id="envelopeCanvas"></canvas>
+        </div>
+
+    </section>
+
+
+    <!-- ======================================================
+         SENSOR MATRIX
+         ====================================================== -->
+
+    <section class="panel full" id="browserSensorMatrixPanel">
+
+        <div class="section-title">
+            <h2>Live Sensor Matrix (HTML extension)</h2>
+            <span>Most recent packet per sensor type</span>
+        </div>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                <tr>
+                    <th>Type</th>
+                    <th>Sensor</th>
+                    <th>X / V0</th>
+                    <th>Y / V1</th>
+                    <th>Z / V2</th>
+                    <th>Timestamp</th>
+                    <th>Packets</th>
+                </tr>
+
+                </thead>
+
+                <tbody id="sensorTableBody">
+
+                <tr>
+                    <td colspan="7" class="empty">
+                        Waiting for sensor packets
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ======================================================
+         DIAGNOSTIC LOG
+         ====================================================== -->
+
+    <section class="panel full" id="browserDiagnosticPanel">
+
+        <div class="section-title">
+
+            <h2>Diagnostic Log (HTML extension)</h2>
+
+            <button
+                onclick="clearLog()">
+                Clear
+            </button>
+
+        </div>
+
+        <div
+            id="log"
+            class="log">
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+"use strict";
+
+/* ============================================================
+   SENSORMAX BROWSER DASHBOARD
+
+   This file intentionally remains dependency-free.
+
+   It accepts the current Android packet families:
+
+   RAW:
+     {
+       "ts": ...,
+       "id": ...,
+       "v0": ...,
+       "v1": ...,
+       "v2": ...
+     }
+
+   ANALYSIS:
+     {
+       "kind": "analysis",
+       "ts": ...,
+       "machineId": ...,
+       "point": ...,
+       "sampleRateHz": ...,
+       "overallRmsAccelMs2": ...,
+       "overallRmsVelocityMmS": ...,
+       "overallRmsDisplacementUm": ...,
+       "dominantAxis": ...,
+       "dominantFreqHz": ...,
+       "envelopePeakFreqHz": ...,
+       "isoZone": ...,
+       "bearingMatch": ...
+     }
+
+   The browser never modifies AndroidApp.
+   ============================================================ */
+
+
+/* ============================================================
+   DOM
+   ============================================================ */
+
+const waveformCanvas =
+    document.getElementById("waveformCanvas");
+
+const spectrumCanvas =
+    document.getElementById("spectrumCanvas");
+
+const trendCanvas =
+    document.getElementById("trendCanvas");
+
+const frequencyTrendCanvas =
+    document.getElementById("frequencyTrendCanvas");
+
+const envelopeTrendCanvas =
+    document.getElementById("envelopeTrendCanvas");
+
+const envelopeCanvas =
+    document.getElementById("envelopeCanvas");
+
+const waveformCtx =
+    waveformCanvas.getContext("2d");
+
+const spectrumCtx =
+    spectrumCanvas.getContext("2d");
+
+const trendCtx =
+    trendCanvas.getContext("2d");
+
+const frequencyTrendCtx =
+    frequencyTrendCanvas.getContext("2d");
+
+const envelopeTrendCtx =
+    envelopeTrendCanvas.getContext("2d");
+
+const envelopeCtx =
+    envelopeCanvas.getContext("2d");
+
+
+/* ============================================================
+   RUNTIME STATE
+   ============================================================ */
+
+let ws = null;
+
+let simulationTimer = null;
+
+let recording = false;
+
+let simulationRunning = false;
+
+let sampleCounter = 0;
+
+let analysisCounter = 0;
+
+let lastPacketTimestamp = 0;
+
+let lastRateTimestamp = performance.now();
+
+let lastRateCount = 0;
+
+let browserRateHz = 0;
+
+let currentSensorType = 1;
+
+let currentSensorName = "Accelerometer";
+
+let currentMachineId = "DEMO-MOTOR-01";
+
+let currentPoint = "DE-BRG-X";
+
+let currentRPM = 1800;
+
+let latestAnalysis = null;
+
+let latestImpact = null;
+
+
+/* ============================================================
+   BUFFERS
+   ============================================================ */
+
+const MAX_WAVEFORM_POINTS = 600;
+
+const MAX_FFT_POINTS = 256;
+
+const MAX_TREND_POINTS = 300;
+const MAX_ANALYSIS_ROWS = 300;
+
+const MAX_ENVELOPE_POINTS = 128;
+
+const waveform = {
+    x: [],
+    y: [],
+    z: [],
+    rss: []
+};
+
+const timestamps = [];
+
+const trend = [];
+const frequencyTrend = [];
+const envelopeTrend = [];
+const importedAnalysisRows = [];
+const importedRawRows = [];
+const liveAnalysisRows = [];
+const liveRawRows = [];
+let analysisFileName = "";
+let rawFileName = "";
+let currentDataMode = "none";
+let impactEventsTotal = 0;
+let lastAutoRefreshAt = 0;
+
+const envelopeHistory = [];
+
+const sensorStates = {};
+
+
+/* ============================================================
+   RECORDING
+   ============================================================ */
+
+const rawRecording = [];
+
+const analysisRecording = [];
+
+
+/* ============================================================
+   SENSOR HELPERS
+   ============================================================ */
+
+function ensureSensorState(type) {
+
+    const key = String(type);
+
+    if (!sensorStates[key]) {
+
+        sensorStates[key] = {
+            type: type,
+            name: "",
+            x: null,
+            y: null,
+            z: null,
+            ts: null,
+            packets: 0
+        };
+    }
+
+    return sensorStates[key];
+}
+
+
+function nullableNumber(value) {
+
+    if (value === null || value === undefined) {
+        return null;
+    }
+
+    if (typeof value === "string" && value.trim() === "") {
+        return null;
+    }
+
+    const number = Number(value);
+
+    return Number.isFinite(number)
+        ? number
+        : null;
+}
+
+
+function formatMeasurementValue(value, digits = 3) {
+
+    const number = nullableNumber(value);
+
+    return number === null
+        ? "N/A"
+        : number.toFixed(digits);
+}
+
+
+function getRawValues(data) {
+
+    if (
+        data.v0 !== undefined ||
+        data.v1 !== undefined ||
+        data.v2 !== undefined
+    ) {
+        return [
+            nullableNumber(data.v0),
+            nullableNumber(data.v1),
+            nullableNumber(data.v2)
+        ];
+    }
+
+    return [
+        nullableNumber(data.x),
+        nullableNumber(data.y),
+        nullableNumber(data.z)
+    ];
+}
+
+function getSensorType(data) {
+
+    const declaredType = nullableNumber(data.sensorType);
+    if (declaredType !== null) {
+        return declaredType;
+    }
+
+    const legacyId = nullableNumber(data.id);
+    if (legacyId !== null) {
+        return legacyId;
+    }
+
+    const genericType = nullableNumber(data.type);
+    return genericType !== null ? genericType : 1;
+}
+
+function getSensorName(data) {
+
+    return (
+        data.sensor ||
+        data.sensorName ||
+        data.name ||
+        sensorNameFromType(getSensorType(data))
+    );
+}
+
+
+function sensorNameFromType(type) {
+
+    switch (Number(type)) {
+
+        case 1:
+            return "Accelerometer";
+
+        case 2:
+            return "Magnetometer";
+
+        case 4:
+            return "Gyroscope";
+
+        case 5:
+            return "Light Sensor";
+
+        case 8:
+            return "Proximity Sensor";
+
+        case 9:
+            return "Gravity Sensor";
+
+        case 10:
+            return "Linear Acceleration";
+
+        case 11:
+            return "Rotation Vector";
+
+        default:
+            return "Sensor " + type;
+    }
+}
+
+
+/* ============================================================
+   RAW PACKET HANDLING
+   ============================================================ */
+
+function handleRawPacket(data) {
+
+    const type = getSensorType(data);
+    const name = getSensorName(data);
+    const values = getRawValues(data);
+    const ts = nullableNumber(data.ts);
+
+    const x = values[0];
+    const y = values[1];
+    const z = values[2];
+    const rss = [x, y, z].every(value => Number.isFinite(value))
+        ? Math.sqrt(x * x + y * y + z * z)
+        : null;
+
+    const state = ensureSensorState(type);
+    state.name = name;
+    state.x = x;
+    state.y = y;
+    state.z = z;
+    state.ts = ts;
+    state.packets++;
+
+    sampleCounter++;
+    if (currentDataMode === "none") currentDataMode = ws ? "websocket" : (simulationRunning ? "simulation" : "websocket");
+    if (currentDataMode === "websocket" || currentDataMode === "simulation") {
+        document.getElementById("contextSource").textContent = currentDataMode === "simulation" ? "Browser simulation (synthetic)" : "Android SensorMax via WebSocket";
+        setSourceStatus("raw", currentDataMode === "simulation" ? "Browser simulation (synthetic)" : "Raw stream detected", "ok");
+        document.getElementById("noRecordsNotice").hidden = true;
+    }
+    document.getElementById("assetRawRows").textContent = sampleCounter.toLocaleString();
+    lastPacketTimestamp = ts === null ? 0 : ts;
+    currentSensorType = type;
+    currentSensorName = name;
+
+    // Raw packets can carry source identity without waiting for an analysis snapshot.
+    if (typeof data.machineId === "string" && data.machineId.trim()) {
+        currentMachineId = data.machineId;
+        document.getElementById("contextMachine").textContent = data.machineId;
+        document.getElementById("machine2").textContent = data.machineId;
+    }
+    if (typeof data.point === "string" && data.point.trim()) {
+        currentPoint = data.point;
+        document.getElementById("contextPoint").textContent = data.point;
+    }
+
+    if (type === 1 || /accelerometer/i.test(name)) {
+        waveform.x.push(x);
+        waveform.y.push(y);
+        waveform.z.push(z);
+        waveform.rss.push(rss);
+        if (ts !== null) {
+            timestamps.push(ts);
+            trimArray(timestamps, MAX_WAVEFORM_POINTS);
+        }
+
+        trimArray(waveform.x, MAX_WAVEFORM_POINTS);
+        trimArray(waveform.y, MAX_WAVEFORM_POINTS);
+        trimArray(waveform.z, MAX_WAVEFORM_POINTS);
+        trimArray(waveform.rss, MAX_WAVEFORM_POINTS);
+
+        document.getElementById("valueX").textContent = formatMeasurementValue(x, 3);
+        document.getElementById("valueY").textContent = formatMeasurementValue(y, 3);
+        document.getElementById("valueZ").textContent = formatMeasurementValue(z, 3);
+        document.getElementById("valueRSS").textContent = formatMeasurementValue(rss, 3);
+        document.getElementById("contextSensor").textContent = name;
+
+        // Chart/FFT rendering is throttled by the configured auto-refresh interval below.
+    }
+
+    const rawRowValues = (
+        data.v0 !== undefined || data.v1 !== undefined || data.v2 !== undefined
+    ) ? [data.v0, data.v1, data.v2, data.v3, data.v4, data.v5] : [data.x, data.y, data.z, null, null, null];
+    pushBounded(liveRawRows, {
+        Schema_Version: 2,
+        Sensor_Timestamp_ns: data.sensorTimestampNs ?? "",
+        Timestamp_ms: ts,
+        Machine_ID: data.machineId ?? currentMachineId,
+        Point: data.point ?? currentPoint,
+        Source_Kind: data.sourceKind ?? "",
+        Source_ID: data.sourceId ?? "",
+        Channel_ID: data.channelId ?? "",
+        Sensor_Type: type,
+        Sensor_Name: data.sensor ?? data.sensorName ?? data.name ?? name,
+        Unit: data.unit ?? "",
+        Val_0: nullableNumber(rawRowValues[0]), Val_1: nullableNumber(rawRowValues[1]), Val_2: nullableNumber(rawRowValues[2]),
+        Val_3: nullableNumber(rawRowValues[3]), Val_4: nullableNumber(rawRowValues[4]), Val_5: nullableNumber(rawRowValues[5])
+    }, MAX_WAVEFORM_POINTS);
+
+    if (recording) {
+        const rawSourceValues = (
+            data.v0 !== undefined || data.v1 !== undefined || data.v2 !== undefined
+        )
+            ? [data.v0, data.v1, data.v2, data.v3, data.v4, data.v5]
+            : [data.x, data.y, data.z, null, null, null];
+
+        rawRecording.push({
+            Schema_Version: 2,
+            Sensor_Timestamp_ns: data.sensorTimestampNs ?? "",
+            Timestamp_ms: ts,
+            Machine_ID: data.machineId ?? "",
+            Point: data.point ?? "",
+            Source_Kind: data.sourceKind ?? "",
+            Source_ID: data.sourceId ?? "",
+            Channel_ID: data.channelId ?? "",
+            Sensor_Type: type,
+            Sensor_Name: data.sensor ?? data.sensorName ?? data.name ?? "",
+            Unit: data.unit ?? "",
+            Val_0: nullableNumber(rawSourceValues[0]),
+            Val_1: nullableNumber(rawSourceValues[1]),
+            Val_2: nullableNumber(rawSourceValues[2]),
+            Val_3: nullableNumber(rawSourceValues[3]),
+            Val_4: nullableNumber(rawSourceValues[4]),
+            Val_5: nullableNumber(rawSourceValues[5])
+        });
+    }
+
+    updateSensorTable();
+    updateLiveRate();
+    updateAssetContextCounts();
+    if (currentDataMode === "websocket" || currentDataMode === "simulation") {
+        document.getElementById("noRecordsNotice").hidden = true;
+        document.getElementById("sourceStatusSummary").textContent = currentDataMode === "simulation" ? "Synthetic browser demo data" : "Live WebSocket packets received";
+        setSourceStatus("raw", currentDataMode === "simulation" ? "Browser simulation (synthetic)" : "Raw stream detected", currentDataMode === "simulation" ? "warn" : "ok");
+    }
+    updateStreamInformation();
+    syncDashboardVisibility();
+}
+
+/* ============================================================
+   ANALYSIS PACKET HANDLING
+   ============================================================ */
+
+function handleAnalysisPacket(data) {
+
+    if (currentDataMode === "none") currentDataMode = ws ? "websocket" : (simulationRunning ? "simulation" : "websocket");
+    latestAnalysis = data;
+
+    analysisCounter++;
+
+    const machine =
+        data.machineId ||
+        "UNSPECIFIED";
+
+    const point =
+        data.point ||
+        "UNSPECIFIED";
+
+    pushBounded(liveAnalysisRows, {
+        Timestamp_ms: nullableNumber(data.ts),
+        Machine_ID: machine,
+        Point: point,
+        Sample_Rate_Hz: nullableNumber(data.sampleRateHz),
+        RMS_X_ms2: nullableNumber(data.rmsXMs2 ?? data.rmsXAccelMs2),
+        RMS_Y_ms2: nullableNumber(data.rmsYMs2 ?? data.rmsYAccelMs2),
+        RMS_Z_ms2: nullableNumber(data.rmsZMs2 ?? data.rmsZAccelMs2),
+        Overall_RMS_Accel_ms2: nullableNumber(data.overallRmsAccelMs2),
+        Overall_RMS_Velocity_mms: nullableNumber(data.overallRmsVelocityMmS),
+        Overall_RMS_Displacement_um: nullableNumber(data.overallRmsDisplacementUm),
+        Dominant_Axis: data.dominantAxis || "",
+        Dominant_Freq_Hz: nullableNumber(data.dominantFreqHz),
+        Dominant_Accel_Amplitude_ms2: nullableNumber(data.dominantAccelAmplitudeMs2),
+        Envelope_Peak_Freq_Hz: nullableNumber(data.envelopePeakFreqHz),
+        ISO20816_Zone: data.isoZone || "",
+        Bearing_Match: data.bearingMatch || "",
+        RPM_Input: nullableNumber(data.rpmHint),
+        Impact_Event: data.impactEvent ?? false,
+        Snapshot_Triggered: data.snapshotTriggered ?? false
+    }, MAX_ANALYSIS_ROWS);
+
+    currentMachineId = machine;
+
+    currentPoint = point;
+
+    document.getElementById("contextMachine")
+        .textContent = machine;
+
+    document.getElementById("contextPoint")
+        .textContent = point;
+
+    document.getElementById("machine2")
+        .textContent = machine;
+
+    document.getElementById("contextRPM")
+        .textContent =
+        currentRPM.toFixed(0) + " RPM";
+
+    const sampleRate = nullableNumber(data.sampleRateHz);
+    const rmsAccel = nullableNumber(data.overallRmsAccelMs2);
+    const rmsVelocity = nullableNumber(data.overallRmsVelocityMmS);
+    const dominantFreq = nullableNumber(data.dominantFreqHz);
+    const envelopePeak = nullableNumber(data.envelopePeakFreqHz);
+
+    document.getElementById("sampleRate").textContent = formatMeasurementValue(sampleRate, 1);
+    document.getElementById("browserSampleRate").textContent = formatMeasurementValue(sampleRate, 1);
+    document.getElementById("overallRmsAccel").textContent = formatMeasurementValue(rmsAccel, 3);
+    document.getElementById("overallRmsVelocity").textContent = formatMeasurementValue(rmsVelocity, 3);
+    document.getElementById("dominantFreq").textContent = formatMeasurementValue(dominantFreq, 3);
+    document.getElementById("browserPeakFreq").textContent = formatMeasurementValue(dominantFreq, 2);
+
+    // Null markers create a visible gap instead of joining across missing trend samples.
+    trend.push(rmsVelocity);
+    frequencyTrend.push(dominantFreq);
+    envelopeTrend.push(envelopePeak);
+    trimArray(trend, MAX_TREND_POINTS);
+    trimArray(frequencyTrend, MAX_TREND_POINTS);
+    trimArray(envelopeTrend, MAX_TREND_POINTS);
+
+    document.getElementById("dominantAxis")
+        .textContent =
+        data.dominantAxis || "--";
+
+    document.getElementById("rpmInputSnapshot").textContent =
+        Number.isFinite(Number(data.rpmHint)) && Number(data.rpmHint) > 0
+            ? Number(data.rpmHint).toFixed(0)
+            : currentRPM.toFixed(0);
+    document.getElementById("overallRmsDisplacement").textContent =
+        formatMeasurementValue(data.overallRmsDisplacementUm, 2);
+
+    document.getElementById("envelopePeak").textContent = formatMeasurementValue(envelopePeak, 3);
+    document.getElementById("envFreq2").textContent = formatMeasurementValue(envelopePeak, 2);
+
+    const isoNode = document.getElementById("isoZone");
+    const isoText = String(data.isoZone || "--").trim().toUpperCase();
+    isoNode.textContent = isoText;
+    isoNode.classList.remove("status-good", "status-warn", "status-fail");
+    if (isoText.includes("A") && !isoText.includes("B")) isoNode.classList.add("status-good");
+    else if (isoText.includes("B")) isoNode.classList.add("status-warn");
+    else if (isoText.includes("C") || isoText.includes("D")) isoNode.classList.add("status-fail");
+
+    document.getElementById("bearingMatch")
+        .textContent =
+        data.bearingMatch || "--";
+
+    document.getElementById("bearingCode2")
+        .textContent =
+        data.bearingMatch || "N/A";
+
+    document.getElementById("analysisWindows")
+        .textContent =
+        analysisCounter;
+    document.getElementById("assetAnalysisRows").textContent = analysisCounter.toLocaleString();
+    document.getElementById("assetLatestSource").textContent =
+        currentDataMode === "csv" && analysisFileName
+            ? analysisFileName
+            : currentDataMode === "websocket" ? "Android via WebSocket" : "Browser simulation";
+
+    const impact = data.impactEvent ?? data.Impact_Event ?? false;
+    if (impact === true || impact === 1 || ["true", "1", "yes"].includes(String(impact).toLowerCase())) {
+        impactEventsTotal++;
+        document.getElementById("impactState").textContent = "IMPACT";
+    } else {
+        document.getElementById("impactState").textContent = "NONE";
+    }
+    document.getElementById("impactEvents").textContent = impactEventsTotal.toLocaleString();
+
+    document.getElementById("qualityOrigin")
+        .textContent =
+        "Android analysis packet";
+
+    document.getElementById("contextSource")
+        .textContent =
+        currentDataMode === "csv" && analysisFileName
+            ? "Imported analysis CSV: " + analysisFileName
+            : currentDataMode === "websocket"
+                ? "Android SensorMax via WebSocket"
+                : "Browser simulation (synthetic)";
+
+    setSourceStatus("analysis", currentDataMode === "csv" ? "Analysis stream detected · " + analysisFileName :
+        currentDataMode === "websocket" ? "Analysis stream detected" : "Synthetic analysis packet", currentDataMode === "simulation" ? "warn" : "ok");
+    document.getElementById("noRecordsNotice").hidden = true;
+    document.getElementById("sourceStatusSummary").textContent = currentDataMode === "simulation" ? "Synthetic browser demo data" : currentDataMode === "csv" ? "Analysis CSV imported" : "Live analysis packets received";
+
+    if (data.rpmHint !== undefined) {
+
+        const rpm =
+            Number(data.rpmHint);
+
+        if (Number.isFinite(rpm) && rpm > 0) {
+            currentRPM = rpm;
+        }
+    }
+
+    document.getElementById("rpmDisplay")
+        .textContent =
+        currentRPM.toFixed(0);
+
+    document.getElementById("rpm2")
+        .textContent =
+        currentRPM.toFixed(0);
+
+    updateRunningSpeedHints();
+
+    updateFaultHint();
+
+    if (recording) {
+
+        analysisRecording.push({
+            Timestamp_ms:
+                nullableNumber(data.ts),
+
+            Machine_ID:
+                machine,
+
+            Point:
+                point,
+
+            Sample_Rate_Hz:
+                nullableNumber(data.sampleRateHz),
+
+            RMS_Accel_ms2:
+                nullableNumber(data.overallRmsAccelMs2),
+
+            RMS_Velocity_mms:
+                nullableNumber(data.overallRmsVelocityMmS),
+
+            RMS_Displacement_um:
+                nullableNumber(data.overallRmsDisplacementUm),
+
+            Dominant_Axis:
+                data.dominantAxis || "",
+
+            Dominant_Freq_Hz:
+                nullableNumber(data.dominantFreqHz),
+
+            Envelope_Peak_Freq_Hz:
+                nullableNumber(data.envelopePeakFreqHz),
+
+            ISO_Zone:
+                data.isoZone || "",
+
+            Bearing_Match:
+                data.bearingMatch || ""
+        });
+    }
+
+    updateAssetContextCounts();
+    updateStreamInformation();
+    syncDashboardVisibility();
+}
+
+
+/* ============================================================
+   PACKET ROUTER
+   ============================================================ */
+
+function handlePacket(data) {
+
+    if (!data || typeof data !== "object") {
+        return;
+    }
+
+    if (data.kind === "analysis") {
+
+        handleAnalysisPacket(data);
+
+        return;
+    }
+
+    if (
+        data.v0 !== undefined ||
+        data.v1 !== undefined ||
+        data.v2 !== undefined ||
+        data.x !== undefined ||
+        data.y !== undefined ||
+        data.z !== undefined
+    ) {
+
+        handleRawPacket(data);
+
+        return;
+    }
+
+    /*
+     * Unknown packet:
+     * preserve visibility through diagnostic log.
+     */
+
+    log(
+        "Unknown packet received: " +
+        JSON.stringify(data),
+        "warn"
+    );
+}
+
+
+/* ============================================================
+   WEBSOCKET
+   ============================================================ */
+
+function toggleConnection() {
+
+    if (ws) {
+
+        ws.close();
+
+        ws = null;
+
+        setConnectionState(
+            "Simulation Mode",
+            "sim"
+        );
+
+        document.getElementById("connectButton")
+            .textContent =
+            "Connect WebSocket";
+
+        document.getElementById("streamState")
+            .textContent =
+            simulationRunning
+                ? "SIMULATION"
+                : "DISCONNECTED";
+
+        return;
+    }
+
+    try {
+
+        ws = new WebSocket(
+            "ws://localhost:8765"
+        );
+
+        document.getElementById("connectionText")
+            .textContent =
+            "Connecting to ws://localhost:8765";
+
+        ws.onopen = function () {
+
+            beginNewStreamMode("websocket");
+            setConnectionState(
+                "Live Stream Connected",
+                "connected"
+            );
+
+            document.getElementById("connectButton")
+                .textContent =
+                "Disconnect WebSocket";
+
+            document.getElementById("streamState")
+                .textContent =
+                "LIVE";
+
+            document.getElementById("contextSource")
+                .textContent =
+                "Android SensorMax via WebSocket";
+
+            log(
+                "WebSocket connected to localhost:8765",
+                "good"
+            );
+        };
+
+        ws.onmessage = function (event) {
+
+            try {
+
+                const data =
+                    JSON.parse(event.data);
+
+                handlePacket(data);
+
+            } catch (error) {
+
+                log(
+                    "Invalid JSON packet: " +
+                    error.message,
+                    "error"
+                );
+            }
+        };
+
+        ws.onerror = function () {
+
+            log(
+                "WebSocket error",
+                "error"
+            );
+        };
+
+        ws.onclose = function () {
+
+            ws = null;
+
+            setConnectionState(
+                simulationRunning
+                    ? "Simulation Mode"
+                    : "Disconnected",
+                simulationRunning
+                    ? "sim"
+                    : ""
+            );
+
+            document.getElementById("connectButton")
+                .textContent =
+                "Connect WebSocket";
+
+            document.getElementById("streamState")
+                .textContent =
+                simulationRunning
+                    ? "SIMULATION"
+                    : "DISCONNECTED";
+
+            log(
+                "WebSocket disconnected",
+                "warn"
+            );
+        };
+
+    } catch (error) {
+
+        ws = null;
+
+        log(
+            "Failed to create WebSocket: " +
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+function setConnectionState(text, mode) {
+
+    const badge =
+        document.getElementById(
+            "connectionBadge"
+        );
+
+    const connectionText =
+        document.getElementById(
+            "connectionText"
+        );
+
+    badge.className =
+        "badge " + (mode || "");
+
+    badge.textContent =
+        text;
+
+    connectionText.textContent =
+        text;
+}
+
+
+/* ============================================================
+   SIMULATION
+   ============================================================ */
+
+function toggleSimulation() {
+
+    if (simulationRunning) {
+
+        stopSimulation();
+
+    } else {
+
+        startSimulation();
+    }
+}
+
+
+function startSimulation() {
+
+    if (simulationTimer) {
+        return;
+    }
+
+    simulationRunning = true;
+    beginNewStreamMode("simulation");
+    document.getElementById("noRecordsNotice").hidden = true;
+    setSourceStatus("raw", "Browser simulation (synthetic)", "warn");
+
+    let t = 0;
+
+    simulationTimer =
+        setInterval(function () {
+
+            /*
+             * Demonstration machine:
+             * 1800 RPM = 30 Hz running speed.
+             *
+             * Add harmonics around 1X / 2X / 3X
+             * plus noise and a weak envelope-like component.
+             */
+
+            t += 0.02;
+
+            const fs = 50;
+
+            const dt = 1 / fs;
+
+            const ts =
+                Date.now();
+
+            const f1 =
+                currentRPM / 60.0;
+
+            const f2 =
+                f1 * 2.0;
+
+            const f3 =
+                f1 * 3.0;
+
+            const noise =
+                (Math.random() - 0.5) *
+                0.16;
+
+            const x =
+                0.55 *
+                Math.sin(
+                    2 * Math.PI *
+                    f1 *
+                    t
+                )
+                +
+                0.18 *
+                Math.sin(
+                    2 * Math.PI *
+                    f2 *
+                    t
+                )
+                +
+                noise;
+
+            const y =
+                9.81
+                +
+                0.35 *
+                Math.sin(
+                    2 * Math.PI *
+                    f1 *
+                    t +
+                    0.5
+                )
+                +
+                0.12 *
+                Math.sin(
+                    2 * Math.PI *
+                    f3 *
+                    t
+                )
+                +
+                noise;
+
+            const z =
+                0.28 *
+                Math.sin(
+                    2 * Math.PI *
+                    f1 *
+                    t +
+                    1.2
+                )
+                +
+                0.08 *
+                Math.sin(
+                    2 * Math.PI *
+                    f3 *
+                    t
+                )
+                +
+                noise;
+
+            const rawPacket = {
+                ts: ts,
+                id: 1,
+                sensorName: "Demo Accelerometer",
+                v0: x,
+                v1: y,
+                v2: z,
+                v3: 0,
+                v4: 0,
+                v5: 0
+            };
+
+            handlePacket(rawPacket);
+
+            /*
+             * Periodically generate an Android-shaped analysis packet.
+             */
+
+            if (sampleCounter % 25 === 0) {
+
+                const rmsAccel =
+                    Math.sqrt(
+                        (
+                            square(x) +
+                            square(y - 9.81) +
+                            square(z)
+                        ) / 3
+                    );
+
+                const velocity =
+                    rmsAccel * 0.95;
+
+                const analysisPacket = {
+
+                    kind: "analysis",
+
+                    ts: ts,
+
+                    machineId:
+                        document.getElementById(
+                            "machineInput"
+                        ).value ||
+                        "DEMO-MOTOR-01",
+
+                    point:
+                        document.getElementById(
+                            "pointInput"
+                        ).value ||
+                        "DE-BRG-X",
+
+                    sampleRateHz: fs,
+
+                    overallRmsAccelMs2:
+                        rmsAccel,
+
+                    overallRmsVelocityMmS:
+                        velocity,
+
+                    overallRmsDisplacementUm:
+                        velocity * 6.2,
+
+                    dominantAxis:
+                        "X",
+
+                    dominantFreqHz:
+                        f1,
+
+                    envelopePeakFreqHz:
+                        f1 * 3.02,
+
+                    isoZone:
+                        velocity < 2.8
+                            ? "ZONE A"
+                            : velocity < 4.5
+                                ? "ZONE B"
+                                : "ZONE C",
+
+                    bearingMatch:
+                        "NONE",
+
+                    rpmHint:
+                        currentRPM
+                };
+
+                handlePacket(
+                    analysisPacket
+                );
+            }
+
+        }, 20);
+
+    document.getElementById("simulationButton")
+        .textContent =
+        "Stop Simulation";
+
+    document.getElementById("streamState")
+        .textContent =
+        "SIMULATION";
+
+    setConnectionState(
+        "Simulation Mode",
+        "sim"
+    );
+
+    log(
+        "Browser simulation started",
+        "good"
+    );
+}
+
+
+function stopSimulation() {
+
+    if (simulationTimer) {
+
+        clearInterval(
+            simulationTimer
+        );
+
+        simulationTimer = null;
+    }
+
+    simulationRunning = false;
+
+    document.getElementById("simulationButton")
+        .textContent =
+        "Start Simulation";
+
+    if (!ws) {
+
+        setConnectionState(
+            "Disconnected",
+            ""
+        );
+
+        document.getElementById("streamState")
+            .textContent =
+            "DISCONNECTED";
+    }
+
+    log(
+        "Browser simulation stopped",
+        "info"
+    );
+}
+
+
+/* ============================================================
+   BROWSER FFT
+   ============================================================ */
+
+function computeAndDisplayBrowserFFT() {
+
+    const selection =
+        document.getElementById(
+            "spectrumSelect"
+        ).value;
+
+    let data;
+
+    if (selection === "X") {
+        data = waveform.x;
+    } else if (selection === "Y") {
+        data = waveform.y;
+    } else if (selection === "Z") {
+        data = waveform.z;
+    } else {
+        data = waveform.rss;
+    }
+
+    if (data.length < 8) {
+        document.getElementById("spectrumStatus").textContent = "Waiting for at least 8 samples";
+        document.getElementById("browserPeakFreq").textContent = "N/A";
+        document.getElementById("fftResolution").textContent = "N/A";
+        drawSpectrum([], 0);
+        return;
+    }
+
+    /*
+     * Choose the largest power-of-two window
+     * available, capped at 256.
+     */
+
+    let n = 1;
+
+    while (
+        n * 2 <= data.length &&
+        n * 2 <= MAX_FFT_POINTS
+    ) {
+        n *= 2;
+    }
+
+    if (n < 8) {
+        return;
+    }
+
+    const samples = data.slice(data.length - n);
+    if (!samples.every(value => typeof value === "number" && Number.isFinite(value))) {
+        document.getElementById("spectrumStatus").textContent = "Unavailable channel in selected sample window";
+        document.getElementById("browserPeakFreq").textContent = "N/A";
+        document.getElementById("fftResolution").textContent = "N/A";
+        drawSpectrum([], 0);
+        return;
+    }
+
+    document.getElementById("spectrumStatus").textContent = `Ready · ${n} consecutive valid samples`;
+    removeMean(samples);
+
+    applyHannWindow(samples);
+
+    const result =
+        simpleDFT(samples);
+
+    const fs =
+        estimateSampleRate();
+
+    if (fs <= 0) {
+        document.getElementById("spectrumStatus").textContent = "Unavailable sampling interval";
+        document.getElementById("browserPeakFreq").textContent = "N/A";
+        document.getElementById("fftResolution").textContent = "N/A";
+        drawSpectrum([], 0);
+        return;
+    }
+
+    const resolution =
+        fs / n;
+
+    let peakIndex = 1;
+
+    let peakMagnitude =
+        result[1] || 0;
+
+    for (
+        let i = 2;
+        i < result.length;
+        i++
+    ) {
+
+        if (
+            result[i] >
+            peakMagnitude
+        ) {
+
+            peakMagnitude =
+                result[i];
+
+            peakIndex =
+                i;
+        }
+    }
+
+    const peakFreq =
+        peakIndex *
+        resolution;
+
+    document.getElementById(
+        "browserPeakFreq"
+    ).textContent =
+        peakFreq.toFixed(2);
+
+    document.getElementById(
+        "fftResolution"
+    ).textContent =
+        resolution.toFixed(3);
+
+    drawSpectrum(
+        result,
+        resolution
+    );
+
+    updateRunningSpeedHints(
+        peakFreq
+    );
+}
+
+
+function simpleDFT(samples) {
+
+    /*
+     * Small dependency-free DFT implementation.
+     * Used only for the browser demo.
+     *
+     * The Android application remains the reference
+     * implementation for acquisition/analysis.
+     */
+
+    const n =
+        samples.length;
+
+    const half =
+        Math.floor(n / 2);
+
+    const magnitude =
+        new Array(half)
+            .fill(0);
+
+    for (
+        let k = 0;
+        k < half;
+        k++
+    ) {
+
+        let real = 0;
+
+        let imag = 0;
+
+        for (
+            let i = 0;
+            i < n;
+            i++
+        ) {
+
+            const angle =
+                2 *
+                Math.PI *
+                k *
+                i /
+                n;
+
+            real +=
+                samples[i] *
+                Math.cos(angle);
+
+            imag -=
+                samples[i] *
+                Math.sin(angle);
+        }
+
+        magnitude[k] =
+            Math.sqrt(
+                real * real +
+                imag * imag
+            ) / n;
+    }
+
+    return magnitude;
+}
+
+
+/* ============================================================
+   RUNNING SPEED
+   ============================================================ */
+
+function updateRunningSpeedHints(
+    peakFreqOverride = null
+) {
+
+    const rpm =
+        Number(
+            document.getElementById(
+                "rpmInput"
+            ).value
+        ) || 0;
+
+    currentRPM = rpm;
+
+    const f1 =
+        rpm / 60.0;
+
+    const f2 =
+        f1 * 2.0;
+
+    const f3 =
+        f1 * 3.0;
+
+    document.getElementById(
+        "rpmDisplay"
+    ).textContent =
+        rpm.toFixed(0);
+
+    document.getElementById(
+        "rpm2"
+    ).textContent =
+        rpm.toFixed(0);
+
+    document.getElementById(
+        "oneX"
+    ).textContent =
+        f1.toFixed(2);
+
+    document.getElementById(
+        "oneXHint"
+    ).textContent =
+        f1.toFixed(2);
+
+    document.getElementById(
+        "twoXHint"
+    ).textContent =
+        f2.toFixed(2);
+
+    document.getElementById(
+        "threeXHint"
+    ).textContent =
+        f3.toFixed(2);
+
+    document.getElementById(
+        "contextRPM"
+    ).textContent =
+        rpm.toFixed(0) +
+        " RPM";
+}
+
+
+/* ============================================================
+   FAULT HINT
+   ============================================================ */
+
+function updateFaultHint() {
+
+    const analysis =
+        latestAnalysis;
+
+    const hint =
+        document.getElementById(
+            "faultHint"
+        );
+
+    if (!analysis) {
+
+        hint.textContent =
+            "Waiting for vibration analysis";
+        document.getElementById("peakRatio").textContent = "--";
+        hint.className = "";
+        return;
+    }
+
+    const freq =
+        Number(
+            analysis.dominantFreqHz
+        );
+
+    const f1 =
+        currentRPM / 60.0;
+
+    if (
+        !Number.isFinite(freq) ||
+        f1 <= 0
+    ) {
+
+        hint.textContent =
+            "Insufficient RPM context for running-speed comparison.";
+        document.getElementById("peakRatio").textContent = "--";
+        return;
+    }
+
+    const ratio =
+        freq / f1;
+    document.getElementById("peakRatio").textContent = ratio.toFixed(2) + "X";
+
+    const distance1 =
+        Math.abs(ratio - 1);
+
+    const distance2 =
+        Math.abs(ratio - 2);
+
+    const distance3 =
+        Math.abs(ratio - 3);
+
+    if (distance1 < 0.08) {
+
+        hint.textContent =
+            "Dominant peak near 1X running speed";
+
+    } else if (distance2 < 0.08) {
+
+        hint.textContent =
+            "Dominant peak near 2X running speed";
+
+    } else if (distance3 < 0.08) {
+
+        hint.textContent =
+            "Dominant peak near 3X running speed";
+
+    } else {
+
+        hint.textContent =
+            "Dominant peak is non-synchronous with entered RPM";
+    }
+}
+
+
+/* ============================================================
+   QUALITY
+   ============================================================ */
+
+function updateBrowserQuality() {
+
+    const fs =
+        estimateSampleRate();
+
+    if (fs <= 0) {
+        return;
+    }
+
+    const requested =
+        50;
+
+    const ratio =
+        Math.min(
+            fs / requested,
+            1
+        );
+
+    let score =
+        Math.round(
+            ratio * 100
+        );
+
+    score =
+        clamp(
+            score,
+            0,
+            100
+        );
+
+    /*
+     * This is explicitly a browser-side visualization estimate.
+     * It is not the Android MeasurementQuality.score0to100.
+     */
+
+    document.getElementById(
+        "browserQuality"
+    ).textContent =
+        score.toString();
+
+    document.getElementById(
+        "qualityBar"
+    ).style.width =
+        score + "%";
+}
+
+
+/* ============================================================
+   RATE ESTIMATION
+   ============================================================ */
+
+function updateLiveRate() {
+
+    const now =
+        performance.now();
+
+    const dt =
+        (
+            now -
+            lastRateTimestamp
+        ) / 1000;
+
+    if (dt < 1.0) {
+        return;
+    }
+
+    browserRateHz =
+        (
+            sampleCounter -
+            lastRateCount
+        ) / dt;
+
+    if (Number.isFinite(browserRateHz)) {
+
+        document.getElementById(
+            "browserSampleRate"
+        ).textContent =
+            browserRateHz.toFixed(1);
+    }
+
+    document.getElementById(
+        "rawPackets"
+    ).textContent =
+        sampleCounter;
+
+    lastRateCount =
+        sampleCounter;
+
+    lastRateTimestamp =
+        now;
+}
+
+
+function estimateSampleRate() {
+
+    if (timestamps.length < 4) {
+        return browserRateHz;
+    }
+
+    let total = 0;
+
+    let count = 0;
+
+    for (
+        let i = 1;
+        i < timestamps.length;
+        i++
+    ) {
+
+        const dt =
+            Number(
+                timestamps[i]
+            ) -
+            Number(
+                timestamps[i - 1]
+            );
+
+        if (dt > 0) {
+
+            total += dt;
+
+            count++;
+        }
+    }
+
+    if (!count) {
+        return browserRateHz;
+    }
+
+    const meanMs =
+        total / count;
+
+    return meanMs > 0
+        ? 1000 / meanMs
+        : browserRateHz;
+}
+
+
+/* ============================================================
+   DRAWING
+   ============================================================ */
+
+function drawAll() {
+    drawWaveform();
+    drawTrend();
+    drawDominantFrequencyTrend();
+    drawEnvelopePeakTrend();
+    drawEnvelope();
+}
+
+
+function drawWaveform() {
+    resizeCanvas(waveformCanvas);
+    const ctx = waveformCtx;
+    const w = waveformCanvas.width;
+    const h = waveformCanvas.height;
+    clearCanvas(ctx, w, h);
+    drawGrid(ctx, w, h);
+
+    const axis = document.getElementById("axisSelect").value;
+    const count = getDisplayPoints();
+    const x = waveform.x.slice(-count);
+    const y = waveform.y.slice(-count);
+    const z = waveform.z.slice(-count);
+
+    if (axis === "TRIAXIAL") {
+        drawTriaxialSharedScale(ctx, [
+            { name: "X", data: x, color: "#f87171" },
+            { name: "Y", data: y, color: "#4ade80" },
+            { name: "Z", data: z, color: "#38bdf8" }
+        ], w, h);
+        drawZeroLine(ctx, w, h);
+        return;
+    }
+
+    const source = axis === "X" ? waveform.x : axis === "Y" ? waveform.y : axis === "Z" ? waveform.z : waveform.rss;
+    const data = source.slice(-count);
+    if (data.length < 2) return;
+    drawSeries(ctx, data, w, h, axisColor(axis));
+    drawZeroLine(ctx, w, h);
+}
+
+function getDisplayPoints() {
+    const input = document.getElementById("waveformPointsSelect");
+    const requested = input ? Number(input.value) : 300;
+    return clamp(Number.isFinite(requested) ? requested : 300, 100, MAX_WAVEFORM_POINTS);
+}
+
+function drawTriaxialSharedScale(ctx, series, w, h) {
+    const valid = series.flatMap(item => item.data).filter(value => typeof value === "number" && Number.isFinite(value));
+    if (valid.length < 2) {
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "12px sans-serif";
+        ctx.fillText("No raw SensorMax records loaded", 10, 20);
+        return;
+    }
+
+    // Shared min/max across X, Y and Z keeps their relative amplitudes comparable, as in the Python Plotly graph.
+    const min = Math.min(...valid);
+    const max = Math.max(...valid);
+    const span = Math.max(max - min, 0.001);
+    const xAt = (index, length) => index / Math.max(length - 1, 1) * w;
+    const yAt = value => h - ((value - min) / span) * (h * 0.82) - h * 0.09;
+
+    for (const item of series) {
+        ctx.strokeStyle = item.color;
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        let drawing = false;
+        item.data.forEach((value, index) => {
+            if (typeof value !== "number" || !Number.isFinite(value)) {
+                drawing = false;
+                return;
+            }
+            const xx = xAt(index, item.data.length);
+            const yy = yAt(value);
+            if (!drawing) { ctx.moveTo(xx, yy); drawing = true; }
+            else ctx.lineTo(xx, yy);
+        });
+        ctx.stroke();
+    }
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "11px sans-serif";
+    ctx.fillText(max.toPrecision(4), 5, 12);
+    ctx.fillText(min.toPrecision(4), 5, h - 5);
+    let lx = Math.max(42, w - 125);
+    for (const item of series) {
+        ctx.fillStyle = item.color;
+        ctx.fillRect(lx, 7, 10, 3);
+        ctx.fillText(item.name, lx + 14, 12);
+        lx += 42;
+    }
+}
+
+
+function drawSpectrum(
+    magnitude,
+    resolution
+) {
+
+    resizeCanvas(
+        spectrumCanvas
+    );
+
+    const ctx =
+        spectrumCtx;
+
+    const w =
+        spectrumCanvas.width;
+
+    const h =
+        spectrumCanvas.height;
+
+    clearCanvas(
+        ctx,
+        w,
+        h
+    );
+
+    drawGrid(
+        ctx,
+        w,
+        h
+    );
+
+    if (!magnitude || magnitude.length < 2) {
+        return;
+    }
+
+    const maxFreq =
+        Math.min(
+            120,
+            (magnitude.length - 1) *
+            resolution
+        );
+
+    const visibleCount =
+        Math.max(
+            2,
+            Math.floor(
+                maxFreq /
+                resolution
+            )
+        );
+
+    const values =
+        magnitude.slice(
+            0,
+            visibleCount
+        );
+
+    const maxVal =
+        Math.max(
+            ...values
+        );
+
+    if (!Number.isFinite(maxVal) || maxVal <= 0) {
+        return;
+    }
+
+    ctx.strokeStyle =
+        "#38bdf8";
+
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+
+    for (
+        let i = 0;
+        i < values.length;
+        i++
+    ) {
+
+        const freq =
+            i *
+            resolution;
+
+        const x =
+            (
+                freq /
+                maxFreq
+            ) * w;
+
+        const y =
+            h -
+            (
+                values[i] /
+                maxVal
+            ) *
+            (
+                h * 0.82
+            ) -
+            14;
+
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    }
+
+    ctx.stroke();
+
+    /*
+     * RPM markers
+     */
+
+    const rpm =
+        currentRPM;
+
+    if (rpm > 0) {
+
+        const f1 =
+            rpm / 60;
+
+        for (
+            let harmonic = 1;
+            harmonic <= 3;
+            harmonic++
+        ) {
+
+            const f =
+                f1 *
+                harmonic;
+
+            if (f > maxFreq) {
+                continue;
+            }
+
+            const x =
+                (
+                    f /
+                    maxFreq
+                ) * w;
+
+            ctx.strokeStyle =
+                harmonic === 1
+                    ? "#4ade80"
+                    : "#c084fc";
+
+            ctx.setLineDash(
+                [5, 4]
+            );
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                x,
+                0
+            );
+
+            ctx.lineTo(
+                x,
+                h
+            );
+
+            ctx.stroke();
+
+            ctx.setLineDash([]);
+
+            ctx.fillStyle =
+                "#cbd5e1";
+
+            ctx.font =
+                "11px sans-serif";
+
+            ctx.fillText(
+                harmonic + "X",
+                x + 4,
+                14
+            );
+        }
+    }
+
+    ctx.fillStyle =
+        "#94a3b8";
+
+    ctx.font =
+        "11px sans-serif";
+
+    ctx.fillText(
+        "0 Hz",
+        5,
+        h - 5
+    );
+
+    ctx.fillText(
+        maxFreq.toFixed(0) +
+        " Hz",
+        w - 50,
+        h - 5
+    );
+}
+
+
+function drawTrend() {
+    drawMetricTrend(trendCanvas, trendCtx, trend, "#4ade80", "mm/s", "Overall RMS Velocity", []);
+}
+
+function drawDominantFrequencyTrend() {
+    const rpm = Number(currentRPM) || 0;
+    const oneX = rpm > 0 ? rpm / 60 : 0;
+    const refs = oneX > 0 ? [
+        { value: oneX, label: "1X", color: "#4ade80" },
+        { value: 2 * oneX, label: "2X", color: "#c084fc" },
+        { value: 3 * oneX, label: "3X", color: "#facc15" }
+    ] : [];
+    drawMetricTrend(frequencyTrendCanvas, frequencyTrendCtx, frequencyTrend, "#38bdf8", "Hz", "Dominant frequency", refs);
+}
+
+function drawEnvelopePeakTrend() {
+    drawMetricTrend(envelopeTrendCanvas, envelopeTrendCtx, envelopeTrend, "#c084fc", "Hz", "Envelope peak frequency", []);
+}
+
+function drawMetricTrend(canvas, ctx, values, color, unit, label, referenceLines) {
+    resizeCanvas(canvas);
+    const w = canvas.width;
+    const h = canvas.height;
+    clearCanvas(ctx, w, h);
+    drawGrid(ctx, w, h);
+    const valid = values.filter(value => typeof value === "number" && Number.isFinite(value));
+    if (valid.length < 2) {
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "12px sans-serif";
+        ctx.fillText("Waiting for analysis CSV or analysis packets", 8, 20);
+        return;
+    }
+
+    const minValue = Math.min(0, ...valid, ...(referenceLines || []).map(item => item.value));
+    const maxValue = Math.max(0.1, ...valid, ...(referenceLines || []).map(item => item.value));
+    const span = Math.max(maxValue - minValue, 0.001);
+    const yAt = value => h - ((value - minValue) / span) * (h * 0.78) - 8;
+
+    for (const line of referenceLines || []) {
+        if (!Number.isFinite(line.value) || line.value < minValue || line.value > maxValue) continue;
+        ctx.strokeStyle = line.color;
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath();
+        ctx.moveTo(0, yAt(line.value));
+        ctx.lineTo(w, yAt(line.value));
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = line.color;
+        ctx.font = "10px sans-serif";
+        ctx.fillText(line.label, Math.max(4, w - 28), yAt(line.value) - 3);
+    }
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    let drawing = false;
+    values.forEach((value, index) => {
+        if (typeof value !== "number" || !Number.isFinite(value)) { drawing = false; return; }
+        const xx = index / Math.max(values.length - 1, 1) * w;
+        const yy = yAt(value);
+        if (!drawing) { ctx.moveTo(xx, yy); drawing = true; }
+        else ctx.lineTo(xx, yy);
+    });
+    ctx.stroke();
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "11px sans-serif";
+    ctx.fillText(label + " · max " + maxValue.toFixed(2) + " " + unit, 6, 13);
+    ctx.fillText("Oldest", 6, h - 4);
+    ctx.fillText("Latest", Math.max(6, w - 42), h - 4);
+}
+
+function drawEnvelope() {
+
+    resizeCanvas(
+        envelopeCanvas
+    );
+
+    const ctx =
+        envelopeCtx;
+
+    const w =
+        envelopeCanvas.width;
+
+    const h =
+        envelopeCanvas.height;
+
+    clearCanvas(
+        ctx,
+        w,
+        h
+    );
+
+    drawGrid(
+        ctx,
+        w,
+        h
+    );
+
+    const peak =
+        latestAnalysis
+            ? Number(
+                latestAnalysis
+                    .envelopePeakFreqHz
+            )
+            : 0;
+
+    if (
+        !Number.isFinite(peak) ||
+        peak <= 0
+    ) {
+        return;
+    }
+
+    const maxFreq =
+        Math.max(
+            peak * 2.5,
+            100
+        );
+
+    const x =
+        (
+            peak /
+            maxFreq
+        ) * w;
+
+    ctx.strokeStyle =
+        "#c084fc";
+
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x,
+        h
+    );
+
+    ctx.lineTo(
+        x,
+        20
+    );
+
+    ctx.stroke();
+
+    ctx.fillStyle =
+        "#c084fc";
+
+    ctx.font =
+        "12px sans-serif";
+
+    ctx.fillText(
+        "Envelope peak " +
+        peak.toFixed(2) +
+        " Hz",
+        8,
+        16
+    );
+
+    /*
+     * Draw expected bearing labels when an Android
+     * bearing code is available.
+     */
+
+    if (latestAnalysis) {
+
+        const code =
+            latestAnalysis.bearingMatch ||
+            "";
+
+        if (code) {
+
+            ctx.fillStyle =
+                "#f8fafc";
+
+            ctx.fillText(
+                "Match: " + code,
+                8,
+                34
+            );
+        }
+    }
+}
+
+
+function drawSeries(ctx, data, w, h, color) {
+
+    const valid = data.filter(value => typeof value === "number" && Number.isFinite(value));
+    if (valid.length < 2) {
+        return;
+    }
+    const min = Math.min(...valid);
+    const max = Math.max(...valid);
+    const center = (max + min) / 2;
+    const span = Math.max(max - min, 0.001);
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    let drawing = false;
+
+    for (let i = 0; i < data.length; i++) {
+        const value = data[i];
+        if (typeof value !== "number" || !Number.isFinite(value)) {
+            drawing = false;
+            continue;
+        }
+        const x = i / Math.max(data.length - 1, 1) * w;
+        const y = h / 2 - ((value - center) / span) * (h * 0.76);
+        if (!drawing) {
+            ctx.moveTo(x, y);
+            drawing = true;
+        } else {
+            ctx.lineTo(x, y);
+        }
+    }
+    ctx.stroke();
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "11px sans-serif";
+    ctx.fillText(max.toFixed(2), 6, 13);
+    ctx.fillText(min.toFixed(2), 6, h - 6);
+}
+
+function axisColor(axis) {
+
+    switch (axis) {
+
+        case "X":
+            return "#f87171";
+
+        case "Y":
+            return "#4ade80";
+
+        case "Z":
+            return "#38bdf8";
+
+        default:
+            return "#c084fc";
+    }
+}
+
+
+function drawGrid(
+    ctx,
+    w,
+    h
+) {
+
+    ctx.strokeStyle =
+        "#1e293b";
+
+    ctx.lineWidth = 1;
+
+    for (
+        let y = 0;
+        y < h;
+        y += 40
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            y
+        );
+
+        ctx.lineTo(
+            w,
+            y
+        );
+
+        ctx.stroke();
+    }
+
+    for (
+        let x = 0;
+        x < w;
+        x += 80
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            0
+        );
+
+        ctx.lineTo(
+            x,
+            h
+        );
+
+        ctx.stroke();
+    }
+}
+
+
+function drawZeroLine(
+    ctx,
+    w,
+    h
+) {
+
+    ctx.strokeStyle =
+        "#334155";
+
+    ctx.setLineDash(
+        [4, 4]
+    );
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        h / 2
+    );
+
+    ctx.lineTo(
+        w,
+        h / 2
+    );
+
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+}
+
+
+function clearCanvas(
+    ctx,
+    w,
+    h
+) {
+
+    ctx.fillStyle =
+        "#0f172a";
+
+    ctx.fillRect(
+        0,
+        0,
+        w,
+        h
+    );
+}
+
+
+function resizeCanvas(canvas) {
+
+    const ratio =
+        window.devicePixelRatio ||
+        1;
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+    const width =
+        Math.max(
+            1,
+            Math.floor(
+                rect.width * ratio
+            )
+        );
+
+    const height =
+        Math.max(
+            1,
+            Math.floor(
+                rect.height * ratio
+            )
+        );
+
+    if (
+        canvas.width !== width ||
+        canvas.height !== height
+    ) {
+
+        canvas.width =
+            width;
+
+        canvas.height =
+            height;
+    }
+}
+
+
+/* ============================================================
+   SENSOR TABLE
+   ============================================================ */
+
+function updateSensorTable() {
+
+    const body =
+        document.getElementById(
+            "sensorTableBody"
+        );
+
+    const rows =
+        Object.values(
+            sensorStates
+        );
+
+    if (!rows.length) {
+
+        body.innerHTML =
+            `<tr>
+                <td colspan="7" class="empty">
+                    Waiting for sensor packets
+                </td>
+            </tr>`;
+
+        return;
+    }
+
+    rows.sort(
+        (a, b) =>
+            Number(a.type) -
+            Number(b.type)
+    );
+
+    body.innerHTML =
+        rows.map(
+            state => {
+
+                return `
+                <tr>
+                    <td>${escapeHtml(state.type)}</td>
+                    <td>${escapeHtml(state.name)}</td>
+                    <td>${formatMeasurementValue(state.x, 4)}</td>
+                    <td>${formatMeasurementValue(state.y, 4)}</td>
+                    <td>${formatMeasurementValue(state.z, 4)}</td>
+                    <td>${escapeHtml(String(state.ts))}</td>
+                    <td>${state.packets}</td>
+                </tr>`;
+            }
+        ).join("");
+}
+
+
+/* ============================================================
+   RECORDING
+   ============================================================ */
+
+function toggleRecording() {
+
+    recording =
+        !recording;
+
+    const button =
+        document.getElementById(
+            "recordButton"
+        );
+
+    if (recording) {
+
+        button.textContent =
+            "Stop Browser Recording";
+
+        button.classList.add(
+            "active"
+        );
+
+        log(
+            "Browser-side recording started",
+            "good"
+        );
+
+    } else {
+
+        button.textContent =
+            "Start Browser Recording";
+
+        button.classList.remove(
+            "active"
+        );
+
+        log(
+            "Browser-side recording stopped",
+            "info"
+        );
+    }
+}
+
+
+function downloadRawCSV() {
+
+    if (!rawRecording.length) {
+
+        alert(
+            "No browser-recorded raw data yet."
+        );
+
+        return;
+    }
+
+    const headers = [
+        "Schema_Version",
+        "Sensor_Timestamp_ns",
+        "Timestamp_ms",
+        "Machine_ID",
+        "Point",
+        "Source_Kind",
+        "Source_ID",
+        "Channel_ID",
+        "Sensor_Type",
+        "Sensor_Name",
+        "Unit",
+        "Val_0",
+        "Val_1",
+        "Val_2",
+        "Val_3",
+        "Val_4",
+        "Val_5"
+    ];
+
+    const rows =
+        rawRecording.map(
+            row =>
+                headers.map(
+                    key =>
+                        csvEscape(
+                            row[key]
+                        )
+                ).join(",")
+        );
+
+    const csv =
+        [
+            headers.join(","),
+            ...rows
+        ].join("\n");
+
+    downloadText(
+        csv,
+        "SensorMax_browser_raw_" +
+        Date.now() +
+        ".csv"
+    );
+}
+
+
+function downloadAnalysisCSV() {
+
+    if (!analysisRecording.length) {
+
+        alert(
+            "No browser-recorded analysis data yet."
+        );
+
+        return;
+    }
+
+    const headers = [
+        "Timestamp_ms",
+        "Machine_ID",
+        "Point",
+        "Sample_Rate_Hz",
+        "RMS_Accel_ms2",
+        "RMS_Velocity_mms",
+        "RMS_Displacement_um",
+        "Dominant_Axis",
+        "Dominant_Freq_Hz",
+        "Envelope_Peak_Freq_Hz",
+        "ISO_Zone",
+        "Bearing_Match"
+    ];
+
+    const rows =
+        analysisRecording.map(
+            row =>
+                headers.map(
+                    key =>
+                        csvEscape(
+                            row[key]
+                        )
+                ).join(",")
+        );
+
+    const csv =
+        [
+            headers.join(","),
+            ...rows
+        ].join("\n");
+
+    downloadText(
+        csv,
+        "SensorMax_browser_analysis_" +
+        Date.now() +
+        ".csv"
+    );
+}
+
+
+function downloadText(
+    text,
+    filename
+) {
+
+    const blob =
+        new Blob(
+            [text],
+            {
+                type:
+                    "text/csv;charset=utf-8"
+            }
+        );
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+    link.href =
+        url;
+
+    link.download =
+        filename;
+
+    document.body.appendChild(
+        link
+    );
+
+    link.click();
+
+    link.remove();
+
+    URL.revokeObjectURL(
+        url
+    );
+}
+
+
+function csvEscape(value) {
+
+    const text =
+        String(
+            value ?? ""
+        );
+
+    if (
+        text.includes(",") ||
+        text.includes('"') ||
+        text.includes("\n")
+    ) {
+
+        return '"' +
+            text.replace(
+                /"/g,
+                '""'
+            ) +
+            '"';
+    }
+
+    return text;
+}
+
+
+/* ============================================================
+   DIAGNOSTIC LOG
+   ============================================================ */
+
+function log(
+    message,
+    level = "info"
+) {
+
+    const container =
+        document.getElementById(
+            "log"
+        );
+
+    const line =
+        document.createElement(
+            "div"
+        );
+
+    line.className =
+        "log-line log-" +
+        level;
+
+    line.textContent =
+        "[" +
+        new Date()
+            .toLocaleTimeString() +
+        "] " +
+        message;
+
+    container.appendChild(
+        line
+    );
+
+    while (
+        container.children.length >
+        250
+    ) {
+
+        container.removeChild(
+            container.firstChild
+        );
+    }
+
+    container.scrollTop =
+        container.scrollHeight;
+}
+
+
+function clearLog() {
+
+    document.getElementById(
+        "log"
+    ).innerHTML = "";
+}
+
+
+/* ============================================================
+   MATH / UTILS
+   ============================================================ */
+
+function trimArray(
+    array,
+    maxLength
+) {
+
+    while (
+        array.length >
+        maxLength
+    ) {
+
+        array.shift();
+    }
+}
+
+
+function removeMean(
+    array
+) {
+
+    const mean =
+        array.reduce(
+            (a, b) =>
+                a + b,
+            0
+        ) /
+        array.length;
+
+    for (
+        let i = 0;
+        i < array.length;
+        i++
+    ) {
+
+        array[i] -= mean;
+    }
+}
+
+
+function applyHannWindow(
+    array
+) {
+
+    const n =
+        array.length;
+
+    if (n <= 1) {
+        return;
+    }
+
+    for (
+        let i = 0;
+        i < n;
+        i++
+    ) {
+
+        const w =
+            0.5 *
+            (
+                1 -
+                Math.cos(
+                    2 *
+                    Math.PI *
+                    i /
+                    (n - 1)
+                )
+            );
+
+        array[i] *= w;
+    }
+}
+
+
+function square(
+    value
+) {
+
+    return value * value;
+}
+
+
+function clamp(
+    value,
+    min,
+    max
+) {
+
+    return Math.max(
+        min,
+        Math.min(
+            max,
+            value
+        )
+    );
+}
+
+
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+
+/* ============================================================
+   CSV IMPORT — browser equivalent of Python Imported_Records
+   ============================================================ */
+
+function beginNewStreamMode(mode) {
+    currentDataMode = mode;
+    importedAnalysisRows.length = 0;
+    importedRawRows.length = 0;
+    liveAnalysisRows.length = 0;
+    liveRawRows.length = 0;
+    analysisFileName = "";
+    rawFileName = "";
+    const analysisPicker = document.getElementById("analysisCsvInput");
+    const rawPicker = document.getElementById("rawCsvInput");
+    if (mode !== "csv") {
+        if (analysisPicker) analysisPicker.value = "";
+        if (rawPicker) rawPicker.value = "";
+    }
+    for (const key of Object.keys(sensorStates)) delete sensorStates[key];
+    waveform.x.length = 0; waveform.y.length = 0; waveform.z.length = 0; waveform.rss.length = 0;
+    timestamps.length = 0; trend.length = 0; frequencyTrend.length = 0; envelopeTrend.length = 0;
+    sampleCounter = 0; analysisCounter = 0; impactEventsTotal = 0; lastPacketTimestamp = 0;
+    latestAnalysis = null; latestImpact = null; browserRateHz = 0;
+    updateSourceStatusForFiles();
+    document.getElementById("sourceStatusSummary").textContent = mode === "simulation" ? "Synthetic browser demo data" : mode === "csv" ? "Loading selected CSV snapshot" : "Waiting for live SensorMax packets";
+    document.getElementById("contextSource").textContent = mode === "simulation" ? "Browser simulation (synthetic)" : mode === "csv" ? "Imported CSV file(s)" : "Android SensorMax via WebSocket";
+    document.getElementById("assetLatestSource").textContent = mode === "simulation" ? "Browser simulation (synthetic)" : mode === "csv" ? "Selected CSV file(s)" : "Android via WebSocket";
+    document.getElementById("overallRmsAccel").textContent = "--";
+    document.getElementById("overallRmsVelocity").textContent = "--";
+    document.getElementById("dominantFreq").textContent = "--";
+    document.getElementById("sampleRate").textContent = "--";
+    document.getElementById("overallRmsDisplacement").textContent = "--";
+    document.getElementById("envelopePeak").textContent = "--";
+    document.getElementById("dominantAxis").textContent = "--";
+    document.getElementById("isoZone").textContent = "--";
+    document.getElementById("bearingMatch").textContent = "--";
+    document.getElementById("impactEvents").textContent = "0";
+    document.querySelector(".layout").hidden = true;
+    document.getElementById("noRecordsNotice").hidden = false;
+    updateAssetContextCounts();
+    updateStreamInformation();
+    syncDashboardVisibility();
+}
+
+function parseCsvText(text) {
+    const clean = String(text || "").replace(/^\uFEFF/, "");
+    const rows = [];
+    let row = [], field = "", quoted = false;
+    for (let i = 0; i < clean.length; i++) {
+        const ch = clean[i];
+        if (quoted) {
+            if (ch === '"' && clean[i + 1] === '"') { field += '"'; i++; }
+            else if (ch === '"') quoted = false;
+            else field += ch;
+        } else if (ch === '"') quoted = true;
+        else if (ch === ',') { row.push(field); field = ""; }
+        else if (ch === '\n') {
+            row.push(field.replace(/\r$/, ""));
+            if (row.some(value => String(value).trim() !== "")) rows.push(row);
+            row = []; field = "";
+        } else field += ch;
+    }
+    if (field.length || row.length) {
+        row.push(field.replace(/\r$/, ""));
+        if (row.some(value => String(value).trim() !== "")) rows.push(row);
+    }
+    if (!rows.length) return [];
+    const headers = rows.shift().map((name, index) => index === 0 ? String(name).trim() : String(name).trim());
+    return rows.map(values => {
+        const record = {};
+        headers.forEach((header, index) => { record[header] = values[index] === undefined ? "" : values[index]; });
+        return record;
+    });
+}
+
+function csvValue(row, ...keys) {
+    for (const key of keys) {
+        if (Object.prototype.hasOwnProperty.call(row, key) && String(row[key] ?? "").trim() !== "") return row[key];
+    }
+    return null;
+}
+
+function csvNumber(row, ...keys) {
+    return nullableNumber(csvValue(row, ...keys));
+}
+
+function csvTruth(value) {
+    return value === true || value === 1 || ["true", "1", "yes"].includes(String(value ?? "").trim().toLowerCase());
+}
+
+function normalizeAnalysisCsvRow(row) {
+    return {
+        kind: "analysis",
+        ts: csvNumber(row, "Timestamp_ms", "timestamp_ms", "ts"),
+        machineId: csvValue(row, "Machine_ID", "machineId", "machine_id") || "UNSPECIFIED",
+        point: csvValue(row, "Point", "point") || "UNSPECIFIED",
+        sampleRateHz: csvNumber(row, "Sample_Rate_Hz", "sampleRateHz"),
+        rmsXMs2: csvNumber(row, "RMS_X_ms2"),
+        rmsYMs2: csvNumber(row, "RMS_Y_ms2"),
+        rmsZMs2: csvNumber(row, "RMS_Z_ms2"),
+        overallRmsAccelMs2: csvNumber(row, "Overall_RMS_Accel_ms2", "RMS_Accel_ms2", "overallRmsAccelMs2"),
+        overallRmsVelocityMmS: csvNumber(row, "Overall_RMS_Velocity_mms", "RMS_Velocity_mms", "overallRmsVelocityMmS"),
+        overallRmsDisplacementUm: csvNumber(row, "Overall_RMS_Displacement_um", "RMS_Displacement_um", "overallRmsDisplacementUm"),
+        dominantAxis: csvValue(row, "Dominant_Axis", "dominantAxis") || "--",
+        dominantFreqHz: csvNumber(row, "Dominant_Freq_Hz", "dominantFreqHz"),
+        dominantAccelAmplitudeMs2: csvNumber(row, "Dominant_Accel_Amplitude_ms2"),
+        envelopePeakFreqHz: csvNumber(row, "Envelope_Peak_Freq_Hz", "envelopePeakFreqHz"),
+        isoZone: csvValue(row, "ISO20816_Zone", "ISO_Zone", "isoZone") || "--",
+        bearingMatch: csvValue(row, "Bearing_Match", "bearingMatch") || "--",
+        rpmHint: csvNumber(row, "RPM_Input", "rpmHint"),
+        impactEvent: csvValue(row, "Impact_Event", "impactEvent"),
+        snapshotTriggered: csvValue(row, "Snapshot_Triggered", "snapshotTriggered"),
+        _csvOriginal: row
+    };
+}
+
+function normalizeRawCsvRow(row) {
+    const type = csvNumber(row, "Sensor_Type", "sensorType", "id", "type");
+    return {
+        ts: csvNumber(row, "Timestamp_ms", "timestamp_ms", "ts"),
+        sensorTimestampNs: csvValue(row, "Sensor_Timestamp_ns", "sensorTimestampNs") || "",
+        machineId: csvValue(row, "Machine_ID", "machineId", "machine_id") || "",
+        point: csvValue(row, "Point", "point") || "",
+        sourceKind: csvValue(row, "Source_Kind", "sourceKind") || "",
+        sourceId: csvValue(row, "Source_ID", "sourceId", "Sensor_ID") || "",
+        channelId: csvValue(row, "Channel_ID", "channelId") || "",
+        unit: csvValue(row, "Unit", "unit") || "",
+        id: type === null ? 1 : type,
+        sensorType: type === null ? 1 : type,
+        sensorName: csvValue(row, "Sensor_Name", "sensorName", "sensor", "name") || sensorNameFromType(type === null ? 1 : type),
+        v0: csvNumber(row, "Val_0", "Value_0", "Value_X", "v0", "x", "X"),
+        v1: csvNumber(row, "Val_1", "Value_1", "Value_Y", "v1", "y", "Y"),
+        v2: csvNumber(row, "Val_2", "Value_2", "Value_Z", "v2", "z", "Z"),
+        v3: csvNumber(row, "Val_3", "Value_3", "v3"),
+        v4: csvNumber(row, "Val_4", "Value_4", "v4"),
+        v5: csvNumber(row, "Val_5", "Value_5", "v5"),
+        _csvOriginal: row
+    };
+}
+
+async function loadCsvSelection(file, kind) {
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+        log("Please select a CSV file", "warn");
+        return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+        log("CSV import exceeds the 50 MB browser safety limit", "error");
+        return;
+    }
+    try {
+        const rows = parseCsvText(await file.text());
+        if (!rows.length) throw new Error("CSV has no data rows");
+        stopSimulation();
+        if (ws && ws.readyState <= WebSocket.OPEN) {
+            ws.close();
+            ws = null;
+        }
+        if (currentDataMode !== "csv") beginNewStreamMode("csv");
+        currentDataMode = "csv";
+        if (kind === "analysis") {
+            importedAnalysisRows.length = 0;
+            for (const row of rows) importedAnalysisRows.push(row);
+            analysisFileName = file.name;
+            renderImportedAnalysisRows(rows);
+            setSourceStatus("analysis", "Analysis stream detected · " + file.name, "ok");
+        } else {
+            importedRawRows.length = 0;
+            for (const row of rows) importedRawRows.push(row);
+            rawFileName = file.name;
+            renderImportedRawRows(rows);
+            setSourceStatus("raw", "Raw stream detected · " + file.name, "ok");
+        }
+        document.getElementById("noRecordsNotice").hidden = !(importedAnalysisRows.length || importedRawRows.length);
+        document.getElementById("sourceStatusSummary").textContent = "Imported CSV snapshot — choose the file again to reload changes";
+        document.getElementById("contextSource").textContent = "Imported CSV file(s)";
+        updateAssetContextCounts();
+        updateStreamInformation();
+        renderImportedTables();
+        log("Loaded " + rows.length.toLocaleString() + " " + kind + " CSV rows from " + file.name, "good");
+    } catch (error) {
+        log("CSV import failed: " + error.message, "error");
+        setSourceStatus(kind, "CSV load failed", "fail");
+    }
+}
+
+function renderImportedAnalysisRows(rows) {
+    const normalized = rows.map(normalizeAnalysisCsvRow);
+    if (!normalized.length) return;
+    const priorRecording = recording;
+    recording = false;
+    analysisCounter = normalized.length - 1;
+    const latest = normalized[normalized.length - 1];
+    currentRPM = latest.rpmHint !== null && latest.rpmHint > 0 ? latest.rpmHint : currentRPM;
+    document.getElementById("rpmInput").value = String(currentRPM);
+    handleAnalysisPacket(latest);
+    recording = priorRecording;
+    analysisCounter = normalized.length;
+    latestAnalysis = latest;
+
+    trend.splice(0, trend.length, ...normalized.slice(-MAX_TREND_POINTS).map(row => row.overallRmsVelocityMmS));
+    frequencyTrend.splice(0, frequencyTrend.length, ...normalized.slice(-MAX_TREND_POINTS).map(row => row.dominantFreqHz));
+    envelopeTrend.splice(0, envelopeTrend.length, ...normalized.slice(-MAX_TREND_POINTS).map(row => row.envelopePeakFreqHz));
+    impactEventsTotal = normalized.filter(row => csvTruth(row.impactEvent)).length;
+    document.getElementById("impactEvents").textContent = impactEventsTotal.toLocaleString();
+    document.getElementById("analysisWindows").textContent = analysisCounter.toLocaleString();
+    document.getElementById("assetAnalysisRows").textContent = analysisCounter.toLocaleString();
+    document.getElementById("assetLatestSource").textContent = analysisFileName;
+    document.getElementById("contextSource").textContent = "Imported analysis CSV: " + analysisFileName;
+    document.getElementById("sourceStatusSummary").textContent = "Analysis CSV imported";
+    document.querySelector(".layout").hidden = false;
+    updateSourceStatusForFiles();
+    updateStreamInformation();
+    drawAll();
+}
+
+function renderImportedRawRows(rows) {
+    const normalized = rows.map(normalizeRawCsvRow);
+    if (!normalized.length) return;
+    for (const key of Object.keys(sensorStates)) delete sensorStates[key];
+    waveform.x.length = 0; waveform.y.length = 0; waveform.z.length = 0; waveform.rss.length = 0; timestamps.length = 0;
+    const visible = normalized.slice(-MAX_WAVEFORM_POINTS);
+    for (const packet of normalized) {
+        const values = getRawValues(packet);
+        const rss = values.every(Number.isFinite) ? Math.sqrt(values[0] ** 2 + values[1] ** 2 + values[2] ** 2) : null;
+        const state = ensureSensorState(packet.sensorType);
+        state.name = packet.sensorName;
+        state.x = values[0]; state.y = values[1]; state.z = values[2]; state.ts = packet.ts;
+        state.packets++;
+    }
+    for (const packet of visible) {
+        const values = getRawValues(packet);
+        const rss = values.every(Number.isFinite) ? Math.sqrt(values[0] ** 2 + values[1] ** 2 + values[2] ** 2) : null;
+        waveform.x.push(values[0]); waveform.y.push(values[1]); waveform.z.push(values[2]); waveform.rss.push(rss);
+        if (packet.ts !== null) timestamps.push(packet.ts);
+    }
+    trimArray(timestamps, MAX_WAVEFORM_POINTS);
+    sampleCounter = normalized.length;
+    lastPacketTimestamp = normalized[normalized.length - 1].ts || 0;
+    const latest = normalized[normalized.length - 1];
+    currentSensorType = latest.sensorType;
+    currentSensorName = latest.sensorName;
+    currentMachineId = latest.machineId || currentMachineId;
+    currentPoint = latest.point || currentPoint;
+    document.getElementById("valueX").textContent = formatMeasurementValue(latest.v0, 3);
+    document.getElementById("valueY").textContent = formatMeasurementValue(latest.v1, 3);
+    document.getElementById("valueZ").textContent = formatMeasurementValue(latest.v2, 3);
+    document.getElementById("valueRSS").textContent = formatMeasurementValue([latest.v0, latest.v1, latest.v2].every(Number.isFinite) ? Math.sqrt(latest.v0 ** 2 + latest.v1 ** 2 + latest.v2 ** 2) : null, 3);
+    document.getElementById("contextMachine").textContent = currentMachineId;
+    document.getElementById("contextPoint").textContent = currentPoint;
+    document.getElementById("contextSensor").textContent = currentSensorName;
+    document.getElementById("machine2").textContent = currentMachineId;
+    document.getElementById("waveformSource").textContent = "Imported raw CSV: " + rawFileName;
+    document.getElementById("rawPackets").textContent = normalized.length.toLocaleString();
+    document.getElementById("browserSampleRate").textContent = formatMeasurementValue(estimateSampleRate(), 1);
+    document.getElementById("assetRawRows").textContent = normalized.length.toLocaleString();
+    document.getElementById("assetLatestSource").textContent = rawFileName;
+    document.getElementById("contextSource").textContent = "Imported raw CSV: " + rawFileName;
+    document.querySelector(".layout").hidden = false;
+    updateSensorTable();
+    computeAndDisplayBrowserFFT();
+    updateBrowserQuality();
+    drawAll();
+}
+
+function setSourceStatus(kind, text, mode = "") {
+    const element = document.getElementById(kind === "analysis" ? "analysisSourceDetail" : "rawSourceDetail");
+    const card = element?.closest(".source-status");
+    if (!element) return;
+    element.textContent = text;
+    if (card) card.className = "source-status " + mode;
+}
+
+function updateSourceStatusForFiles() {
+    setSourceStatus("analysis", analysisFileName ? "Analysis stream detected · " + analysisFileName : "No analysis stream", analysisFileName ? "ok" : "warn");
+    setSourceStatus("raw", rawFileName ? "Raw stream detected · " + rawFileName : "No raw stream", rawFileName ? "ok" : "warn");
+}
+
+function updateAssetContextCounts() {
+    const analysisCount = importedAnalysisRows.length || liveAnalysisRows.length || analysisCounter;
+    const rawCount = importedRawRows.length || liveRawRows.length || sampleCounter;
+    document.getElementById("assetAnalysisRows").textContent = analysisCount.toLocaleString();
+    document.getElementById("assetRawRows").textContent = rawCount.toLocaleString();
+    document.getElementById("analysisWindows").textContent = analysisCount.toLocaleString();
+    document.getElementById("rawPackets").textContent = rawCount.toLocaleString();
+}
+
+function updateStreamInformation() {
+    document.getElementById("streamAnalysisFile").textContent = analysisFileName || (liveAnalysisRows.length ? "Live analysis packets (browser memory)" : "NONE");
+    document.getElementById("streamRawFile").textContent = rawFileName || (liveRawRows.length ? "Live raw packets (browser memory)" : "NONE");
+    const files = [analysisFileName, rawFileName].filter(Boolean);
+    document.getElementById("streamImportDirectory").textContent = files.length
+        ? "User-selected local CSV file(s); browser cannot monitor Imported_Records automatically"
+        : "No files selected — choose CSV from LaptopSuite/Imported_Records";
+    const sourceRows = importedAnalysisRows.length ? importedAnalysisRows : importedRawRows.length ? importedRawRows : liveAnalysisRows.length ? liveAnalysisRows : liveRawRows;
+    let minTimestamp = Infinity, maxTimestamp = -Infinity, timestampCount = 0;
+    for (const row of sourceRows) {
+        const value = csvNumber(row, "Timestamp_ms", "timestamp_ms", "ts");
+        if (!Number.isFinite(value)) continue;
+        minTimestamp = Math.min(minTimestamp, value); maxTimestamp = Math.max(maxTimestamp, value); timestampCount++;
+    }
+    const durationSeconds = timestampCount > 1 ? Math.max(0, (maxTimestamp - minTimestamp) / 1000) : null;
+    document.getElementById("datasetDuration").textContent = durationSeconds === null ? "--" : durationSeconds.toFixed(2) + " s";
+}
+
+
+function syncDashboardVisibility() {
+    const hasAnalysis = Boolean(latestAnalysis) || importedAnalysisRows.length > 0 || liveAnalysisRows.length > 0;
+    const hasRaw = sampleCounter > 0 || importedRawRows.length > 0 || liveRawRows.length > 0;
+    const hasAny = hasAnalysis || hasRaw;
+    const layout = document.querySelector(".layout");
+    if (layout) layout.hidden = !hasAny;
+    document.getElementById("noRecordsNotice").hidden = hasAny;
+
+    const setHidden = (id, hidden) => { const node = document.getElementById(id); if (node) node.hidden = hidden; };
+    setHidden("analysisSnapshotPanel", !hasAnalysis);
+    setHidden("engineeringStatusPanel", !hasAnalysis);
+    setHidden("runningSpeedPanel", !hasAnalysis);
+    setHidden("rmsVelocityTrendPanel", !hasAnalysis);
+    setHidden("dominantFrequencyTrendPanel", !hasAnalysis);
+    setHidden("envelopePeakTrendPanel", !hasAnalysis);
+    setHidden("analysisTablePanel", !hasAnalysis || !document.getElementById("showAnalysisToggle").checked);
+    setHidden("rawWaveformPanel", !hasRaw);
+    setHidden("rawTablePanel", !hasRaw || !document.getElementById("showRawToggle").checked);
+    setHidden("browserFftPanel", !hasRaw);
+    setHidden("browserQualityPanel", !hasRaw);
+    setHidden("browserBearingPanel", !hasAnalysis && !hasRaw);
+    setHidden("browserSensorMatrixPanel", !hasRaw);
+    setHidden("browserDiagnosticPanel", !hasAny);
+}
+
+function pushBounded(target, value, limit) {
+    target.push(value);
+    trimArray(target, limit);
+}
+
+function renderImportedTables() {
+    const rawLimit = getDisplayPoints();
+    const analysisRows = importedAnalysisRows.length ? importedAnalysisRows : liveAnalysisRows;
+    const rawRows = importedRawRows.length ? importedRawRows : liveRawRows;
+    if (document.getElementById("showAnalysisToggle").checked) {
+        renderDataTable("analysisTableHost", analysisRows, 300, [
+            "Timestamp_ms", "Machine_ID", "Point", "Sample_Rate_Hz", "RMS_X_ms2", "RMS_Y_ms2", "RMS_Z_ms2",
+            "Overall_RMS_Accel_ms2", "Overall_RMS_Velocity_mms", "Overall_RMS_Displacement_um", "Dominant_Axis",
+            "Dominant_Freq_Hz", "Envelope_Peak_Freq_Hz", "ISO20816_Zone", "Bearing_Match", "RPM_Input",
+            "Impact_Event", "Snapshot_Triggered"
+        ]);
+    }
+    if (document.getElementById("showRawToggle").checked) {
+        renderDataTable("rawTableHost", rawRows, rawLimit);
+    }
+    syncDashboardVisibility();
+}
+
+function renderDataTable(hostId, rows, limit, preferredHeaders = null) {
+    const host = document.getElementById(hostId);
+    if (!host) return;
+    if (!rows.length) { host.innerHTML = '<div class="empty">No records available</div>'; return; }
+    const allHeaders = Object.keys(rows[0]);
+    const headers = Array.isArray(preferredHeaders)
+        ? preferredHeaders.filter(key => rows.some(row => Object.prototype.hasOwnProperty.call(row, key)))
+        : allHeaders;
+    const displayRows = rows.slice(-limit);
+    host.innerHTML = '<table><thead><tr>' + headers.map(key => '<th>' + escapeHtml(key) + '</th>').join("") + '</tr></thead><tbody>' +
+        displayRows.map(row => '<tr>' + headers.map(key => '<td title="' + escapeHtml(row[key] ?? "") + '">' + escapeHtml(row[key] ?? "") + '</td>').join("") + '</tr>').join("") +
+        '</tbody></table>';
+}
+
+/* ============================================================
+   UI INPUT EVENTS
+   ============================================================ */
+
+
+
+document.getElementById("analysisCsvInput").addEventListener("change", event => loadCsvSelection(event.target.files?.[0], "analysis"));
+document.getElementById("rawCsvInput").addEventListener("change", event => loadCsvSelection(event.target.files?.[0], "raw"));
+document.getElementById("showRawToggle").addEventListener("change", renderImportedTables);
+document.getElementById("showAnalysisToggle").addEventListener("change", renderImportedTables);
+document.getElementById("waveformPointsSelect").addEventListener("change", () => { renderImportedTables(); drawAll(); });
+document.getElementById("refreshIntervalSelect").addEventListener("change", () => { lastAutoRefreshAt = 0; log("Plot refresh interval set to " + document.getElementById("refreshIntervalSelect").value + " second(s)", "info"); });
+document.getElementById("autoRefreshCheck").addEventListener("change", event => log("Automatic plot refresh " + (event.target.checked ? "enabled" : "paused"), "info"));
+
+document.getElementById(
+    "rpmInput"
+).addEventListener(
+    "input",
+    function () {
+
+        currentRPM =
+            Number(
+                this.value
+            ) || 0;
+
+        updateRunningSpeedHints();
+
+        updateFaultHint();
+
+        drawAll();
+    }
+);
+
+
+document.getElementById(
+    "machineInput"
+).addEventListener(
+    "input",
+    function () {
+
+        currentMachineId =
+            this.value ||
+            "UNSPECIFIED";
+
+        document.getElementById(
+            "contextMachine"
+        ).textContent =
+            currentMachineId;
+
+        document.getElementById(
+            "machine2"
+        ).textContent =
+            currentMachineId;
+    }
+);
+
+
+document.getElementById(
+    "pointInput"
+).addEventListener(
+    "input",
+    function () {
+
+        currentPoint =
+            this.value ||
+            "UNSPECIFIED";
+
+        document.getElementById(
+            "contextPoint"
+        ).textContent =
+            currentPoint;
+    }
+);
+
+
+/* ============================================================
+   RESIZE
+   ============================================================ */
+
+window.addEventListener(
+    "resize",
+    function () {
+
+        drawAll();
+
+        computeAndDisplayBrowserFFT();
+    }
+);
+
+
+/* ============================================================
+   PERIODIC UI REFRESH
+   ============================================================ */
+
+setInterval(function () {
+    const enabled = document.getElementById("autoRefreshCheck")?.checked !== false;
+    const intervalMs = (Number(document.getElementById("refreshIntervalSelect")?.value) || 2) * 1000;
+    const now = Date.now();
+    if (enabled && now - lastAutoRefreshAt >= intervalMs) {
+        document.getElementById("lastTimestamp").textContent = lastPacketTimestamp
+            ? new Date(Number(lastPacketTimestamp)).toLocaleTimeString()
+            : "No samples received";
+        computeAndDisplayBrowserFFT();
+        updateBrowserQuality();
+        drawAll();
+        renderImportedTables();
+        lastAutoRefreshAt = now;
+    }
+}, 200);
+
+
+/* ============================================================
+   STARTUP
+   ============================================================ */
+
+document.getElementById(
+    "contextMachine"
+).textContent =
+    currentMachineId;
+
+document.getElementById(
+    "contextPoint"
+).textContent =
+    currentPoint;
+
+document.getElementById(
+    "machine2"
+).textContent =
+    currentMachineId;
+
+document.getElementById(
+    "rpmDisplay"
+).textContent =
+    currentRPM;
+
+document.getElementById(
+    "rpm2"
+).textContent =
+    currentRPM;
+
+document.getElementById(
+    "contextRPM"
+).textContent =
+    currentRPM +
+    " RPM";
+
+document.getElementById(
+    "rpmInput"
+).value =
+    currentRPM;
+
+updateRunningSpeedHints();
+updateStreamInformation();
+updateSourceStatusForFiles();
+setConnectionState("No records loaded", "");
+document.querySelector(".layout").hidden = true;
+document.getElementById("streamState").textContent = "NO DATA";
+document.getElementById("simulationButton").textContent = "Start Simulation";
+document.getElementById("noRecordsNotice").hidden = false;
+
+log(
+    "SensorMax browser dashboard initialized; no SensorMax records loaded",
+    "info"
+);
+log(
+    "Import *_raw.csv / *_analysis.csv or connect to the desktop gateway. Simulation is synthetic demo data.",
+    "warn"
+);
+
+drawAll();
+
+
+
+</script>
+
+</body>
+</html>

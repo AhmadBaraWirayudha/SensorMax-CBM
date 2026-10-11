@@ -61,6 +61,15 @@ if errorlevel 1 (
 
 echo [OK] Python found.
 python --version
+python -c "import sys; raise SystemExit(0 if sys.version_info[:2] == (3,13) else 1)"
+if errorlevel 1 (
+    echo [ERROR] SensorMax LaptopSuite is currently pinned to CPython 3.13.x.
+    echo         Install Python 3.13 and rerun this initializer.
+    echo         Other Python minor versions are not yet validated.
+    echo.
+    pause
+    exit /b 1
+)
 echo.
 
 
@@ -154,22 +163,22 @@ REM ============================================================
 REM 8. Install LaptopSuite dependencies
 REM ============================================================
 
-if not exist "%SUITE_DIR%LaptopSuite\requirements.txt" (
+if not exist "%SUITE_DIR%LaptopSuite\requirements-direct-pins-py313.txt" (
 
-    echo [ERROR] requirements.txt not found.
+    echo [ERROR] Python 3.13 direct-pinned requirements file not found.
     echo.
     echo Expected:
-    echo     %SUITE_DIR%LaptopSuite\requirements.txt
+    echo     %SUITE_DIR%LaptopSuite\requirements-direct-pins-py313.txt
     echo.
     call deactivate >nul 2>&1
     pause
     exit /b 1
 )
 
-echo [*] Installing SensorMax LaptopSuite dependencies...
+echo [*] Installing direct-pinned SensorMax LaptopSuite dependencies...
 echo.
 
-python -m pip install -r "%SUITE_DIR%LaptopSuite\requirements.txt"
+python -m pip install -r "%SUITE_DIR%LaptopSuite\requirements-direct-pins-py313.txt"
 
 if errorlevel 1 (
     echo.
@@ -180,8 +189,17 @@ if errorlevel 1 (
     exit /b 1
 )
 
+python -m pip check
+if errorlevel 1 (
+    echo.
+    echo [ERROR] Dependency conflicts were detected by pip check.
+    call deactivate >nul 2>&1
+    pause
+    exit /b 1
+)
+
 echo.
-echo [OK] SensorMax Python dependencies installed.
+echo [OK] Direct-pinned Python dependencies installed and consistent.
 echo.
 
 
@@ -220,8 +238,11 @@ if errorlevel 1 goto DEPENDENCY_FAIL
 python -c "import aiohttp; print('  aiohttp      : OK')"
 if errorlevel 1 goto DEPENDENCY_FAIL
 
+python "%SUITE_DIR%LaptopSuite\verify_environment.py" --check-pins
+if errorlevel 1 goto DEPENDENCY_FAIL
+
 echo ------------------------------------------------------------
-echo [OK] Critical dependencies verified.
+echo [OK] Critical imports and direct dependency pins verified.
 echo.
 
 
@@ -238,7 +259,8 @@ python -m py_compile ^
     "%SUITE_DIR%LaptopSuite\export_converter.py" ^
     "%SUITE_DIR%LaptopSuite\export_json.py" ^
     "%SUITE_DIR%LaptopSuite\batch_dataset_processor.py" ^
-    "%SUITE_DIR%LaptopSuite\test_all_pipelines.py"
+    "%SUITE_DIR%LaptopSuite\test_all_pipelines.py" ^
+    "%SUITE_DIR%LaptopSuite\cbm_live_dashboard.py"
 
 if errorlevel 1 (
     echo.
@@ -336,7 +358,7 @@ echo [ERROR] One or more critical Python dependencies could
 echo         not be imported.
 echo.
 echo Re-run this script after checking:
-echo     LaptopSuite\requirements.txt
+echo     LaptopSuite\requirements-direct-pins-py313.txt
 echo.
 
 call deactivate >nul 2>&1
