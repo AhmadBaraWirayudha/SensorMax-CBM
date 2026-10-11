@@ -1,397 +1,141 @@
-# SensorMax Research Suite
+# SensorResearchSuite
 
-A sensor acquisition, analysis, visualization, calibration, and condition-monitoring workspace built around the `SensorMax Research` Android application and the desktop `LaptopSuite`.
+SensorResearchSuite is a local engineering/research toolchain built around the SensorMax Android acquisition app, Python desktop tools, a WebSocket gateway, and a browser dashboard. It is not a hosted or multi-tenant SaaS.
 
-The project is intentionally split into two sides:
+> **Development-candidate status:** this is not yet a product-accepted release. Physical Android-device acceptance remain open. The current tests cover selected source, contract and fixture behaviors; they do not validate every workflow, hardware provider, or operating condition. Do not claim validated fault diagnosis based on this candidate alone.
 
-```text
-SensorMax AndroidApp
-        │
-        ├── local raw CSV logging
-        └── WebSocket streaming
-                │
-                ▼
-        LaptopSuite gateway (:8765)
-                │
-        ┌───────┼────────┬───────────────┐
-        ▼       ▼        ▼               ▼
-      Web HMI  Spectrum  Alarm       Offline tools
-                │        monitor
-                └────────┴───────────────┘
-```
+Use [`TUTORIAL.md`](TUTORIAL.md) for the operating procedure, [`CHANGELOG.md`](CHANGELOG.md) for documented changes, and [`ROADMAP.md`](ROADMAP.md) for outstanding acceptance work.
 
-> **Architecture rule:** `SensorResearchSuite/AndroidApp/` is treated as the acquisition producer and is not refactored by the desktop-suite work described here.
-
-## 1. Scope
-
-SensorMax supports:
-
-- raw multi-sensor acquisition;
-- real-time WebSocket streaming;
-- waveform and FFT visualization;
-- vibration analysis;
-- RMS / frequency / envelope features;
-- impact-event monitoring;
-- offline sensor characterization;
-- data-quality checking;
-- Excel and MATLAB export;
-- HTML reporting;
-- synthetic datasets for regression testing.
-
-Desktop tools use explicit measurement context:
-
-```text
-Machine_ID
-Point
-Sensor_Type
-Sensor_Name
-```
-
-The software does not use a specific phone model as the identity of the measured machine.
-
-## 2. Structure
+## Project layout
 
 ```text
 SensorResearchSuite/
-├── README.md
-├── TUTORIAL.md
-├── run_web_hmi.bat
-├── run_desktop_hmi.bat
-├── run_laptop_suite.sh
-├── first_initialize.bat
-├── import_and_process.bat
-│
-├── AndroidApp/
-│   └── app/src/main/
-│       └── ... Kotlin acquisition application ...
-│
-└── LaptopSuite/
-    ├── requirements.txt
-    ├── web_server.py
-    ├── web_dashboard.html
-    ├── sensor_studio.py
-    ├── live_spectrum_studio.py
-    ├── cli_explorer.py
-    ├── realtime_alarm_monitor.py
-    ├── data_analysis.py
-    ├── anomaly_detector.py
-    ├── digital_filters.py
-    ├── vibration_modal_analysis.py
-    ├── sensor_calibration.py
-    ├── generate_html_report.py
-    ├── matlab_exporter.py
-    ├── export_converter.py
-    ├── export_json.py
-    ├── batch_dataset_processor.py
-    ├── synthetic_sensor_generator.py
-    ├── test_all_pipelines.py
-    └── verify_suite_health.py
+├── AndroidApp/                    # Android Studio / Gradle / Kotlin app
+├── LaptopSuite/                   # Python gateway, analysis and export tools
+│   ├── web_server.py              # WebSocket gateway and CSV persistence
+│   ├── export_converter.py        # CSV-to-XLSX exporter
+│   ├── export_json.py             # JSON export
+│   ├── batch_dataset_processor.py
+│   ├── test_all_pipelines.py      # Desktop integration pipeline
+│   ├── verify_suite_health.py    # Bounded desktop health checks
+│   ├── requirements.txt           # Compatibility ranges, not a lockfile
+│   └── requirements-direct-pins-py313.txt
+├── web_dashboard.html             # Browser dashboard at project root
+├── sensormax_demo.html            # Standalone demo page
+├── first_initialize.bat           # Windows Python setup
+├── run_web_hmi.bat                # Gateway/dashboard launcher
+├── run_desktop_hmi.bat            # Desktop HMI wrapper
+├── run_laptop_suite.sh            # Bash launcher
+├── import_and_process.bat         # ADB import/offline processing workflow
+├── SECURITY.md                    # Security limitations and reporting guidance
+└── NETWORK_SECURITY_POLICY.md     # Required network operating policy
 ```
 
-## 3. AndroidApp
+The actual paths are authoritative. In particular, `web_dashboard.html` is in this project root, not inside `LaptopSuite/`.
 
-The Android application is responsible for sensor acquisition, local recording, analysis snapshots, and live streaming.
-
-### Current raw CSV schema
+## Architecture
 
 ```text
-Timestamp_ms,
-Machine_ID,
-Point,
-Sensor_Type,
-Sensor_Name,
-Val_0,
-Val_1,
-Val_2,
-Val_3,
-Val_4,
-Val_5
+SensorMax Android app
+       │ WebSocket packets (local development workflow)
+       ▼
+LaptopSuite/web_server.py ──► live raw/analysis CSV records
+       │
+       ├──► web_dashboard.html
+       └──► offline analysis and export tools
+                  ├── XLSX
+                  ├── JSON
+                  └── tool-specific outputs
 ```
 
-For the accelerometer path used by the desktop CBM tools:
+The desktop gateway defaults to `127.0.0.1:8765`. It currently uses plaintext `ws://` and has no client authentication. The Android app also contains a separate TCP/NDJSON acquisition path that is not protected by TLS. Network exposure is not a secure remote-access feature. Read `SECURITY.md` and `NETWORK_SECURITY_POLICY.md` before starting live acquisition; keep the current workflow local-only.
 
-```text
-Val_0 = X
-Val_1 = Y
-Val_2 = Z
-```
+## Requirements and setup
 
-### Current analysis fields
+### Desktop/web suite
 
-```text
-Timestamp_ms
-Machine_ID
-Point
-Sample_Rate_Hz
-RMS_X_ms2
-RMS_Y_ms2
-RMS_Z_ms2
-Overall_RMS_Accel_ms2
-Overall_RMS_Velocity_mms
-Overall_RMS_Displacement_um
-Dominant_Axis
-Dominant_Freq_Hz
-Dominant_Accel_Amplitude_ms2
-Envelope_Peak_Freq_Hz
-ISO20816_Zone
-Bearing_Match
-RPM_Input
-Impact_Event
-Snapshot_Triggered
-```
+- Configured runtime baseline: **CPython 3.13.x** for the current direct-pin profile.
+- `LaptopSuite/requirements.txt` contains compatibility ranges; it is **NOT a lockfile**.
+- `LaptopSuite/requirements-direct-pins-py313.txt` pins the nine direct dependencies, but does not lock the complete transitive dependency graph or its hashes.
+- A full transitive lock is still outstanding. A clean lock-based installation and a full end-to-end run have not been verified in the candidate package. Previous checks in the review environment reported missing `streamlit` and `pyserial` imports; installation should be revalidated on a clean supported machine.
 
-### Android storage
-
-Current master records are written under the application-facing external Documents area:
-
-```text
-SensorMax_Master_Logs/
-```
-
-Published copies are exposed under:
-
-```text
-Download/SensorMax_Master_Logs/
-```
-
-## 4. Desktop Transport
-
-The current desktop transport is one WebSocket gateway:
-
-```text
-ws://127.0.0.1:8765
-```
-
-The gateway receives raw and analysis packets, broadcasts them to desktop clients, and can log streams under `LaptopSuite/Imported_Records/`.
-
-The legacy UDP/port-5005 workflow is not part of the current architecture.
-
-## 5. Core Desktop Tools
-
-### `web_server.py`
-
-WebSocket gateway on `8765`.
-
-### `web_dashboard.html`
-
-Browser HMI with raw/analysis counters, X/Y/Z/RSS waveform, browser FFT, RMS/frequency/envelope trends, machine/point context, and recording/export functions.
-
-### `sensor_studio.py`
-
-Desktop real-time sensor inspection application.
-
-### `live_spectrum_studio.py`
-
-Live waveform and FFT viewer with timestamp-based sampling-rate estimation.
-
-### `cli_explorer.py`
-
-Interactive terminal explorer:
-
-```text
-load <file.csv>
-info
-stats
-plot x|y|z|rss
-fft x|y|z|rss
-analysis
-export <file.csv>
-clear
-help
-exit
-```
-
-### `realtime_alarm_monitor.py`
-
-Real-time condition/alarm monitor using the same WebSocket gateway.
-
-Default analysis thresholds:
-
-```text
-Warning: 2.0 m/s² RMS acceleration
-Alert  : 4.0 m/s² RMS acceleration
-```
-
-Alarm events are written to:
-
-```text
-LaptopSuite/alarm_events.csv
-```
-
-## 6. Offline Analysis
-
-### `data_analysis.py`
-
-Timing/jitter, X/Y/Z statistics, RSS, FFT, RPM/harmonics, and Android analysis-summary inspection.
-
-### `anomaly_detector.py`
-
-Checks timestamps, gaps, duplicate/backward times, outliers, clipping, and abrupt sample jumps. It does not assign an unsupported universal machine-health score.
-
-### `digital_filters.py`
-
-Derived-data filtering: `ema`, `ma`, `lowpass`, `highpass`, `bandpass`, `none`.
-
-Always preserve the original raw recording.
-
-### `vibration_modal_analysis.py`
-
-Spectral/modal screening and optional damping-ratio estimation. Results are screening estimates, not certified modal testing.
-
-### `sensor_calibration.py`
-
-Offline accelerometer/magnetometer characterization. Profiles are tied to the supplied dataset/device context and are not universal calibration values.
-
-## 7. Reporting and Export
-
-### `generate_html_report.py`
-
-Creates a self-contained report with available metadata, timing, waveform, FFT, trends, and engineering notes.
-
-### `matlab_exporter.py`
-
-Exports time, X/Y/Z, RMS calculations, waveform plots, and MATLAB FFT into a `.m` script.
-
-### `export_converter.py`
-
-Converts SensorMax records into structured Excel workbooks.
-
-### `export_json.py`
-
-Creates structured metadata/provenance JSON.
-
-### `batch_dataset_processor.py`
-
-Compares repeated trials using RMS, peak-to-peak, sample rate, dominant/envelope frequency, RPM, ISO metadata, bearing-match metadata, and impact/snapshot counts where available.
-
-## 8. Synthetic Testing
-
-`synthetic_sensor_generator.py` provides deterministic test fixtures:
-
-```text
-stationary
-walking
-running
-rotation_3d
-tremor
-machine_vibration
-```
-
-Example:
-
-```bat
-python LaptopSuite\synthetic_sensor_generator.py ^
-  --profile machine_vibration ^
-  --duration 30 ^
-  --rate 100 ^
-  --machine-id TEST-M01 ^
-  --point MOTOR-DE-01 ^
-  --seed 151101 ^
-  --output test_machine_vibration.csv
-```
-
-Synthetic data must never be represented as measured equipment data.
-
-## 9. Initialization and Health Check
-
-Initialize the desktop environment:
+On Windows, run from this project root:
 
 ```bat
 first_initialize.bat
 ```
 
-Run:
+The initializer creates `sensormax_env`, installs the direct-pinned profile, checks imports, and runs setup checks. For manual commands in a new Command Prompt, activate that environment first:
 
 ```bat
-sensormax_env\Scripts\python.exe LaptopSuite\verify_suite_health.py
+call sensormax_env\Scripts\activate.bat
+python LaptopSuite\verify_environment.py --check-pins
+python LaptopSuite\verify_suite_health.py --skip-integration
 ```
 
-Integration test:
+The `--skip-integration` option deliberately skips the full integration pipeline. Run it separately when dependencies and environment prerequisites are available:
 
 ```bat
 python LaptopSuite\test_all_pipelines.py
 ```
 
-## 10. Recommended Workflow
+On Linux/macOS, follow [`LaptopSuite/PYTHON_ENVIRONMENT.md`](LaptopSuite/PYTHON_ENVIRONMENT.md) and use the supported Python environment before running `bash run_laptop_suite.sh`.
 
-```text
-Initialize
-   ↓
-Connect Android
-   ↓
-Start gateway / Web HMI
-   ↓
-Acquire recording
-   ↓
-Preserve raw files
-   ↓
-Run data-quality checks
-   ↓
-Run offline analysis
-   ↓
-Compare repeated trials
-   ↓
-Generate HTML / Excel / JSON / MATLAB outputs
+Do not treat successful launcher startup or a bounded health check as evidence that every runtime dependency, hardware source, or measurement workflow has been validated.
+
+### Android app
+
+Open `AndroidApp/` in Android Studio. The project declares Gradle wrapper 8.6, Android Gradle Plugin 8.4.2, Kotlin Android plugin 2.1.20, compile/target SDK 34, min SDK 24, and Java/Kotlin JVM target 21. A clean Gradle build and JVM test run have not been demonstrated in the review environment; the declared versions are not proof of build success.
+
+## Verification commands
+
+Run from this project root using the intended virtual environment:
+
+```bash
+# Python syntax check
+python -m compileall -q LaptopSuite
+
+# Focused regression tests
+python -m unittest \
+  LaptopSuite.test_sprint3_measurement_contract \
+  LaptopSuite.test_sprint31_regressions \
+  LaptopSuite.test_sprint32_gateway_hardening \
+  LaptopSuite.test_sprint35_transport_policy \
+  LaptopSuite.test_python_environment \
+  LaptopSuite.test_sprint33_release_docs \
+  LaptopSuite.test_sprint3_integration_acceptance -v
+
+# Android source/resource checks
+python AndroidApp/tools/qa/resource_integrity_check.py
+python AndroidApp/tools/qa/source_integrity_check.py
+
+# Bounded health check; this does not replace the integration pipeline
+python LaptopSuite/verify_suite_health.py --skip-integration
+
+# Full desktop pipeline
+python LaptopSuite/test_all_pipelines.py
 ```
 
-## 11. Data Integrity
+Interpret results honestly: a blocked package download, missing dependency, unavailable Android SDK/device, skipped test, or `--skip-integration` run is not a full pass. Record verified environment details and test output rather than assuming successful validation.
 
-Maintain this distinction:
+## Measurement and demo-data cautions
 
-```text
-RAW      → immutable source recording
-DERIVED  → filtered / transformed data
-ANALYSIS → calculated features
-REPORT   → presentation
-```
+- Keep unavailable sensor channels distinct from a measured zero.
+- Preserve sensor identity, source/channel identifiers, timestamps, units, and schema/version context through gateway and export paths.
+- Preserve original raw files. Filtering and normalization should write derived files rather than overwrite source data.
+- Synthetic generator outputs and browser-demo values are for development/testing, not evidence of measurement accuracy.
+- Tools under `LaptopSuite/WIP/` are experimental and have not been product-validated.
+- Treat spectrum/fault labels, alarms, RMS thresholds, ISO metadata, and bearing-match outputs as analysis aids, not validated diagnoses or maintenance prescriptions.
 
-Do not overwrite raw files with filtered or normalized output.
+## Security, privacy, and licensing
 
-Retain `Machine_ID`, `Point`, `Sensor_Type`, `Sensor_Name`, and `Timestamp_ms` whenever possible.
+- Use local-only workflow unless a reviewed and explicitly approved network model exists.
+- The current plaintext unauthenticated WebSocket gateway and the TCP/NDJSON path without TLS must not be exposed to an untrusted network or the public Internet.
+- Store real measurement data and logs locally; review and sanitize records and screenshots before sharing.
+- Keep `.env` files, credentials, private keys, local SDK paths, generated outputs, caches, build artifacts, and machine-specific workspace state out of source control and release packages.
+- The supplied candidate ZIP had no Git history, so historical-secret review and full commit-history review are unverified.
+- No project `LICENSE` file was present in the reviewed candidate. No license or permission to redistribute third-party reference material is asserted here. Resolve project licensing and third-party provenance before public distribution.
 
-## 12. Engineering Boundaries
+## Project status and release gate
 
-SensorMax uses smartphone sensors for research and engineering experimentation.
-
-An FFT peak is a spectral observation, not automatically a fault diagnosis. An envelope peak is an indicator requiring machine context. An ISO 20816 zone field is treated as advisory metadata in this suite. Alarm thresholds are configurable monitoring rules, not universal acceptance limits for every machine.
-
-Use machine-specific limits, reference measurements, and appropriate instrumentation when results are required for formal maintenance, acceptance, certification, or safety decisions.
-
-## 13. Android Boundary
-
-Desktop modernization should normally occur under:
-
-```text
-SensorResearchSuite/LaptopSuite/
-```
-
-and in project-level launch/import scripts.
-
-Avoid casual edits under:
-
-```text
-SensorResearchSuite/AndroidApp/app/src/main/
-```
-
-The Android application remains the acquisition producer.
-
-## 14. Quick Commands
-
-```bat
-first_initialize.bat
-run_web_hmi.bat
-python LaptopSuite\web_server.py
-python LaptopSuite\cli_explorer.py
-python LaptopSuite\realtime_alarm_monitor.py
-python LaptopSuite\data_analysis.py recording.csv
-python LaptopSuite\sensor_calibration.py recording.csv
-python LaptopSuite\synthetic_sensor_generator.py --profile machine_vibration
-python LaptopSuite\test_all_pipelines.py
-python LaptopSuite\verify_suite_health.py
-```
-
-See [`TUTORIAL.md`](TUTORIAL.md) for the end-to-end operating procedure.
-
-## 15. License
-
-See `LICENSE`.
+This repository is a development candidate, not a production release. Clean buildability, replay of a real Android-generated capture through the data contract, locale validation, full desktop integration, transport security, dependency locking, package provenance, backups/recovery, and physical Android-device acceptance remain open. See [`ROADMAP.md`](ROADMAP.md) for the proposed release work sequence and [`CHANGELOG.md`](CHANGELOG.md) for documented changes.

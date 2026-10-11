@@ -1,6 +1,6 @@
 # SensorMax Research Suite Tutorial
 
-Practical operating guide for the current SensorMax architecture.
+Practical operating guide for the current SensorMax development candidate. Run commands from the repository root, the directory containing `first_initialize.bat` and `LaptopSuite/`.
 
 Assumptions:
 
@@ -8,7 +8,9 @@ Assumptions:
 - the Android application is already built or installable;
 - `AndroidApp` remains unchanged;
 - desktop communication uses WebSocket `8765`;
-- raw Android data follows the current SensorMax CSV schema.
+- raw Android data follows the current SensorMax CSV schema;
+- CPython 3.13.x is the configured desktop runtime for the supplied direct-pin profile;
+- the current network gateway is plaintext and unauthenticated, so the supported operating posture is local-only.
 
 ## 1. Understand the Data Flow
 
@@ -40,22 +42,33 @@ HTML / Excel / JSON / MATLAB
 
 ## 2. First-Time Installation
 
-Open Command Prompt in the project root:
+Open Command Prompt and enter the repository root (adjust the path to your clone or extraction location):
 
 ```bat
-cd /d C:\path\to\Sensor-Acquistion-main\SensorResearchSuite
+cd /d C:\path\to\your\SensorResearchSuite-checkout
+python --version
 ```
 
-Run:
+Use CPython 3.13.x for the supplied direct-pin profile. The current initializer rejects other Python minor versions. Then run:
 
 ```bat
 first_initialize.bat
 ```
 
-Then verify:
+The initializer creates `sensormax_env`, installs `LaptopSuite\requirements-direct-pins-py313.txt`, checks dependencies and runs bounded setup checks. It does not prove the Android app builds or that all device/integration workflows pass.
+
+For subsequent manual Python commands in each new Command Prompt, activate the environment first:
 
 ```bat
-sensormax_env\Scripts\python.exe LaptopSuite\verify_suite_health.py
+call sensormax_env\Scripts\activate.bat
+python LaptopSuite\verify_environment.py --check-pins
+python LaptopSuite\verify_suite_health.py --skip-integration
+```
+
+Run the full desktop pipeline separately when its prerequisites are available:
+
+```bat
+python LaptopSuite\test_all_pipelines.py
 ```
 
 ## 3. Connect the Android Device
@@ -97,6 +110,8 @@ The browser dashboard uses:
 ```text
 ws://127.0.0.1:8765
 ```
+
+This is plaintext WebSocket transport without client authentication. Use it only in the local development workflow. Do not enable insecure LAN mode or expose this gateway to an untrusted network or the Internet. Read [`NETWORK_SECURITY_POLICY.md`](NETWORK_SECURITY_POLICY.md) before enabling any network listener.
 
 ## 5. Start a Measurement
 
@@ -142,7 +157,7 @@ Val_2 = Z
 Example:
 
 ```text
-1720000000000,PUMP-01,DE-BEARING,1,Accelerometer,0.12,0.35,9.74,,,,
+1720000000000,PUMP-01,DE-BEARING,1,Accelerometer,0.12,0.35,9.74,,,
 ```
 
 ## 7. Understand Analysis Data
@@ -610,8 +625,12 @@ Run:
 
 ```bat
 first_initialize.bat
-python LaptopSuite\verify_suite_health.py
+python LaptopSuite\verify_environment.py --check-pins
+python LaptopSuite\verify_suite_health.py --skip-integration
+python LaptopSuite\test_all_pipelines.py
 ```
+
+Treat each result separately: `--skip-integration` skips the full pipeline, and a test blocked by missing packages, network access, Android SDK access, or an attached device is not a pass.
 
 ## 31. Development Boundary
 
@@ -649,3 +668,39 @@ REPORT
 ```
 
 Keep the acquisition record, derived calculations, and engineering interpretation traceable as separate layers.
+
+
+## 33. Safe Handling of Records and Reports
+
+- Preserve original raw CSV files. Write filtered, normalized, and analysis outputs to separate files.
+- Synthetic generator output and browser demo values are test data; label them as synthetic and never present them as equipment measurements.
+- Before sharing data, inspect machine IDs, asset names, site/location metadata, operator identifiers, timestamps, and any embedded paths. Keep real records under `LaptopSuite/Imported_Records/` and exports under `LaptopSuite/Exported_Analysis/` local to the machine.
+- Do not commit `.env` files, credentials, signing keys, SDK paths, IDE state, caches, APK build intermediates, private measurements, or generated logs.
+- Before a public release, review the project and third-party licenses. The current candidate does not include a project `LICENSE` file and does not assert redistribution rights for retained adapted experiment descriptors.
+
+## 34. Network and Release Limits
+
+The WebSocket gateway uses `ws://` by default and does not authenticate clients. The Android TCP/NDJSON path also lacks TLS/authentication. `usesCleartextTraffic=false` does not secure raw `Socket`/`ServerSocket` code. A private IP, firewall, ADB reverse forwarding, or browser-origin check is not a replacement for authenticated, encrypted transport.
+
+Current status remains **NO-GO for production use, public Internet exposure, or untrusted-network operation**. Remote access needs a designed TLS/WSS deployment, client authentication and authorization, safe certificate/key handling, logging and rate limits, plus integration and physical-device verification. See `NETWORK_SECURITY_POLICY.md` and `SECURITY.md` from the inner workspace.
+
+## 35. Troubleshooting Evidence
+
+When reporting a failure, record:
+
+- operating system and Python version;
+- command executed and exit status;
+- whether the intended `sensormax_env` environment was active;
+- relevant redacted traceback or test output;
+- Android model/API level and connection method when device-related;
+- whether a check was skipped or blocked by an unavailable dependency, network, SDK, or device.
+
+Remove secrets and real measurement data from logs before sharing them. Do not label a skipped or blocked check as passed.
+
+## 36. Related Project Documents
+
+- [README / architecture overview](README.md)
+- [Changelog](CHANGELOG.md)
+- [Roadmap](ROADMAP.md)
+- [Security notes](SECURITY.md)
+- [Network security policy](NETWORK_SECURITY_POLICY.md)
